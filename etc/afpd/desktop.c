@@ -14,10 +14,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
-
 #include <errno.h>
-
-#include <atalk/adouble.h>
 #include <sys/uio.h>
 #include <sys/param.h>
 #include <sys/socket.h>
@@ -33,6 +30,7 @@
 #include <atalk/bstrlib.h>
 #include <atalk/bstradd.h>
 #include <atalk/errchk.h>
+#include <atalk/adouble.h>
 
 #include "volume.h"
 #include "directory.h"
