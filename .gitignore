@@ -31,3 +31,5 @@ autoscan.log
 **/.DS_Store
 *.xml
 *.iml
+ylwrap
+test-driver
