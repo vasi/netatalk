@@ -15,7 +15,6 @@ EXTRA_DIST = \
 	cnid_metad.8.xml \
 	netatalk.8.xml
 
-if HAVE_XSLTPROC
 CLEANFILES += $(MAN_MANPAGES)
 
 %.8 : %.8.xml
@@ -23,4 +22,3 @@ CLEANFILES += $(MAN_MANPAGES)
 	@cp $@ $(top_builddir)/man/man8/$@.in
 
 html-local: $(MAN_MANPAGES) $(MAN_STYLESHEET)
-endif

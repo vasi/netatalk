@@ -15,7 +15,6 @@ EXTRA_DIST = \
 	afp.conf.5.xml \
 	extmap.conf.5.xml
 
-if HAVE_XSLTPROC
 CLEANFILES += $(MAN_MANPAGES)
 
 %.5 : %.5.xml
@@ -23,4 +22,3 @@ CLEANFILES += $(MAN_MANPAGES)
 	@cp $@ $(top_builddir)/man/man5/$@.in
 
 html-local: $(MAN_MANPAGES) $(MAN_STYLESHEET)
-endif
