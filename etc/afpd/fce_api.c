@@ -397,7 +397,7 @@ static void send_fce_event(const AFPObj *obj, int event, const char *path, const
             udp_entry->next_try_on_error = 0;
 
             /* Okay, we have a running socket again, send server that we had a problem on our side*/
-            data_len = build_fce_packet(obj, iobuf, FCE_CONN_BROKEN, "", NULL, getpid(), user, 0);
+            data_len = build_fce_packet(obj, (char *)iobuf, FCE_CONN_BROKEN, "", NULL, getpid(), user, 0);
 
             sendto(udp_entry->sock,
                    iobuf,
@@ -408,7 +408,7 @@ static void send_fce_event(const AFPObj *obj, int event, const char *path, const
         }
 
         /* build our data packet */
-        data_len = build_fce_packet(obj, iobuf, event, path, oldpath, getpid(), user, event_id);
+        data_len = build_fce_packet(obj, (char *)iobuf, event, path, oldpath, getpid(), user, event_id);
 
         sent_data = sendto(udp_entry->sock,
                            iobuf,
