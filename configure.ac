@@ -14,6 +14,7 @@ AC_CANONICAL_HOST
 
 AM_INIT_AUTOMAKE
 AM_MAINTAINER_MODE([enable])
+AM_SILENT_RULES([yes])
 
 dnl Checks for programs.
 AC_PROG_AWK

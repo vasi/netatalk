@@ -51,7 +51,6 @@ HTML_PAGES = \
 
 DISTCLEANFILES = manual.xml
 
-if HAVE_XSLTPROC
 CLEANFILES += $(HTML_PAGES)
 
 html-local: $(XML_PAGES)
@@ -59,5 +58,3 @@ html-local: $(XML_PAGES)
 
 html-upload: html-local
 	scp $(HTML_PAGES) $$USER,netatalk@web.sourceforge.net:/home/project-web/netatalk/htdocs/3.1/htmldocs/
-
-endif

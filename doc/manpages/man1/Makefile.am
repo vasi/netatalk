@@ -29,7 +29,6 @@ EXTRA_DIST = \
 	netatalk-config.1.xml \
 	uniconv.1.xml
 
-if HAVE_XSLTPROC
 CLEANFILES += $(MAN_MANPAGES)
 
 %.1 : %.1.xml
@@ -37,4 +36,3 @@ CLEANFILES += $(MAN_MANPAGES)
 	@cp $@ $(top_builddir)/man/man1/$@.in
 
 html-local: $(MAN_MANPAGES) $(MAN_STYLESHEET)
-endif

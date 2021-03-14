@@ -26,20 +26,17 @@ AC_DEFUN([AX_CHECK_DOCBOOK], [
 <book id="test">
 </book>
 END
-      if test "$?" = 0; then
+    if test "$?" = 0; then
         XSLTPROC_WORKS=yes
-      fi
-      AC_MSG_RESULT($XSLTPROC_WORKS)
     fi
-  fi
-
-  AC_MSG_CHECKING([whether to build Docbook documentation])
-  AC_MSG_RESULT($XSLTPROC_WORKS)
-
-  AM_CONDITIONAL(HAVE_XSLTPROC, test x"$XSLTPROC_WORKS" = x"yes")
-  AC_SUBST(XSLTPROC_FLAGS)
-  AC_SUBST(DOCBOOK_ROOT)
-  AC_SUBST(XSLTPROC)
+    AC_MSG_RESULT($XSLTPROC_WORKS)
+fi
+AM_CONDITIONAL(have_xsltproc, test "$XSLTPROC_WORKS" = "yes")
+AC_SUBST(XML_CATALOG)
+AC_SUBST(XSLTPROC_FLAGS)
+AC_SUBST(DOCBOOK_ROOT)
+AC_SUBST(CAT_ENTRY_START)
+AC_SUBST(CAT_ENTRY_END)
 ])
 
 dnl Check for dtrace
@@ -257,7 +254,7 @@ AC_DEFUN([AC_NETATALK_TDB], [
             PKG_CHECK_MODULES(TDB, tdb, , [AC_MSG_ERROR([couldn't find tdb with pkg-config])])
         fi
         use_bundled_tdb=no
-    fi        
+    fi
 
     AC_SUBST(TDB_CFLAGS)
     AC_SUBST(TDB_LIBS)
@@ -401,7 +398,7 @@ AC_ARG_ENABLE(debug,
 			AC_DEFINE(DEBUG, 1, [Define if verbose debugging information should be included])
 		else
 			AC_DEFINE_UNQUOTED(DEBUG, $enableval, [Define if verbose debugging information should be included])
-		fi 
+		fi
 		AC_MSG_RESULT([yes])
 	else
 		AC_MSG_RESULT([no])
@@ -424,7 +421,7 @@ AC_ARG_ENABLE(debugging,
 			AC_DEFINE(DEBUGGING, 1, [Define if you want to disable SIGALRM timers and DSI tickles])
 		else
 			AC_DEFINE_UNQUOTED(DEBUGGING, $enableval, [Define if you want to disable SIGALRM timers and DSI tickles])
-		fi 
+		fi
 		AC_MSG_RESULT([yes])
 	else
 		AC_MSG_RESULT([no])
@@ -450,13 +447,13 @@ if test "x$netatalk_cv_use_shadowpw" != "xno"; then
     if test x"$ac_cv_header_shadow_h" = x"yes"; then
 	netatalk_cv_use_shadowpw=yes
 	AC_DEFINE(SHADOWPW, 1, [Define if shadow passwords should be used])
-    else 
+    else
       if test "x$shadowpw" = "xyes"; then
         AC_MSG_ERROR([shadow support not available])
       else
        	netatalk_cv_use_shadowpw=no
       fi
-    fi 
+    fi
 fi
 
 AC_MSG_CHECKING([whether shadow support should be enabled])
@@ -473,7 +470,7 @@ netatalk_cv_use_shellcheck=yes
 AC_MSG_CHECKING([whether checking for a valid shell should be enabled])
 AC_ARG_ENABLE(shell-check,
 	[  --disable-shell-check   disable checking for a valid shell],[
-	if test "$enableval" = "no"; then 
+	if test "$enableval" = "no"; then
 		AC_DEFINE(DISABLE_SHELLCHECK, 1, [Define if shell check should be disabled])
 		AC_MSG_RESULT([no])
 		netatalk_cv_use_shellcheck=no
@@ -492,7 +489,7 @@ AC_DEFUN([AC_NETATALK_INIT_STYLE], [
                 [  --with-init-style       use OS specific init config [[redhat-sysv|redhat-systemd|suse-sysv|suse-systemd|gentoo-openrc|gentoo-systemd|netbsd|debian-sysv|debian-systemd|solaris|openrc|systemd]]],
                 init_style="$withval", init_style=none
     )
-    case "$init_style" in 
+    case "$init_style" in
     "redhat")
 	    AC_MSG_ERROR([--with-init-style=redhat is obsoleted. Use redhat-sysv or redhat-systemd.])
         ;;
@@ -614,7 +611,7 @@ esac
 dnl --------------------- operating system specific flags (port from sys/*)
 
 dnl ----- FreeBSD specific -----
-if test x"$this_os" = "xfreebsd"; then 
+if test x"$this_os" = "xfreebsd"; then
 	AC_MSG_RESULT([ * FreeBSD specific configuration])
 	AC_DEFINE(BSD4_4, 1, [BSD compatiblity macro])
 	AC_DEFINE(FREEBSD, 1, [Define if OS is FreeBSD])
@@ -630,9 +627,9 @@ if test x"$this_os" = "xkfreebsd"; then
 fi
 
 dnl ----- Linux specific -----
-if test x"$this_os" = "xlinux"; then 
+if test x"$this_os" = "xlinux"; then
 	AC_MSG_RESULT([ * Linux specific configuration])
-    AC_DEFINE(LINUX, 1, [OS is Linux])	
+    AC_DEFINE(LINUX, 1, [OS is Linux])
 	dnl ----- check if we need the quotactl wrapper
     AC_CHECK_HEADERS(linux/dqblk_xfs.h,,
 		[AC_CHECK_HEADERS(linux/xqm.h linux/xfs_fs.h)
@@ -647,7 +644,7 @@ if test x"$this_os" = "xlinux"; then
 fi
 
 dnl ----- NetBSD specific -----
-if test x"$this_os" = "xnetbsd"; then 
+if test x"$this_os" = "xnetbsd"; then
 	AC_MSG_RESULT([ * NetBSD specific configuration])
 	AC_DEFINE(BSD4_4, 1, [BSD compatiblity macro])
 	AC_DEFINE(NETBSD, 1, [Define if OS is NetBSD])
@@ -660,7 +657,7 @@ if test x"$this_os" = "xnetbsd"; then
 fi
 
 dnl ----- OpenBSD specific -----
-if test x"$this_os" = "xopenbsd"; then 
+if test x"$this_os" = "xopenbsd"; then
 	AC_MSG_RESULT([ * OpenBSD specific configuration])
     AC_DEFINE(BSD4_4, 1, [BSD compatiblity macro])
 	dnl ----- OpenBSD does not have crypt.h, uses unistd.h -----
@@ -668,7 +665,7 @@ if test x"$this_os" = "xopenbsd"; then
 fi
 
 dnl ----- Solaris specific -----
-if test x"$this_os" = "xsolaris"; then 
+if test x"$this_os" = "xsolaris"; then
 	AC_MSG_RESULT([ * Solaris specific configuration])
 	AC_DEFINE(__svr4__, 1, [Solaris compatibility macro])
 	AC_DEFINE(_ISOC9X_SOURCE, 1, [Compatibility macro])
@@ -709,8 +706,8 @@ AC_DEFUN([AC_NETATALK_PGP_UAM], [
 AC_MSG_CHECKING([whether the PGP UAM should be build])
 AC_ARG_ENABLE(pgp-uam,
 	[  --enable-pgp-uam        enable build of PGP UAM module],[
-	if test "$enableval" = "yes"; then 
-		if test "x$neta_cv_have_openssl" = "xyes"; then 
+	if test "$enableval" = "yes"; then
+		if test "x$neta_cv_have_openssl" = "xyes"; then
 			AC_DEFINE(UAM_PGP, 1, [Define if the PGP UAM module should be compiled])
 			compile_pgp=yes
 			AC_MSG_RESULT([yes])
@@ -738,7 +735,7 @@ AC_ARG_ENABLE(krbV-uam,
 			])
 		fi
 	]
-	
+
 )
 
 AC_MSG_CHECKING([whether Kerberos V UAM should be build])
