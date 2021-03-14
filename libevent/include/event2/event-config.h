@@ -157,6 +157,12 @@
 /* Define to 1 if you have the <mach/mach_time.h> header file. */
 #define EVENT__HAVE_MACH_MACH_TIME_H 1
 
+/* Define if the system has mbedtls */
+/* #undef EVENT__HAVE_MBEDTLS */
+
+/* Define to 1 if you have the <mbedtls/ssl.h> header file. */
+/* #undef EVENT__HAVE_MBEDTLS_SSL_H */
+
 /* Define to 1 if you have the <memory.h> header file. */
 #define EVENT__HAVE_MEMORY_H 1
 
@@ -207,6 +213,9 @@
 
 /* Define if we have pthreads on this system */
 #define EVENT__HAVE_PTHREADS 1
+
+/* Define to 1 if you have the `pthread_mutexattr_setprotocol' function. */
+#define EVENT__HAVE_PTHREAD_MUTEXATTR_SETPROTOCOL 1
 
 /* Define to 1 if you have the `putenv' function. */
 #define EVENT__HAVE_PUTENV 1
@@ -261,6 +270,9 @@
 
 /* Define to 1 if you have the `strsep' function. */
 #define EVENT__HAVE_STRSEP 1
+
+/* Define to 1 if you have the `strsignal' function. */
+#define EVENT__HAVE_STRSIGNAL 1
 
 /* Define to 1 if you have the `strtok_r' function. */
 #define EVENT__HAVE_STRTOK_R 1
@@ -418,6 +430,9 @@
 /* Define to 1 if you have the `vasprintf' function. */
 #define EVENT__HAVE_VASPRINTF 1
 
+/* Define if your system supports the wepoll module */
+/* #undef EVENT__HAVE_WEPOLL */
+
 /* Define if kqueue works correctly with pipes */
 #define EVENT__HAVE_WORKING_KQUEUE 1
 
@@ -440,7 +455,7 @@
 #define EVENT__LT_OBJDIR ".libs/"
 
 /* Numeric representation of the version */
-#define EVENT__NUMERIC_VERSION 0x02010c00
+#define EVENT__NUMERIC_VERSION 0x02020001
 
 /* Name of package */
 #define EVENT__PACKAGE "libevent"
@@ -452,7 +467,7 @@
 #define EVENT__PACKAGE_NAME "libevent"
 
 /* Define to the full name and version of this package. */
-#define EVENT__PACKAGE_STRING "libevent 2.1.12-stable"
+#define EVENT__PACKAGE_STRING "libevent 2.2.0-alpha-dev"
 
 /* Define to the one symbol short name of this package. */
 #define EVENT__PACKAGE_TARNAME "libevent"
@@ -461,7 +476,7 @@
 #define EVENT__PACKAGE_URL ""
 
 /* Define to the version of this package. */
-#define EVENT__PACKAGE_VERSION "2.1.12-stable"
+#define EVENT__PACKAGE_VERSION "2.2.0-alpha-dev"
 
 /* Define to necessary symbol if this constant uses a non-standard name on
    your system. */
@@ -523,7 +538,7 @@
 
 
 /* Version number of package */
-#define EVENT__VERSION "2.1.12-stable"
+#define EVENT__VERSION "2.2.0-alpha-dev"
 
 /* Enable large inode numbers on Mac OS X 10.5.  */
 #ifndef _DARWIN_USE_64_BIT_INODE

@@ -28,7 +28,7 @@
 
 /** @file event2/util.h
 
-  Common convenience functions for cross-platform portability and
+  @brief Common convenience functions for cross-platform portability and
   related socket manipulations.
 
  */
@@ -819,7 +819,7 @@ const char *evutil_gai_strerror(int err);
  *
  * Current versions of Libevent use an ARC4-based random number generator,
  * seeded using the platform's entropy source (/dev/urandom on Unix-like
- * systems; CryptGenRandom on Windows).  This is not actually as secure as it
+ * systems; BCryptGenRandom on Windows). This is not actually as secure as it
  * should be: ARC4 is a pretty lousy cipher, and the current implementation
  * provides only rudimentary prediction- and backtracking-resistance.  Don't
  * use this for serious cryptographic applications.
