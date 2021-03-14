@@ -1449,8 +1449,8 @@ int copyfile(struct vol *s_vol,
     }
 
     if (copy_fork(ADEID_DFORK, &add, adp,
-                         s_vol->v_obj->dsi->commands,
-                         s_vol->v_obj->dsi->server_quantum) != 0) {
+                  (char *)s_vol->v_obj->dsi->commands,
+                  s_vol->v_obj->dsi->server_quantum) != 0) {
         err = errno;
         LOG(log_error, logtype_afpd, "copyfile('%s'): copy_fork: %s", src, strerror(errno));
     } else if (d_vol->vfs->vfs_copyfile(d_vol, sfd, src, dst) != AFP_OK) {
