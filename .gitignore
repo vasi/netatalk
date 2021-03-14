@@ -19,8 +19,6 @@ ltconfig
 ltmain.sh
 autom4te.cache
 autoscan.log
-ylwrap
-test-driver
 *.rpm
 *.deb
 *.dsc
@@ -28,4 +26,8 @@ test-driver
 *.tar.gz
 *.diff.gz
 *~
+.gitignore
 *.o
+**/.DS_Store
+*.xml
+*.iml
