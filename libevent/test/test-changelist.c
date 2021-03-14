@@ -26,7 +26,7 @@
 
 #include "event2/event-config.h"
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <winsock2.h>
 #include <windows.h>
 #else
@@ -34,11 +34,11 @@
 #endif
 #include <sys/types.h>
 #include <sys/stat.h>
-#ifdef _EVENT_HAVE_SYS_TIME_H
+#ifdef EVENT__HAVE_SYS_TIME_H
 #include <sys/time.h>
 #endif
 
-#ifdef _EVENT_HAVE_SYS_SOCKET_H
+#ifdef EVENT__HAVE_SYS_SOCKET_H
 #include <sys/socket.h>
 #endif
 #include <fcntl.h>
@@ -52,7 +52,7 @@
 #include <time.h>
 
 struct cpu_usage_timer {
-#ifdef WIN32
+#ifdef _WIN32
 	HANDLE thread;
 	FILETIME usertimeBegin;
 	FILETIME kerneltimeBegin;
@@ -64,7 +64,7 @@ struct cpu_usage_timer {
 static void
 start_cpu_usage_timer(struct cpu_usage_timer *timer)
 {
-#ifdef WIN32
+#ifdef _WIN32
 	int r;
 	FILETIME createtime, exittime;
 	timer->thread = GetCurrentThread();
@@ -77,7 +77,7 @@ start_cpu_usage_timer(struct cpu_usage_timer *timer)
 
 	evutil_gettimeofday(&timer->timeBegin, NULL);
 }
-#ifdef WIN32
+#ifdef _WIN32
 static ev_int64_t
 filetime_to_100nsec(const FILETIME *ft)
 {
@@ -104,7 +104,7 @@ static void
 get_cpu_usage(struct cpu_usage_timer *timer, double *secElapsedOut,
     double *secUsedOut, double *usageOut)
 {
-#ifdef WIN32
+#ifdef _WIN32
 	double usertime_seconds, kerneltime_seconds;
 	FILETIME createtime, exittime, usertimeEnd, kerneltimeEnd;
 	int r;
@@ -114,7 +114,7 @@ get_cpu_usage(struct cpu_usage_timer *timer, double *secElapsedOut,
 	struct timeval timeEnd, timeDiff;
 	double secondsPassed, secondsUsed;
 
-#ifdef WIN32
+#ifdef _WIN32
 	r = GetThreadTimes(timer->thread, &createtime, &exittime,
 	    &usertimeEnd, &kerneltimeEnd);
 	if (r==0) printf("GetThreadTimes failed.");
@@ -171,28 +171,28 @@ main(int argc, char **argv)
 
 	double usage, secPassed, secUsed;
 
-#ifdef WIN32
+#ifdef _WIN32
 	WORD wVersionRequested;
 	WSADATA wsaData;
-	int	err;
 
 	wVersionRequested = MAKEWORD(2, 2);
 
-	err = WSAStartup(wVersionRequested, &wsaData);
+	(void) WSAStartup(wVersionRequested, &wsaData);
 #endif
 	if (evutil_socketpair(AF_UNIX, SOCK_STREAM, 0, pair) == -1)
 		return (1);
 
-	/* Initalize the event library */
-	base = event_base_new();
+	/* Initialize the event library */
+	if (!(base = event_base_new()))
+		return (1);
 
-	/* Initalize a timeout to terminate the test */
+	/* Initialize a timeout to terminate the test */
 	timeout = evtimer_new(base,timeout_cb,&timeout);
 	/* and watch for writability on one end of the pipe */
 	ev = event_new(base,pair[1],EV_WRITE | EV_PERSIST, write_cb, &ev);
 
-	tv.tv_sec  = 5;
-	tv.tv_usec = 0;
+	tv.tv_sec  = 1;
+	tv.tv_usec = 500*1000;
 
 	evtimer_add(timeout, &tv);
 
@@ -201,6 +201,10 @@ main(int argc, char **argv)
 	start_cpu_usage_timer(&timer);
 
 	event_base_dispatch(base);
+
+	event_free(ev);
+	event_free(timeout);
+	event_base_free(base);
 
 	get_cpu_usage(&timer, &secPassed, &secUsed, &usage);
 
