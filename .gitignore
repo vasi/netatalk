@@ -33,3 +33,10 @@ autoscan.log
 *.iml
 ylwrap
 test-driver
+*.Plo
+*.a
+*.dylib
+*.la
+*.lai
+*.lo
+*.Po
