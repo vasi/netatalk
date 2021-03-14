@@ -794,7 +794,7 @@ static struct vol *creatvol(AFPObj *obj,
         val = getoption(obj->iniconfig, section, "vol dbpath", preset, NULL);
         if (val == NULL) {
             /* check global option */
-            global_path = atalk_iniparser_getstring(obj->iniconfig,
+            global_path = (char *)atalk_iniparser_getstring(obj->iniconfig,
                                                     INISEC_GLOBAL,
                                                     "vol dbpath",
                                                     NULL);
@@ -1613,7 +1613,7 @@ int load_volumes(AFPObj *obj, lv_flags_t flags)
         EC_ZERO_LOG( lstat(obj->options.configfile, &st) );
         obj->options.volfile.mtime = st.st_mtime;
 
-        includefile = atalk_iniparser_getstring(obj->iniconfig, INISEC_GLOBAL,
+        includefile = (char *)atalk_iniparser_getstring(obj->iniconfig, INISEC_GLOBAL,
                                                 "include", NULL);
         if (includefile) {
             EC_ZERO_LOG( stat(includefile, &st) );
