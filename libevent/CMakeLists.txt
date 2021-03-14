@@ -19,7 +19,7 @@
 #       start libevent.sln
 #
 
-cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.1.2 FATAL_ERROR)
 
 if (POLICY CMP0054)
     cmake_policy(SET CMP0054 NEW)
@@ -33,7 +33,7 @@ endif()
 
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release
-        CACHE STRING "Set build type to Debug o Release (default Release)" FORCE)
+        CACHE STRING "Set build type to Debug or Release (default Release)" FORCE)
 endif()
 string(TOLOWER "${CMAKE_BUILD_TYPE}" CMAKE_BUILD_TYPE_LOWER)
 
@@ -81,14 +81,15 @@ set(EVENT_ABI_LIBVERSION
 set(EVENT_PACKAGE_VERSION
     "${EVENT_VERSION_MAJOR}.${EVENT_VERSION_MINOR}.${EVENT_VERSION_PATCH}")
 
-set(EVENT_NUMERIC_VERSION 0x02010c00)
 # equals to VERSION_INFO in Makefile.am
-set(EVENT_ABI_LIBVERSION_CURRENT   7)
-set(EVENT_ABI_LIBVERSION_REVISION  1)
+set(EVENT_ABI_LIBVERSION_CURRENT   1)
+set(EVENT_ABI_LIBVERSION_REVISION  0)
 set(EVENT_ABI_LIBVERSION_AGE       0)
 
 # equals to RELEASE in Makefile.am
-set(EVENT_PACKAGE_RELEASE 2.1)
+set(EVENT_PACKAGE_RELEASE 2.2)
+
+set(EVENT_NUMERIC_VERSION 0x02020001)
 
 # only a subset of names can be used, defaults to "beta"
 set(EVENT_STAGE_NAME ${EVENT_VERSION_STAGE})
@@ -130,6 +131,9 @@ option(EVENT__DISABLE_THREAD_SUPPORT
 
 option(EVENT__DISABLE_OPENSSL
     "Define if libevent should build without support for OpenSSL encryption" OFF)
+
+option(EVENT__DISABLE_MBEDTLS
+    "Define if libevent should build without support for mbed TLS encryption" OFF)
 
 option(EVENT__DISABLE_BENCHMARK
     "Defines if libevent should build without the benchmark executables" OFF)
@@ -185,9 +189,9 @@ if (EVENT__COVERAGE)
 
     message(STATUS "Setting coverage compiler flags")
 
-    set(CMAKE_REQUIRED_LIBRARIES "--coverage")
+    list(APPEND CMAKE_REQUIRED_LIBRARIES "--coverage")
     add_compiler_flags(-g -O0 --coverage)
-    set(CMAKE_REQUIRED_LIBRARIES "")
+    list(REMOVE_ITEM CMAKE_REQUIRED_LIBRARIES "--coverage")
 endif()
 
 set(GNUC 0)
@@ -200,7 +204,7 @@ endif()
 if (("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU") OR (${CLANG}))
     set(GNUC 1)
 endif()
-if (("${CMAKE_C_COMPILER_ID}" STREQUAL "MSVC") OR (${CLANG}))
+if (("${CMAKE_C_COMPILER_ID}" STREQUAL "MSVC") OR ("${CMAKE_C_SIMULATE_ID}" STREQUAL "MSVC"))
     set(MSVC 1)
 endif()
 
@@ -232,6 +236,11 @@ elseif ("${EVENT_LIBRARY_TYPE}" STREQUAL "SHARED")
     set(EVENT_LIBRARY_SHARED ON)
 else()
     message(FATAL_ERROR "${EVENT_LIBRARY_TYPE} is not supported")
+endif()
+
+# brew support
+if (APPLE)
+    find_program(BREW brew)
 endif()
 
 if (${MSVC})
@@ -324,9 +333,8 @@ if (${GNUC})
 endif()
 
 if (APPLE)
-    # Get rid of deprecated warnings for OpenSSL on OSX 10.7 and greater.
+    # Clang on macOS emits warnings for each directory specified which isn't used
     add_compiler_flags(
-        -Wno-error=deprecated-declarations
         -Qunused-arguments
     )
 endif()
@@ -337,11 +345,19 @@ endif()
 
 # Winsock.
 if(WIN32)
-    set(CMAKE_REQUIRED_LIBRARIES  ws2_32 shell32 advapi32)
+    list(APPEND CMAKE_REQUIRED_LIBRARIES
+        ws2_32
+        shell32
+        advapi32
+        bcrypt
+    )
     set(CMAKE_REQUIRED_DEFINITIONS -FIwinsock2.h -FIws2tcpip.h -D_WIN32_WINNT=0x0600)
 endif()
 if (SOLARIS)
-    set(CMAKE_REQUIRED_LIBRARIES socket nsl)
+    list(APPEND CMAKE_REQUIRED_LIBRARIES
+        socket
+        nsl
+    )
 endif()
 
 # Check if _GNU_SOURCE is available.
@@ -430,6 +446,13 @@ if (APPLE)
     )
 endif()
 
+if (NOT EVENT__DISABLE_THREAD_SUPPORT AND NOT WIN32)
+    list(APPEND FILES_TO_CHECK pthread.h)
+    # (Only `CHECK_TYPE_SIZE()' will use `CMAKE_EXTRA_INCLUDE_FILES')
+    list(APPEND CMAKE_EXTRA_INCLUDE_FILES pthread.h)
+endif()
+
+# Fills EVENT_INCLUDES
 foreach(FILE ${FILES_TO_CHECK})
     CHECK_INCLUDE_FILE_CONCAT(${FILE} "EVENT")
 endforeach()
@@ -508,11 +531,35 @@ else()
     endif()
 endif()
 
+if (NOT EVENT__DISABLE_THREAD_SUPPORT)
+    if (WIN32)
+        list(APPEND SRC_CORE evthread_win32.c)
+    else()
+        find_package(Threads REQUIRED)
+        if (NOT CMAKE_USE_PTHREADS_INIT)
+            message(FATAL_ERROR
+                    "Failed to find Pthreads, set EVENT__DISABLE_THREAD_SUPPORT to disable")
+        endif()
+
+        set(EVENT__HAVE_PTHREADS 1)
+        list(APPEND LIB_APPS ${CMAKE_THREAD_LIBS_INIT})
+
+        # for CHECK_SYMBOLS_EXIST()
+        list(APPEND CMAKE_REQUIRED_LIBRARIES ${CMAKE_THREAD_LIBS_INIT})
+
+        CHECK_TYPE_SIZE(pthread_t EVENT__SIZEOF_PTHREAD_T)
+        list(APPEND SYMBOLS_TO_CHECK pthread_mutexattr_setprotocol)
+    endif()
+endif()
+
 # Add stdio.h for vasprintf
-set(EVENT_INCLUDES ${EVENT_INCLUDES} stdio.h)
-CHECK_SYMBOLS_EXIST("${SYMBOLS_TO_CHECK}" "${EVENT_INCLUDES}" "EVENT")
+list(APPEND CMAKE_EXTRA_INCLUDE_FILES ${EVENT_INCLUDES} stdio.h)
+CHECK_SYMBOLS_EXIST("${SYMBOLS_TO_CHECK}" "${CMAKE_EXTRA_INCLUDE_FILES}" "EVENT")
 unset(SYMBOLS_TO_CHECK)
 set(EVENT__HAVE_EPOLL ${EVENT__HAVE_EPOLL_CREATE})
+if(WIN32 AND NOT CYGWIN)
+    set(EVENT__HAVE_WEPOLL 1)
+endif()
 
 # Get the gethostbyname_r prototype.
 if(EVENT__HAVE_GETHOSTBYNAME_R)
@@ -538,9 +585,6 @@ endif()
 if(HAVE_PORT_H AND HAVE_PORT_CREATE)
     set(EVENT__HAVE_EVENT_PORTS 1)
 endif()
-
-# Only `CHECK_TYPE_SIZE()' will use `CMAKE_EXTRA_INCLUDE_FILES'
-set(CMAKE_EXTRA_INCLUDE_FILES ${EVENT_INCLUDES})
 
 CHECK_TYPE_SIZE("struct sockaddr_un" EVENT__HAVE_STRUCT_SOCKADDR_UN)
 CHECK_TYPE_SIZE("uint8_t" EVENT__HAVE_UINT8_T)
@@ -629,13 +673,6 @@ if(NOT EVENT__SIZEOF_PID_T)
   set(EVENT__SIZEOF_PID_T ${EVENT__SIZEOF_INT})
 else()
 	set(EVENT__SIZEOF_PID_T EVENT__SIZEOF_PID_T)
-endif()
-
-if (NOT EVENT__DISABLE_THREAD_SUPPORT)
-    if (NOT WIN32)
-        list(APPEND CMAKE_EXTRA_INCLUDE_FILES pthread.h)
-    endif()
-    CHECK_TYPE_SIZE(pthread_t EVENT__SIZEOF_PTHREAD_T)
 endif()
 
 if(EVENT__HAVE_CLOCK_GETTIME)
@@ -783,6 +820,7 @@ set(HDR_PUBLIC
     include/event2/event.h
     include/event2/event_compat.h
     include/event2/event_struct.h
+    include/event2/watch.h
     include/event2/http.h
     include/event2/http_compat.h
     include/event2/http_struct.h
@@ -798,7 +836,7 @@ set(HDR_PUBLIC
     include/event2/visibility.h
     ${PROJECT_BINARY_DIR}/include/event2/event-config.h)
 
-set(SRC_CORE
+list(APPEND SRC_CORE
     buffer.c
     bufferevent.c
     bufferevent_filter.c
@@ -811,6 +849,7 @@ set(SRC_CORE
     evutil.c
     evutil_rand.c
     evutil_time.c
+    watch.c
     listener.c
     log.c
     signal.c
@@ -836,11 +875,31 @@ if(EVENT__HAVE_EPOLL)
     list(APPEND SRC_CORE epoll.c)
 endif()
 
+if(EVENT__HAVE_WEPOLL)
+    list(APPEND SRC_CORE
+        epoll.c
+        wepoll.c)
+endif()
+
 if(EVENT__HAVE_EVENT_PORTS)
     list(APPEND SRC_CORE evport.c)
 endif()
 
 if (NOT EVENT__DISABLE_OPENSSL)
+    # only if OPENSSL_ROOT_DIR is not set yet
+    if (BREW AND NOT OPENSSL_ROOT_DIR AND NOT "$ENV{OPENSSL_ROOT_DIR}")
+        execute_process(COMMAND ${BREW} --prefix openssl
+            OUTPUT_VARIABLE BREW_OPENSSL_PREFIX
+            RESULT_VARIABLE BREW_OPENSSL_RESULT
+            ERROR_QUIET
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+        )
+        if (BREW_OPENSSL_RESULT EQUAL 0)
+            message(STATUS "Set OPENSSL_ROOT_DIR=${BREW_OPENSSL_PREFIX} (from brew)")
+            set(OPENSSL_ROOT_DIR "${BREW_OPENSSL_PREFIX}" CACHE PATH "")
+        endif()
+    endif()
+
     find_package(OpenSSL REQUIRED)
 
     set(EVENT__HAVE_OPENSSL 1)
@@ -850,24 +909,24 @@ if (NOT EVENT__DISABLE_OPENSSL)
 
     include_directories(${OPENSSL_INCLUDE_DIR})
 
-    list(APPEND SRC_OPENSSL bufferevent_openssl.c)
+    list(APPEND SRC_OPENSSL bufferevent_openssl.c bufferevent_ssl.c)
     list(APPEND HDR_PUBLIC include/event2/bufferevent_ssl.h)
     list(APPEND LIB_APPS ${OPENSSL_LIBRARIES})
 endif()
 
-if (NOT EVENT__DISABLE_THREAD_SUPPORT)
-    if (WIN32)
-        list(APPEND SRC_CORE evthread_win32.c)
-    else()
-        find_package(Threads REQUIRED)
-        if (NOT CMAKE_USE_PTHREADS_INIT)
-            message(FATAL_ERROR
-                    "Failed to find Pthreads, set EVENT__DISABLE_THREAD_SUPPORT to disable")
-        endif()
+if (NOT EVENT__DISABLE_MBEDTLS)
+    find_package(MbedTLS REQUIRED)
 
-        set(EVENT__HAVE_PTHREADS 1)
-        list(APPEND LIB_APPS ${CMAKE_THREAD_LIBS_INIT})
-    endif()
+    set(EVENT__HAVE_MBEDTLS 1)
+
+    message(STATUS "mbed TLS include: ${MBEDTLS_INCLUDE_DIR}")
+    message(STATUS "mbed TLS lib: ${MBEDTLS_LIBRARIES}")
+
+    include_directories(${MBEDTLS_INCLUDE_DIR})
+
+    list(APPEND SRC_MBEDTLS bufferevent_mbedtls.c bufferevent_ssl.c)
+    list(APPEND HDR_PUBLIC include/event2/bufferevent_ssl.h)
+    list(APPEND LIB_APPS ${MBEDTLS_LIBRARIES})
 endif()
 
 if (NOT EVENT__DISABLE_TESTS)
@@ -906,7 +965,7 @@ if(WIN32)
     list(APPEND HDR_PRIVATE WIN32-Code/getopt.h)
 
     set(EVENT__DNS_USE_FTIME_FOR_ID 1)
-    set(LIB_PLATFORM ws2_32 shell32 advapi32)
+    set(LIB_PLATFORM ws2_32 shell32 advapi32 bcrypt)
     add_definitions(
             -D_CRT_SECURE_NO_WARNINGS
             -D_CRT_NONSTDC_NO_DEPRECATE)
@@ -960,6 +1019,14 @@ if (NOT EVENT__DISABLE_OPENSSL)
         SOURCES ${SRC_OPENSSL})
 endif()
 
+if (NOT EVENT__DISABLE_MBEDTLS)
+    add_event_library(event_mbedtls
+        INNER_LIBRARIES event_core
+        OUTER_INCLUDES ${MBEDTLS_INCLUDE_DIR}
+        LIBRARIES ${MBEDTLS_LIBRARIES}
+        SOURCES ${SRC_MBEDTLS})
+endif()
+
 if (EVENT__HAVE_PTHREADS)
     set(SRC_PTHREADS evthread_pthread.c)
     add_event_library(event_pthreads
@@ -1003,8 +1070,8 @@ macro(add_sample_prog ssl name)
                           ${LIB_APPS}
                           ${LIB_PLATFORM})
 
-    if (${ssl})
-        target_link_libraries(${name} event_openssl)
+    if (TARGET ${ssl})
+        target_link_libraries(${name} ${ssl})
         if(WIN32)
             target_link_libraries(${name} crypt32)
         endif()
@@ -1016,19 +1083,32 @@ if (NOT EVENT__DISABLE_SAMPLES)
         hello-world
         signal-test
         http-connect
-        time-test)
+        time-test
+        watch-timing)
 
     foreach(SAMPLE ${SAMPLES})
         add_sample_prog(OFF ${SAMPLE} sample/${SAMPLE}.c)
     endforeach()
+    if (NOT WIN32)
+        target_link_libraries(watch-timing m)
+    endif()
 
     if (NOT EVENT__DISABLE_OPENSSL)
-        add_sample_prog(ON https-client
+        add_sample_prog(event_openssl https-client
                         sample/https-client.c
                         sample/openssl_hostname_validation.c
                         sample/hostcheck.c)
-        add_sample_prog(ON le-proxy
+        add_sample_prog(event_openssl le-proxy
                         sample/le-proxy.c)
+        add_sample_prog(event_openssl becat sample/becat.c ${WIN32_GETOPT})
+    endif()
+
+    if (NOT EVENT__DISABLE_MBEDTLS)
+        add_sample_prog(event_mbedtls https-client-mbedtls
+                sample/https-client.c)
+        target_compile_definitions(https-client-mbedtls PRIVATE USE_MBEDTLS)
+        add_sample_prog(event_mbedtls ssl-client-mbedtls
+                sample/ssl-client-mbedtls.c)
     endif()
 
     set(SAMPLES_WOPT
@@ -1123,6 +1203,7 @@ if (NOT EVENT__DISABLE_TESTS)
                  test/regress_testutils.c
                  test/regress_testutils.h
                  test/regress_util.c
+                 test/regress_watch.c
                  test/tinytest.c)
 
             if (WIN32)
@@ -1139,7 +1220,11 @@ if (NOT EVENT__DISABLE_TESTS)
             endif()
 
             if (NOT EVENT__DISABLE_OPENSSL)
-                list(APPEND SRC_REGRESS test/regress_ssl.c)
+                list(APPEND SRC_REGRESS test/regress_openssl.c)
+            endif()
+
+            if (NOT EVENT__DISABLE_MBEDTLS)
+                list(APPEND SRC_REGRESS test/regress_mbedtls.c)
             endif()
 
             add_executable(regress ${SRC_REGRESS})
@@ -1151,6 +1236,9 @@ if (NOT EVENT__DISABLE_TESTS)
                                   event_extra)
             if (NOT EVENT__DISABLE_OPENSSL)
                 target_link_libraries(regress event_openssl)
+            endif()
+            if (NOT EVENT__DISABLE_MBEDTLS)
+                target_link_libraries(regress event_mbedtls)
             endif()
             if (CMAKE_USE_PTHREADS_INIT)
                 target_link_libraries(regress event_pthreads)
@@ -1229,6 +1317,10 @@ if (NOT EVENT__DISABLE_TESTS)
 
     if (EVENT__HAVE_DEVPOLL)
         list(APPEND BACKENDS DEVPOLL)
+    endif()
+
+    if (EVENT__HAVE_WEPOLL)
+        list(APPEND BACKENDS WEPOLL)
     endif()
 
     if (WIN32)
@@ -1373,13 +1465,12 @@ if (NOT EVENT__DISABLE_TESTS)
     #  If they are set in the shell the tests are running using simply "ctest" or "make test" will fail)
     if (WIN32)
         # Windows doesn't have "unset". But you can use "set VAR=" instead.
-        # We need to guard against the possibility taht EVENT_NOWIN32 is set, and all test failing
-        # since no event backend being available.
         file(TO_NATIVE_PATH ${CMAKE_CTEST_COMMAND} WINDOWS_CTEST_COMMAND)
 
         file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/tmp/verify_tests.bat
             "
             set EVENT_NOWIN32=
+            set EVENT_NOWEPOLL=
             \"${WINDOWS_CTEST_COMMAND}\"
             ")
 
@@ -1401,7 +1492,7 @@ if (NOT EVENT__DISABLE_TESTS)
         add_custom_target(verify COMMAND "${VERIFY_PATH}"
                           DEPENDS event ${ALL_TESTPROGS})
     else()
-        # On some platforms doing exec(unset) as CMake does won't work, so make sure
+        # On some platforms doing exec(unset) as CMake doesn't work, so make sure
         # we run the unset command in a shell instead.
         # First we write the script contents.
         file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/tmp/verify_tests.sh

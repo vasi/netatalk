@@ -59,6 +59,7 @@
 #include "event2/event.h"
 #include "event2/event_struct.h"
 #include "event2/event_compat.h"
+#include "event2/watch.h"
 #include "event-internal.h"
 #include "defer-internal.h"
 #include "evthread-internal.h"
@@ -95,6 +96,9 @@ extern const struct eventop kqops;
 #ifdef EVENT__HAVE_DEVPOLL
 extern const struct eventop devpollops;
 #endif
+#ifdef EVENT__HAVE_WEPOLL
+extern const struct eventop wepollops;
+#endif
 #ifdef _WIN32
 extern const struct eventop win32ops;
 #endif
@@ -121,6 +125,9 @@ static const struct eventop *eventops[] = {
 #endif
 #ifdef _WIN32
 	&win32ops,
+#endif
+#ifdef EVENT__HAVE_WEPOLL
+	&wepollops,
 #endif
 	NULL
 };
@@ -737,6 +744,10 @@ event_base_new_with_config(const struct event_config *cfg)
 		event_base_start_iocp_(base, cfg->n_cpus_hint);
 #endif
 
+	/* initialize watcher lists */
+	for (i = 0; i < EVWATCH_MAX; ++i)
+		TAILQ_INIT(&base->watchers[i]);
+
 	return (base);
 }
 
@@ -837,8 +848,10 @@ static int event_base_free_queues_(struct event_base *base, int run_finalizers)
 static void
 event_base_free_(struct event_base *base, int run_finalizers)
 {
-	int i, n_deleted=0;
+	int i;
+	size_t n_deleted=0;
 	struct event *ev;
+	struct evwatch *watcher;
 	/* XXXX grab the lock? If there is contention when one thread frees
 	 * the base, then the contending thread will be very sad soon. */
 
@@ -912,7 +925,7 @@ event_base_free_(struct event_base *base, int run_finalizers)
 	}
 
 	if (n_deleted)
-		event_debug(("%s: %d events were still set in base",
+		event_debug(("%s: "EV_SIZE_FMT" events were still set in base",
 			__func__, n_deleted));
 
 	while (LIST_FIRST(&base->once_events)) {
@@ -938,6 +951,15 @@ event_base_free_(struct event_base *base, int run_finalizers)
 
 	EVTHREAD_FREE_LOCK(base->th_base_lock, 0);
 	EVTHREAD_FREE_COND(base->current_event_cond);
+
+	/* Free all event watchers */
+	for (i = 0; i < EVWATCH_MAX; ++i) {
+		while (!TAILQ_EMPTY(&base->watchers[i])) {
+			watcher = TAILQ_FIRST(&base->watchers[i]);
+			TAILQ_REMOVE(&base->watchers[i], watcher, next);
+			mm_free(watcher);
+		}
+	}
 
 	/* If we're freeing current_base, there won't be a current_base. */
 	if (base == current_base)
@@ -1926,9 +1948,12 @@ event_base_loop(struct event_base *base, int flags)
 	struct timeval tv;
 	struct timeval *tv_p;
 	int res, done, retval = 0;
+	struct evwatch_prepare_cb_info prepare_info;
+	struct evwatch_check_cb_info check_info;
+	struct evwatch *watcher;
 
 	/* Grab the lock.  We will release it inside evsel.dispatch, and again
-	 * as we invoke user callbacks. */
+	 * as we invoke watchers and user callbacks. */
 	EVBASE_ACQUIRE_LOCK(base, th_base_lock);
 
 	if (base->running_loop) {
@@ -1987,6 +2012,14 @@ event_base_loop(struct event_base *base, int flags)
 
 		event_queue_make_later_events_active(base);
 
+		/* Invoke prepare watchers before polling for events */
+		prepare_info.timeout = tv_p;
+		TAILQ_FOREACH(watcher, &base->watchers[EVWATCH_PREPARE], next) {
+			EVBASE_RELEASE_LOCK(base, th_base_lock);
+			(*watcher->callback.prepare)(watcher, &prepare_info, watcher->arg);
+			EVBASE_ACQUIRE_LOCK(base, th_base_lock);
+		}
+
 		clear_time_cache(base);
 
 		res = evsel->dispatch(base, tv_p);
@@ -1999,6 +2032,14 @@ event_base_loop(struct event_base *base, int flags)
 		}
 
 		update_time_cache(base);
+
+		/* Invoke check watchers after polling for events, and before
+		 * processing them */
+		TAILQ_FOREACH(watcher, &base->watchers[EVWATCH_CHECK], next) {
+			EVBASE_RELEASE_LOCK(base, th_base_lock);
+			(*watcher->callback.check)(watcher, &check_info, watcher->arg);
+			EVBASE_ACQUIRE_LOCK(base, th_base_lock);
+		}
 
 		timeout_process(base);
 
@@ -3681,7 +3722,7 @@ event_base_foreach_event_nolock_(struct event_base *base,
     event_base_foreach_event_cb fn, void *arg)
 {
 	int r, i;
-	unsigned u;
+	size_t u;
 	struct event *ev;
 
 	/* Start out with all the EVLIST_INSERTED events. */
@@ -3834,7 +3875,7 @@ event_base_active_by_fd(struct event_base *base, evutil_socket_t fd, short event
 		/* If we want to activate timer events, loop and activate each event with
 		 * the same fd in both the timeheap and common timeouts list */
 		int i;
-		unsigned u;
+		size_t u;
 		struct event *ev;
 
 		for (u = 0; u < base->timeheap.n; ++u) {
@@ -3964,20 +4005,21 @@ void
 event_base_assert_ok_nolock_(struct event_base *base)
 {
 	int i;
+	size_t u;
 	int count;
 
 	/* First do checks on the per-fd and per-signal lists */
 	evmap_check_integrity_(base);
 
 	/* Check the heap property */
-	for (i = 1; i < (int)base->timeheap.n; ++i) {
-		int parent = (i - 1) / 2;
+	for (u = 1; u < base->timeheap.n; ++u) {
+		size_t parent = (u - 1) / 2;
 		struct event *ev, *p_ev;
-		ev = base->timeheap.p[i];
+		ev = base->timeheap.p[u];
 		p_ev = base->timeheap.p[parent];
 		EVUTIL_ASSERT(ev->ev_flags & EVLIST_TIMEOUT);
 		EVUTIL_ASSERT(evutil_timercmp(&p_ev->ev_timeout, &ev->ev_timeout, <=));
-		EVUTIL_ASSERT(ev->ev_timeout_pos.min_heap_idx == i);
+		EVUTIL_ASSERT(ev->ev_timeout_pos.min_heap_idx == u);
 	}
 
 	/* Check that the common timeouts are fine */

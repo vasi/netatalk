@@ -7,7 +7,7 @@ includedir=${prefix}/include
 
 Name: libevent_core
 Description: libevent_core
-Version: 2.1.12-stable
+Version: 2.2.0-alpha-dev
 Requires:
 Conflicts:
 Libs: -L${libdir} -levent_core

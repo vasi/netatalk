@@ -7,10 +7,10 @@ includedir=${prefix}/include
 
 Name: libevent
 Description: libevent is an asynchronous notification event loop library
-Version: 2.1.12-stable
+Version: 2.2.0-alpha-dev
 Requires:
 Conflicts:
-Libs: -L${libdir} -levent
+Libs: -L${libdir} -levent_core -levent_extra
 Libs.private: 
 Cflags: -I${includedir}
 

@@ -43,7 +43,7 @@ struct evhttp_connection;
 
 /** @file event2/http.h
  *
- * Basic support for HTTP serving.
+ * @brief Basic support for HTTP serving.
  *
  * As Libevent is a library for dealing with event notification and most
  * interesting applications are networked today, I have often found the
@@ -73,6 +73,7 @@ struct evkeyvalq;
 struct evhttp_bound_socket;
 struct evconnlistener;
 struct evdns_base;
+struct evhttp_ext_method;
 
 /**
  * Create a new HTTP server.
@@ -223,6 +224,24 @@ EVENT2_EXPORT_SYMBOL
 void evhttp_set_max_body_size(struct evhttp* http, ev_ssize_t max_body_size);
 
 /**
+ * Set the maximum number of simultaneous connections for this server.
+ * A value of zero or less disables the limit.
+ *
+ * @param http the http server on which to set the max connection limit
+ * @param max_connections the maximum number of simultaneous connections or 0
+ */
+EVENT2_EXPORT_SYMBOL
+void evhttp_set_max_connections(struct evhttp* http, int max_connections);
+
+/**
+ * Get the current number of connections.
+ *
+ * @return The current number of connections for this server.
+ */
+EVENT2_EXPORT_SYMBOL
+int evhttp_get_connection_count(struct evhttp* http);
+
+/**
   Set the value to use for the Content-Type header when none was provided. If
   the content type string is NULL, the Content-Type header will not be
   automatically added.
@@ -246,7 +265,27 @@ void evhttp_set_default_content_type(struct evhttp *http,
   @param methods bit mask constructed from evhttp_cmd_type values
 */
 EVENT2_EXPORT_SYMBOL
-void evhttp_set_allowed_methods(struct evhttp* http, ev_uint16_t methods);
+void evhttp_set_allowed_methods(struct evhttp* http, ev_uint32_t methods);
+
+typedef int (*evhttp_ext_method_cb)(struct evhttp_ext_method *);
+/**
+  Sets the callback function which allows HTTP extended methods
+  to be supported by this server.
+
+  The callback should :
+   - if method field is NULL : set method field according to type field
+   - else : set type and flags fields according to method string
+   - return 0 for success (known method / type)
+   - return -1 for error (unknown method / type)
+
+  evhttp_set_allowed_methods still needs to be called.
+
+  @param http the http server on which to add support to the methods
+  @param cmp the extended method callback
+  @see evhttp_ext_method
+*/
+EVENT2_EXPORT_SYMBOL
+void evhttp_set_ext_method_cmp(struct evhttp *http, evhttp_ext_method_cb cmp);
 
 /**
    Set a callback for a specified URI
@@ -297,6 +336,51 @@ void evhttp_set_gencb(struct evhttp *http,
 EVENT2_EXPORT_SYMBOL
 void evhttp_set_bevcb(struct evhttp *http,
     struct bufferevent *(*cb)(struct event_base *, void *), void *arg);
+
+
+/**
+   Set a callback which allows the user to note or throttle incoming requests.
+
+   The requests are not populated with HTTP level information. They
+   are just associated to a connection.
+
+   If the callback returns -1, the associated connection is terminated
+   and the request is closed.
+
+   @param http the evhttp server object for which to set the callback
+   @param cb the callback to invoke for incoming connections
+   @param arg an context argument for the callback
+ */
+EVENT2_EXPORT_SYMBOL
+void evhttp_set_newreqcb(struct evhttp *http,
+    int (*cb)(struct evhttp_request*, void *), void *arg);
+
+/**
+   Set a callback to output for any error pages sent for requests of a given
+   evhttp object.
+
+   You can use this to override the default error pages sent, allowing such
+   things as multi-lingual support or customization to match other pages.
+
+   The callback should use the supplied buffer to output the text for an
+   error page. If the callback returns a negative value or doesn't output
+   anything to the buffer, the default error page will be sent instead. The
+   buffer will be automatically be sent when the callback returns, so the
+   callback shouldn't do so itself.
+
+   Microsoft Internet Explorer may display its own error pages if ones sent by
+   an HTTP server are smaller than certain sizes, depending on the status code.
+   To reliably suppress this feature an error page should be at least 512
+   bytes in size.
+
+   @param http the evhttp server object for which to set the callback
+   @param cb the callback to invoke to format error pages
+   @param arg an context argument for the callback
+ */
+EVENT2_EXPORT_SYMBOL
+void evhttp_set_errorcb(struct evhttp *http,
+    int (*cb)(struct evhttp_request *req, struct evbuffer *buffer, int error, const char *reason, void *cbarg),
+    void *cbarg);
 
 /**
    Adds a virtual host to the http server.
@@ -360,19 +444,42 @@ int evhttp_remove_server_alias(struct evhttp *http, const char *alias);
  * Set the timeout for an HTTP request.
  *
  * @param http an evhttp object
- * @param timeout_in_secs the timeout, in seconds
+ * @param timeout the timeout, in seconds
+ * @see evhttp_set_timeout_tv()
  */
 EVENT2_EXPORT_SYMBOL
-void evhttp_set_timeout(struct evhttp *http, int timeout_in_secs);
+void evhttp_set_timeout(struct evhttp *http, int timeout);
 
 /**
- * Set the timeout for an HTTP request.
+ * Set read and write timeout for an HTTP request.
+ *
+ * @param http an evhttp object
+ * @param tv the timeout, or NULL
+ *
+ * For more precise control:
+ * @see evhttp_set_read_timeout_tv()
+ * @see evhttp_set_write_timeout_tv()
+ */
+EVENT2_EXPORT_SYMBOL
+void evhttp_set_timeout_tv(struct evhttp *http, const struct timeval* tv);
+
+/**
+ * Set read timeout for an HTTP request.
  *
  * @param http an evhttp object
  * @param tv the timeout, or NULL
  */
 EVENT2_EXPORT_SYMBOL
-void evhttp_set_timeout_tv(struct evhttp *http, const struct timeval* tv);
+void evhttp_set_read_timeout_tv(struct evhttp *http, const struct timeval* tv);
+
+/**
+ * Set write timeout for an HTTP request.
+ *
+ * @param http an evhttp object
+ * @param tv the timeout, or NULL
+ */
+EVENT2_EXPORT_SYMBOL
+void evhttp_set_write_timeout_tv(struct evhttp *http, const struct timeval* tv);
 
 /* Read all the clients body, and only after this respond with an error if the
  * clients body exceed max_body_size */
@@ -464,10 +571,10 @@ void evhttp_send_reply_chunk(struct evhttp_request *req,
    @param req a request object
    @param databuf the data chunk to send as part of the reply.
    @param cb callback funcion
-   @param call back's argument.
+   @param arg call back's argument.
 */
 EVENT2_EXPORT_SYMBOL
-void evhttp_send_reply_chunk_with_cb(struct evhttp_request *, struct evbuffer *,
+void evhttp_send_reply_chunk_with_cb(struct evhttp_request *req, struct evbuffer *databuf,
     void (*cb)(struct evhttp_connection *, void *), void *arg);
 
 /**
@@ -483,7 +590,10 @@ void evhttp_send_reply_end(struct evhttp_request *req);
  */
 
 /** The different request types supported by evhttp.  These are as specified
- * in RFC2616, except for PATCH which is specified by RFC5789.
+ * in RFC2616, except for:
+ * - PATCH which is specified by RFC5789
+ * - PROPFIND, PROPPATCH, MKCOL, LOCK, UNLOCK, COPY, MOVE
+ *   which are specified by RFC4918
  *
  * By default, only some of these methods are accepted and passed to user
  * callbacks; use evhttp_set_allowed_methods() to change which methods
@@ -498,8 +608,32 @@ enum evhttp_cmd_type {
 	EVHTTP_REQ_OPTIONS = 1 << 5,
 	EVHTTP_REQ_TRACE   = 1 << 6,
 	EVHTTP_REQ_CONNECT = 1 << 7,
-	EVHTTP_REQ_PATCH   = 1 << 8
+	EVHTTP_REQ_PATCH   = 1 << 8,
+	EVHTTP_REQ_PROPFIND= 1 << 9,
+	EVHTTP_REQ_PROPPATCH=1 << 10,
+	EVHTTP_REQ_MKCOL   = 1 << 11,
+	EVHTTP_REQ_LOCK    = 1 << 12,
+	EVHTTP_REQ_UNLOCK  = 1 << 13,
+	EVHTTP_REQ_COPY    = 1 << 14,
+	EVHTTP_REQ_MOVE    = 1 << 15,
 };
+
+#define EVHTTP_REQ_MAX EVHTTP_REQ_MOVE
+
+/**
+ * @brief stucture that is passed to (and modified by) the
+ * extended method callback function
+ *
+ * @see evhttp_set_ext_method_cmp
+ * @see evhttp_connection_set_ext_method_cmp
+ */
+struct evhttp_ext_method {
+	const char *method;
+	ev_uint32_t type;	/* @see enum evhttp_cmd_type */
+	ev_uint16_t flags;	/* Available flag : EVHTTP_METHOD_HAS_BODY */
+};
+
+#define EVHTTP_METHOD_HAS_BODY 0x0001
 
 /** a request object can represent either a request or a reply */
 enum evhttp_request_kind { EVHTTP_REQUEST, EVHTTP_RESPONSE };
@@ -508,6 +642,11 @@ enum evhttp_request_kind { EVHTTP_REQUEST, EVHTTP_RESPONSE };
  * Create and return a connection object that can be used to for making HTTP
  * requests.  The connection object tries to resolve address and establish the
  * connection when it is given an http request object.
+ *
+ * Connection also has default timeouts for the following events:
+ * - connect HTTP_CONNECT_TIMEOUT, which is 45 seconds
+ * - read    HTTP_READ_TIMEOUT which is 50 seconds
+ * - write   HTTP_WRITE_TIMEOUT, which is 50 seconds
  *
  * @param base the event_base to use for handling the connection
  * @param dnsbase the dns_base to use for resolving host names; if not
@@ -687,6 +826,15 @@ EVENT2_EXPORT_SYMBOL
 int evhttp_request_is_owned(struct evhttp_request *req);
 
 /**
+ * Sets extended method cmp callback for this http connection.
+ *
+ * @see evhttp_set_ext_method_cmp
+ */
+EVENT2_EXPORT_SYMBOL
+void evhttp_connection_set_ext_method_cmp(struct evhttp_connection *evcon,
+	evhttp_ext_method_cb cmp);
+
+/**
  * Returns the connection object associated with the request or NULL
  *
  * The user needs to either free the request explicitly or call
@@ -721,7 +869,11 @@ void evhttp_connection_free(struct evhttp_connection *evcon);
 EVENT2_EXPORT_SYMBOL
 void evhttp_connection_free_on_completion(struct evhttp_connection *evcon);
 
-/** sets the ip address from which http connections are made */
+/** Sets the IP address from which http connections are made
+ *
+ * Note this resets internal bufferevent fd, so any options that had been
+ * installed will be flushed.
+ */
 EVENT2_EXPORT_SYMBOL
 void evhttp_connection_set_local_address(struct evhttp_connection *evcon,
     const char *address);
@@ -731,21 +883,69 @@ EVENT2_EXPORT_SYMBOL
 void evhttp_connection_set_local_port(struct evhttp_connection *evcon,
     ev_uint16_t port);
 
-/** Sets the timeout in seconds for events related to this connection */
+/**
+ * Sets the timeout for this connection.
+ *
+ * @see evhttp_connection_set_timeout_tv()
+ */
 EVENT2_EXPORT_SYMBOL
 void evhttp_connection_set_timeout(struct evhttp_connection *evcon,
-    int timeout_in_secs);
+    int timeout);
 
-/** Sets the timeout for events related to this connection.  Takes a struct
- * timeval. */
+/**
+ * Sets the timeout for this connection for the following events:
+ * - read,  if tv==NULL then it uses default timeout (HTTP_READ_TIMEOUT)
+ * - write, if tv==NULL then it uses default timeout (HTTP_WRITE_TIMEOUT)
+ *
+ * But it does not adjust timeout for the "connect" (for historical reasons).
+ *
+ * @param tv the timeout, or NULL
+ *
+ * For more precise control:
+ * @see evhttp_connection_set_connect_timeout_tv()
+ * @see evhttp_connection_set_read_timeout_tv()
+ * @see evhttp_connection_set_write_timeout_tv()
+ */
 EVENT2_EXPORT_SYMBOL
 void evhttp_connection_set_timeout_tv(struct evhttp_connection *evcon,
     const struct timeval *tv);
 
-/** Sets the delay before retrying requests on this connection. This is only
- * used if evhttp_connection_set_retries is used to make the number of retries
- * at least one. Each retry after the first is twice as long as the one before
- * it. */
+/**
+ * Sets the connect timeout for this connection
+ *
+ * @param tv the timeout, or NULL
+ */
+EVENT2_EXPORT_SYMBOL
+void evhttp_connection_set_connect_timeout_tv(struct evhttp_connection *evcon,
+    const struct timeval *tv);
+
+/**
+ * Sets the read timeout for this connection
+ *
+ * @param tv the timeout, or NULL
+ */
+EVENT2_EXPORT_SYMBOL
+void evhttp_connection_set_read_timeout_tv(struct evhttp_connection *evcon,
+    const struct timeval *tv);
+
+/**
+ * Sets the write timeout for this connection
+ *
+ * @param tv the timeout, or NULL
+ */
+EVENT2_EXPORT_SYMBOL
+void evhttp_connection_set_write_timeout_tv(struct evhttp_connection *evcon,
+    const struct timeval *tv);
+
+/**
+ * Sets the delay before retrying requests on this connection.
+ *
+ * This is only used if evhttp_connection_set_retries is used to make the
+ * number of retries at least one. Each retry after the first is twice as long
+ * as the one before it.
+ *
+ * Default delay is HTTP_INITIAL_RETRY_TIMEOUT, which is 2 seconds.
+ */
 EVENT2_EXPORT_SYMBOL
 void evhttp_connection_set_initial_retry_tv(struct evhttp_connection *evcon,
     const struct timeval *tv);
@@ -763,7 +963,7 @@ void evhttp_connection_set_closecb(struct evhttp_connection *evcon,
 /** Get the remote address and port associated with this connection. */
 EVENT2_EXPORT_SYMBOL
 void evhttp_connection_get_peer(struct evhttp_connection *evcon,
-    char **address, ev_uint16_t *port);
+    const char **address, ev_uint16_t *port);
 
 /** Get the remote address associated with this connection.
  * extracted from getpeername() OR from nameserver.
@@ -986,6 +1186,33 @@ char *evhttp_uridecode(const char *uri, int decode_plus,
 EVENT2_EXPORT_SYMBOL
 int evhttp_parse_query(const char *uri, struct evkeyvalq *headers);
 
+/** @see evhttp_parse_query_str_flags() */
+EVENT2_EXPORT_SYMBOL
+int evhttp_parse_query_str(const char *uri, struct evkeyvalq *headers);
+
+/** Tolerate queries that are not standard conformant.
+ *
+ * Here are some examples:
+ *
+ * - test=123&test2
+ *   with with this flag test2 will be present in the output headers
+ *
+ * - test=123&&test2=1
+ *   will parse the query with this flag
+ *
+ * - test=123&=456&test2=1
+ *   will parse the queyr with this flag, however there won't be empty key
+ *   present
+ */
+#define EVHTTP_URI_QUERY_NONCONFORMANT 0x01
+/** Prefer last value over the first from query args
+ *
+ * Example: test=123&test=456
+ * Without: test=123
+ * With   : test=456
+ */
+#define EVHTTP_URI_QUERY_LAST_VAL 0x02
+
 /**
    Helper function to parse out arguments from the query portion of an
    HTTP URI.
@@ -999,12 +1226,13 @@ int evhttp_parse_query(const char *uri, struct evkeyvalq *headers);
    The first entry is: key="q", value="test"
    The second entry is: key="s", value="some thing"
 
-   @param query_parse the query portion of the URI
+   @param uri the query portion of the URI
    @param headers the head of the evkeyval queue
+   @param flags one or more of EVHTTP_URI_QUERY_*
    @return 0 on success, -1 on failure
  */
 EVENT2_EXPORT_SYMBOL
-int evhttp_parse_query_str(const char *uri, struct evkeyvalq *headers);
+int evhttp_parse_query_str_flags(const char *uri, struct evkeyvalq *headers, unsigned flags);
 
 /**
  * Escape HTML character entities in a string.
@@ -1154,6 +1382,15 @@ struct evhttp_uri *evhttp_uri_parse_with_flags(const char *source_uri,
  * </ul>
  */
 #define EVHTTP_URI_NONCONFORMANT 0x01
+/**
+ * Strip brackets from the IPv6 address and only for evhttp_uri_get_host(),
+ * evhttp_uri_join() returns the host with brackets.
+ *
+ * Thus you can use host part of the evhttp_uri for getaddrinfo().
+ *
+ * @see also _EVHTTP_URI_HOST_HAS_BRACKETS
+ */
+#define EVHTTP_URI_HOST_STRIP_BRACKETS 0x04
 
 /** Alias for evhttp_uri_parse_with_flags(source_uri, 0) */
 EVENT2_EXPORT_SYMBOL
