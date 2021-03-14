@@ -40,3 +40,5 @@ test-driver
 *.lai
 *.lo
 *.Po
+.*
+!/.gitignore

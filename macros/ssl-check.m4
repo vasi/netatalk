@@ -45,7 +45,17 @@ dnl	compile_ssl=no
 
 	if test "$tryssl" = "yes"; then
 		AC_MSG_CHECKING([for SSL])
-		for ssldir in "" $tryssldir /usr /usr/local/openssl /usr/$atalk_libname/openssl /usr/local/ssl /usr/$atalk_libname/ssl /usr/local /usr/pkg /opt /opt/openssl /usr/local/ssl ; do
+
+		case "$host_os" in
+		     darwin*)
+		     dnl when compiling for Darwin, attempt to find OpenSSL using brew.
+		     dnl We append the location given by brew to PKG_CONFIG_PATH path
+		     dnl and then export it, so that it can be used in detection below.
+		     AC_CHECK_PROG([BREW],brew, brew)
+		     ;;
+		 esac
+
+		for ssldir in "" $tryssldir $($BREW --prefix openssl 2>/dev/null) /usr /usr/local/openssl /usr/$atalk_libname/openssl /usr/local/ssl /usr/$atalk_libname/ssl /usr/local /usr/pkg /opt /opt/openssl /usr/local/ssl ; do
 			if test -f "$ssldir/include/openssl/cast.h" ; then
 				SSL_CFLAGS="$SSL_CFLAGS -I$ssldir/include -I$ssldir/include/openssl"
 				SSL_LIBS="$SSL_LIBS -L$ssldir/$atalk_libname -L$ssldir -lcrypto"
