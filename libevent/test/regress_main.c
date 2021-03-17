@@ -203,20 +203,23 @@ ignore_log_cb(int s, const char *msg)
 #if defined(__APPLE__)
 static void move_pthread_to_realtime_scheduling_class(pthread_t pthread)
 {
-	mach_timebase_info_data_t info;
+    const uint64_t NANOS_PER_MSEC = 1000000ULL;
+    double clock2abs;
+    int kr;
+    
+    thread_time_constraint_policy_data_t policy;
+    mach_timebase_info_data_t info;
 	mach_timebase_info(&info);
 
-	const uint64_t NANOS_PER_MSEC = 1000000ULL;
-	double clock2abs =
+	clock2abs =
 		((double)info.denom / (double)info.numer) * NANOS_PER_MSEC;
 
-	thread_time_constraint_policy_data_t policy;
 	policy.period      = 0;
 	policy.computation = (uint32_t)(5 * clock2abs); // 5 ms of work
 	policy.constraint  = (uint32_t)(10 * clock2abs);
 	policy.preemptible = FALSE;
 
-	int kr = thread_policy_set(pthread_mach_thread_np(pthread),
+	kr = thread_policy_set(pthread_mach_thread_np(pthread),
 		THREAD_TIME_CONSTRAINT_POLICY,
 		(thread_policy_t)&policy,
 		THREAD_TIME_CONSTRAINT_POLICY_COUNT);
