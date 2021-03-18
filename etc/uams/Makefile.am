@@ -71,7 +71,6 @@ uams_dhx2_pam_la_CFLAGS    = @LIBGCRYPT_CFLAGS@ @PAM_CFLAGS@
 uams_gss_la_CFLAGS   	   = @GSSAPI_CFLAGS@ @KRB5_CFLAGS@
 
 uams_pam_la_LDFLAGS        = -module -avoid-version @PAM_LIBS@
-uams_pgp_la_LDFLAGS        = -module -avoid-version @SSL_LIBS@
 uams_dhx_passwd_la_LDFLAGS = -module -avoid-version @CRYPT_LIBS@ @SSL_LIBS@
 uams_dhx_pam_la_LDFLAGS		= -module -avoid-version @CRYPT_LIBS@ @SSL_LIBS@ @PAM_LIBS@
 uams_dhx2_passwd_la_LDFLAGS	= -module -avoid-version @CRYPT_LIBS@ @LIBGCRYPT_LIBS@
