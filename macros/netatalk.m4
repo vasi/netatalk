@@ -39,39 +39,6 @@ AC_SUBST(CAT_ENTRY_START)
 AC_SUBST(CAT_ENTRY_END)
 ])
 
-dnl Check for dtrace
-AC_DEFUN([AC_NETATALK_DTRACE], [
-  AC_ARG_WITH(dtrace,
-    AS_HELP_STRING(
-      [--with-dtrace],
-      [Enable dtrace probes (default: enabled if dtrace found)]
-    ),
-    [WDTRACE=$withval],
-    [WDTRACE=auto]
-  )
-  if test "x$WDTRACE" = "xyes" -o "x$WDTRACE" = "xauto" ; then
-    AC_CHECK_PROG([atalk_cv_have_dtrace], [dtrace], [yes], [no])
-    if test "x$atalk_cv_have_dtrace" = "xno" ; then
-      if test "x$WDTRACE" = "xyes" ; then
-        AC_MSG_FAILURE([dtrace requested but not found])
-      fi
-      WDTRACE="no"
-    else
-      WDTRACE="yes"
-    fi
-  fi
-
-  if test x"$WDTRACE" = x"yes" ; then
-    AC_DEFINE([WITH_DTRACE], [1], [dtrace probes])
-    DTRACE_LIBS=""
-    if test x"$this_os" = x"freebsd" ; then
-      DTRACE_LIBS="-lelf"
-    fi
-    AC_SUBST(DTRACE_LIBS)
-  fi
-  AM_CONDITIONAL(WITH_DTRACE, test "x$WDTRACE" = "xyes")
-])
-
 dnl Check for dbus-glib, for AFP stats
 AC_DEFUN([AC_NETATALK_DBUS_GLIB], [
   atalk_cv_with_dbus=no
@@ -135,74 +102,6 @@ AC_DEFUN([AC_DEVELOPER], [
     )
     AC_MSG_RESULT([$enable_dev])
     AM_CONDITIONAL(DEVELOPER, test x"$enable_dev" = x"yes")
-])
-
-dnl Tracker, for Spotlight
-AC_DEFUN([AC_NETATALK_SPOTLIGHT], [
-    ac_cv_have_tracker=no
-    ac_cv_tracker_pkg_version_default=0.12
-    ac_cv_tracker_pkg_version_min=0.12
-
-    dnl Tracker SPARQL
-    AC_ARG_WITH([tracker-pkgconfig-version],
-      [AS_HELP_STRING([--with-tracker-pkgconfig-version=VERSION],[Version suffix of the Tracker SPARQL pkg-config (default: 0.12)])],
-      [ac_cv_tracker_pkg_version=$withval],
-      [ac_cv_tracker_pkg_version=$ac_cv_tracker_pkg_version_default]
-    )
-
-    AC_ARG_WITH([tracker-prefix],
-      [AS_HELP_STRING([--with-tracker-prefix=PATH],[Prefix of Tracker (default: none)])],
-      [ac_cv_tracker_prefix=$withval],
-      [ac_cv_tracker_prefix="`pkg-config --variable=prefix tracker-sparql-$ac_cv_tracker_pkg_version`"]
-    )
-
-    AC_ARG_WITH([tracker-install-prefix],
-      [AS_HELP_STRING([--with-tracker-install-prefix=PATH],[Install prefix for Tracker (default: none)])],
-      [ac_cv_tracker_install_prefix=$withval],
-      [ac_cv_tracker_install_prefix=$ac_cv_tracker_prefix]
-    )
-
-    AC_ARG_WITH([dbus-daemon],
-      [AS_HELP_STRING([--with-dbus-daemon=PATH],[Path to DBus daemon (default: /bin/dbus-daemon)])],
-      [ac_cv_dbus_daemon=$withval],
-      [ac_cv_dbus_daemon=/bin/dbus-daemon]
-    )
-    DBUS_DAEMON_PATH=$ac_cv_dbus_daemon
-
-    AC_ARG_VAR([PKG_CONFIG_PATH], [Path to additional pkg-config packages])
-    PKG_CHECK_MODULES([TRACKER], [tracker-sparql-$ac_cv_tracker_pkg_version >= $ac_cv_tracker_pkg_version_min], [ac_cv_have_tracker_sparql=yes], [ac_cv_have_tracker_sparql=no])
-
-    if test x"$ac_cv_have_tracker_sparql" = x"no" ; then
-        if test x"$need_tracker_sparql" = x"yes" ; then
-            AC_MSG_ERROR([$ac_cv_tracker_pkg not found])
-        fi
-    else
-        ac_cv_have_tracker=yes
-        AC_DEFINE(HAVE_TRACKER, 1, [Define if Tracker is available])
-        AC_DEFINE_UNQUOTED(TRACKER_PREFIX, ["$ac_cv_tracker_install_prefix"], [Path to Tracker])
-        AC_DEFINE_UNQUOTED([DBUS_DAEMON_PATH], ["$ac_cv_dbus_daemon"], [Path to dbus-daemon])
-    fi
-
-    dnl Tracker Managing Command
-    if test x"$ac_cv_have_tracker" = x"yes" ; then
-        AC_CHECK_PROGS(ac_cv_tracker_manage, tracker tracker-control, , ["$ac_cv_tracker_prefix"/bin])
-        if test x"$ac_cv_tracker_manage" = x"tracker" ; then
-           TRACKER_MANAGING_COMMAND="tracker daemon"
-           AC_DEFINE(TRACKER_MANAGING_COMMAND, "tracker daemon", [tracker managing command])
-        elif test x"$ac_cv_tracker_manage" = x"tracker-control" ; then
-           TRACKER_MANAGING_COMMAND="tracker-control"
-           AC_DEFINE(TRACKER_MANAGING_COMMAND, "tracker-control", [tracker managing command])
-        else
-           AC_MSG_ERROR([could find neither tracker command nor tracker-control command])
-        fi
-    fi
-
-    AC_SUBST(TRACKER_CFLAGS)
-    AC_SUBST(TRACKER_LIBS)
-    AC_SUBST(TRACKER_MINER_CFLAGS)
-    AC_SUBST(TRACKER_MINER_LIBS)
-    AC_SUBST(DBUS_DAEMON_PATH)
-    AM_CONDITIONAL(HAVE_TRACKER, [test x"$ac_cv_have_tracker" = x"yes"])
 ])
 
 dnl Whether to disable bundled libevent
@@ -358,34 +257,6 @@ powerpc64:yes | s390x:yes | sparc*:yes | x86_64:yes | i386:yes)
     atalk_libname="lib"
     ;;
 esac
-])
-
-dnl Check for optional cracklib support
-AC_DEFUN([AC_NETATALK_CRACKLIB], [
-netatalk_cv_with_cracklib=no
-AC_ARG_WITH(cracklib,
-	[  --with-cracklib[[=DICT]]  enable/set location of cracklib dictionary [[no]]],[
-	if test "x$withval" != "xno" ; then
-		cracklib="$withval"
-		AC_CHECK_LIB(crack, main, [
-			AC_DEFINE(USE_CRACKLIB, 1, [Define if cracklib should be used])
-			LIBS="$LIBS -lcrack"
-			if test "$cracklib" = "yes"; then
-				cracklib="/usr/$atalk_libname/cracklib_dict"
-			fi
-			AC_DEFINE_UNQUOTED(_PATH_CRACKLIB, "$cracklib",
-				[path to cracklib dictionary])
-			AC_MSG_RESULT([setting cracklib dictionary to $cracklib])
-			netatalk_cv_with_cracklib=yes
-			],[
-			AC_MSG_ERROR([cracklib not found!])
-			]
-		)
-	fi
-	]
-)
-AC_MSG_CHECKING([for cracklib support])
-AC_MSG_RESULT([$netatalk_cv_with_cracklib])
 ])
 
 dnl Check whether to enable debug code

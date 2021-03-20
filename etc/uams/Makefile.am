@@ -6,12 +6,12 @@
 
 dhx_exec_hook = echo
 dhx2_exec_hook = echo
+uams_LINKS = uams_dhx.so
 
 # these are complex: check if DHX and DHX2 module should be build
 
 if USE_DHX
 if HAVE_OPENSSL
-uams_LINKS = uams_dhx.so
 UAMS_DHX = uams_dhx_passwd.la
 if BUILD_PAM
 UAMS_DHX_PAM = uams_dhx_pam.la
@@ -22,7 +22,7 @@ endif
 
 if USE_DHX2
 if HAVE_LIBGCRYPT
-uams_LINKS = uams_dhx2.so
+uams_LINKS += uams_dhx2.so
 UAMS_DHX2 = uams_dhx2_passwd.la
 if BUILD_PAM
 UAMS_DHX2_PAM = uams_dhx2_pam.la

@@ -139,13 +139,6 @@ static void show_version_extended(void )
 	puts( "No" );
 #endif
 
-	printf( "      cracklib support:\t" );
-#ifdef USE_CRACKLIB
-	puts( "Yes" );
-#else
-	puts( "No" );
-#endif
-
 	printf( "            EA support:\t" );
 	puts( EA_MODULES );
 
@@ -165,20 +158,6 @@ static void show_version_extended(void )
 
 	printf( "         D-Bus support:\t" );
 #ifdef HAVE_DBUS_GLIB
-	puts( "Yes" );
-#else
-	puts( "No" );
-#endif
-
-	printf( "     Spotlight support:\t" );
-#ifdef HAVE_TRACKER
-	puts( "Yes" );
-#else
-	puts( "No" );
-#endif
-
-	printf( "         DTrace probes:\t" );
-#ifdef WITH_DTRACE
 	puts( "Yes" );
 #else
 	puts( "No" );

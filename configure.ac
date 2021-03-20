@@ -109,9 +109,6 @@ AC_NETATALK_AFS_CHECK
 dnl --with-pkgconfdir check to change configuration directory location
 AC_NETATALK_CONFIG_DIRS
 
-dnl Check for optional cracklib support
-AC_NETATALK_CRACKLIB
-
 dnl Check whether to enable debug code
 AC_NETATALK_DEBUG
 
@@ -151,7 +148,7 @@ AC_ARG_WITH(uams-path, [  --with-uams-path=PATH   path to UAMs [[$libdir/netatal
 dnl Check for libgcrypt, if found enables DHX2 UAM
 AC_NETATALK_PATH_LIBGCRYPT([1:1.2.3])
 
-dnl Check for openssl, if found enables DHX UAM and Randnum UAM
+dnl Check for openssl, if found enables DHX UAM
 AC_NETATALK_PATH_SSL
 
 dnl Check for Berkeley DB library
@@ -159,9 +156,6 @@ AC_NETATALK_PATH_BDB
 
 dnl Check for crypt
 AC_NETATALK_CRYPT
-
-dnl Check for building PGP UAM module
-AC_NETATALK_PGP_UAM
 
 dnl Check for building Kerberos V UAM module
 AC_NETATALK_KRB5_UAM
@@ -194,14 +188,8 @@ AC_NETATALK_LIBEVENT
 dnl Check whether bundled tdb shall be used
 AC_NETATALK_TDB
 
-dnl Check for Tracker
-AC_NETATALK_SPOTLIGHT
-
 dnl libatalk API checks
 AC_DEVELOPER
-
-dnl Check for dtrace
-AC_NETATALK_DTRACE
 
 dnl Check for dbus-glib, for AFP stats on dbus
 AC_NETATALK_DBUS_GLIB
@@ -222,18 +210,15 @@ AC_SUBST(LIBS)
 AC_SUBST(CFLAGS)
 AC_SUBST(UAMS_PATH)
 
-AM_CONDITIONAL(SOLARIS_MODULE, test x$solaris_module = xyes)
 AM_CONDITIONAL(HAVE_LIBGCRYPT, test x$neta_cv_have_libgcrypt = xyes)
 AM_CONDITIONAL(HAVE_OPENSSL, test x$neta_cv_have_openssl = xyes)
 AM_CONDITIONAL(HAVE_ACLS, test x"$ac_cv_have_acls" = x"yes")
 AM_CONDITIONAL(HAVE_LDAP, test x"$netatalk_cv_ldap" = x"yes")
 AM_CONDITIONAL(USE_DHX, test x$neta_cv_compile_dhx = xyes)
 AM_CONDITIONAL(USE_DHX2, test x$neta_cv_compile_dhx2 = xyes)
-AM_CONDITIONAL(USE_RANDNUM, test x$neta_cv_have_openssl = xyes)
 AM_CONDITIONAL(USE_PAM_SO, test x$use_pam_so = xyes)
 AM_CONDITIONAL(USE_PAM, test x$netatalk_cv_install_pam = xyes)
 AM_CONDITIONAL(BUILD_PAM, test x$compile_pam = xyes)
-AM_CONDITIONAL(USE_PGP, test x$compile_pgp = xyes)
 AM_CONDITIONAL(DEFAULT_HOOK, test x$neta_cv_have_libgcrypt != xyes && test x$neta_cv_have_openssl != xyes)
 AM_CONDITIONAL(USE_BDB, test x$bdb_required = xyes)
 AM_CONDITIONAL(HAVE_ATFUNCS, test x"$ac_neta_haveatfuncs" = x"yes")
@@ -243,29 +228,27 @@ dnl Enable silent Automake rules if present
 m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])])
 
 dnl --------------------- generate files
-AC_CONFIG_FILES([
-  Makefile
-  bin/Makefile
-  bin/ad/Makefile
-  bin/afppasswd/Makefile
-  bin/cnid/Makefile
-  bin/cnid/cnid2_create
-  bin/megatron/Makefile
-  bin/misc/Makefile
-  config/Makefile
-  config/pam/Makefile
-  contrib/Makefile
-  contrib/macusers/Makefile
-  contrib/macusers/macusers
-  contrib/shell_utils/Makefile
-  contrib/shell_utils/apple_dump
-  contrib/shell_utils/asip-status.pl
-  distrib/Makefile
-  distrib/config/Makefile
-  distrib/config/netatalk-config
-  distrib/initscripts/Makefile
-  distrib/m4/Makefile
-  doc/Makefile
+AC_OUTPUT([Makefile
+	bin/Makefile
+	bin/ad/Makefile
+	bin/cnid/Makefile
+	bin/cnid/cnid2_create
+	bin/megatron/Makefile
+	bin/misc/Makefile
+	config/Makefile
+	config/pam/Makefile
+	contrib/Makefile
+	contrib/macusers/Makefile
+	contrib/macusers/macusers
+	contrib/shell_utils/Makefile
+	contrib/shell_utils/apple_dump
+	contrib/shell_utils/asip-status.pl
+	distrib/Makefile
+	distrib/config/Makefile
+	distrib/config/netatalk-config
+	distrib/initscripts/Makefile
+	distrib/m4/Makefile
+	doc/Makefile
   doc/html.xsl
   doc/man.xsl
   doc/manual/Makefile
@@ -274,36 +257,35 @@ AC_CONFIG_FILES([
   doc/manpages/man1/Makefile
   doc/manpages/man5/Makefile
   doc/manpages/man8/Makefile
-  etc/Makefile
-  etc/afpd/Makefile
-  etc/cnid_dbd/Makefile
-  etc/netatalk/Makefile
-  etc/spotlight/Makefile
-  etc/uams/Makefile
-  include/Makefile
-  include/atalk/Makefile
-  libatalk/Makefile
-  libatalk/acl/Makefile
-  libatalk/adouble/Makefile
-  libatalk/bstring/Makefile
-  libatalk/cnid/Makefile
-  libatalk/cnid/cdb/Makefile
-  libatalk/cnid/last/Makefile
-  libatalk/cnid/dbd/Makefile
-  libatalk/cnid/tdb/Makefile
-  libatalk/cnid/mysql/Makefile
-  libatalk/compat/Makefile
-  libatalk/dsi/Makefile
-  libatalk/iniparser/Makefile
-  libatalk/talloc/Makefile
-  libatalk/tdb/Makefile
-  libatalk/unicode/Makefile
-  libatalk/unicode/charsets/Makefile
-  libatalk/util/Makefile
-  libatalk/vfs/Makefile
-  macros/Makefile
-  man/Makefile
-  man/man1/Makefile
+	etc/Makefile
+	etc/afpd/Makefile
+	etc/cnid_dbd/Makefile
+	etc/netatalk/Makefile
+	etc/uams/Makefile
+	include/Makefile
+	include/atalk/Makefile
+	libatalk/Makefile
+	libatalk/acl/Makefile
+	libatalk/adouble/Makefile
+	libatalk/bstring/Makefile
+	libatalk/cnid/Makefile
+	libatalk/cnid/cdb/Makefile
+	libatalk/cnid/last/Makefile
+	libatalk/cnid/dbd/Makefile
+	libatalk/cnid/tdb/Makefile
+	libatalk/cnid/mysql/Makefile
+	libatalk/compat/Makefile
+	libatalk/dsi/Makefile
+	libatalk/iniparser/Makefile
+	libatalk/talloc/Makefile
+	libatalk/tdb/Makefile
+	libatalk/unicode/Makefile
+	libatalk/unicode/charsets/Makefile
+	libatalk/util/Makefile
+	libatalk/vfs/Makefile
+	macros/Makefile
+	man/Makefile
+	man/man1/Makefile
   man/man1/ad.1
   man/man1/afpldaptest.1
   man/man1/afppasswd.1
@@ -314,23 +296,20 @@ AC_CONFIG_FILES([
   man/man1/macusers.1
   man/man1/netatalk-config.1
   man/man1/uniconv.1
-  man/man5/Makefile
+	man/man5/Makefile
   man/man5/afp.conf.5
   man/man5/afp_signature.conf.5
   man/man5/afp_voluuid.conf.5
   man/man5/extmap.conf.5
-  man/man8/Makefile
+	man/man8/Makefile
   man/man8/afpd.8
   man/man8/cnid_dbd.8
   man/man8/cnid_metad.8
   man/man8/netatalk.8
-  test/Makefile
-  test/afpd/Makefile
-])
-
-AC_CONFIG_COMMANDS([default],
-  [chmod a+x distrib/config/netatalk-config contrib/shell_utils/apple_*],
-  []
+	test/Makefile
+	test/afpd/Makefile
+	],
+	[chmod a+x distrib/config/netatalk-config contrib/shell_utils/apple_*]
 )
 
 AC_OUTPUT

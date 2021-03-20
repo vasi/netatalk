@@ -12,7 +12,6 @@ AC_DEFUN([AC_NETATALK_CONFIG_SUMMARY], [
 	AC_MSG_RESULT([    AFP:])
 	AC_MSG_RESULT([         Extended Attributes: $neta_cv_eas])
 	AC_MSG_RESULT([         ACL support: $ac_cv_have_acls])
-	AC_MSG_RESULT([         Spotlight: $ac_cv_have_tracker])
 	AC_MSG_RESULT([    CNID:])
 	AC_MSG_RESULT([         backends: $compiled_backends])
 	AC_MSG_RESULT([    UAMS:])
@@ -35,26 +34,16 @@ AC_DEFUN([AC_NETATALK_CONFIG_SUMMARY], [
 	if test x"$netatalk_cv_build_krb5_uam" = x"yes"; then
 		AC_MSG_RESULT([         Kerberos V])
 	fi
-	if test x"$compile_pgp" = x"yes"; then
-		AC_MSG_RESULT([         PGP])
-	fi
-	AC_MSG_RESULT([         clrtxt  ($uams_using_options)])
-	AC_MSG_RESULT([         guest])
 	AC_MSG_RESULT([    Options:])
 	AC_MSG_RESULT([         Zeroconf support:        $netatalk_cv_zeroconf])
 	AC_MSG_RESULT([         tcp wrapper support:     $netatalk_cv_tcpwrap])
-dnl	if test x"$netatalk_cv_linux_sendfile" != x; then
-dnl		AC_MSG_RESULT([         Linux sendfile support:  $netatalk_cv_linux_sendfile])
-dnl	fi
 	AC_MSG_RESULT([         quota support:           $netatalk_cv_quotasupport])
 	AC_MSG_RESULT([         valid shell check:       $netatalk_cv_use_shellcheck])
-	AC_MSG_RESULT([         cracklib support:        $netatalk_cv_with_cracklib])
 dnl	AC_MSG_RESULT([         Samba sharemode interop: $neta_cv_have_smbshmd])
 	AC_MSG_RESULT([         ACL support:             $with_acl_support])
 	AC_MSG_RESULT([         Kerberos support:        $with_kerberos])
 	AC_MSG_RESULT([         LDAP support:            $netatalk_cv_ldap])
 	AC_MSG_RESULT([         AFP stats via dbus:      $atalk_cv_with_dbus])
-	AC_MSG_RESULT([         dtrace probes:           $WDTRACE])
 	AC_MSG_RESULT([    Paths:])
 	AC_MSG_RESULT([         Netatalk lockfile:       $ac_cv_netatalk_lock])
 	if test "x$init_style" != x"none"; then
@@ -62,12 +51,6 @@ dnl	AC_MSG_RESULT([         Samba sharemode interop: $neta_cv_have_smbshmd])
 	fi
 	if test x"$atalk_cv_with_dbus" = x"yes"; then
 		AC_MSG_RESULT([         dbus system directory:   $ac_cv_dbus_sysdir])
-	fi
-	if test x"$ac_cv_have_tracker" = x"yes"; then
-		AC_MSG_RESULT([         dbus daemon path:        $ac_cv_dbus_daemon])
-		AC_MSG_RESULT([         tracker prefix:          $ac_cv_tracker_prefix])
-		AC_MSG_RESULT([         tracker install prefix:  $ac_cv_tracker_install_prefix])
-		AC_MSG_RESULT([         tracker manager:         $ac_cv_tracker_install_prefix/bin/$TRACKER_MANAGING_COMMAND])
 	fi
 	if test x"$use_pam_so" = x"yes"; then
 	   if test x"$netatalk_cv_install_pam" = x"yes"; then
