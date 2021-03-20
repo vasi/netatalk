@@ -28,9 +28,6 @@ AC_DEFUN([AC_NETATALK_CONFIG_SUMMARY], [
         if test "x$neta_cv_compile_dhx2" = "xyes"; then
                 AC_MSG_RESULT([         DHX2    ($uams_using_options)])
         fi
-	if test "x$neta_cv_have_openssl" = "xyes"; then
-		AC_MSG_RESULT([         RANDNUM (afppasswd)])
-	fi
 	if test x"$netatalk_cv_build_krb5_uam" = x"yes"; then
 		AC_MSG_RESULT([         Kerberos V])
 	fi
