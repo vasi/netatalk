@@ -46,14 +46,4 @@ noinst_HEADERS = \
 	talloc.h \
 	dalloc.h \
 	byteorder.h \
-	fce_api.h \
-	spotlight.h
-
-EXTRA_DIST = afp_dtrace.d
-
-if WITH_DTRACE
-BUILT_SOURCES += afp_dtrace.h
-CLEANFILES += afp_dtrace.h
-afp_dtrace.h: $(top_srcdir)/include/atalk/afp_dtrace.d
-	$(LIBTOOL) --mode=execute dtrace -o afp_dtrace.h -h -s $(top_srcdir)/include/atalk/afp_dtrace.d
-endif
+	fce_api.h
