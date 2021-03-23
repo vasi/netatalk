@@ -1,74 +1,17 @@
 #!/bin/sh
 
-DIE=0
+autoreconf -fi
 
-(autoconf --version) < /dev/null > /dev/null 2>&1 || {
-  echo
-  echo "**Error**: You must have \`autoconf' installed to."
-  echo "Download the appropriate package for your distribution,"
-  echo "or get the source tarball at ftp://ftp.gnu.org/pub/gnu/"
-  DIE=1
-}
+case `uname -s` in
+    Darwin)
+    FLAGS="$FLAGS --without-acls \
+                  --disable-zeroconf \
+                  --with-libevent-header=/usr/local/include \
+                  --with-libevent-lib=/usr/local/lib \
+                  --with-afpstats"
+    ;;
+esac
 
-(glibtool --version) < /dev/null > /dev/null 2>&1 || {
-  echo
-  echo "**Error**: You must have \`libtool' installed."
-  echo "Get ftp://ftp.gnu.org/pub/gnu/libtool-1.2d.tar.gz"
-  echo "(or a newer version if it is available)"
-  DIE=1
-}
+./configure $FLAGS "$@" CC=gcc-10
 
-(automake --version) < /dev/null > /dev/null 2>&1 || {
-  echo
-  echo "**Error**: You must have \`automake' installed."
-  echo "Get ftp://ftp.gnu.org/pub/gnu/automake-1.3.tar.gz"
-  echo "(or a newer version if it is available)"
-  DIE=1
-}
-
-(aclocal --version) < /dev/null > /dev/null 2>&1 || {
-  echo
-  echo "**Error**: Missing \`aclocal'.  The version of \`automake'"
-  echo "installed doesn't appear recent enough."
-  echo "Get ftp://ftp.gnu.org/pub/gnu/automake-1.3.tar.gz"
-  echo "(or a newer version if it is available)"
-  DIE=1
-}
-
-(pkg-config --version) < /dev/null > /dev/null 2>&1 || {
-  echo
-  echo "**Error**: You must have \`pkg-config' installed."
-  DIE=1
-}
-
-if test "$DIE" -eq 1; then
-  exit 1
-fi
-
-set -x
-
-rm -rf autom4te*.cache
-
-LIBTOOLIZE=libtoolize
-SYSNAME=`uname`
-if [ "x$SYSNAME" = "xDarwin" ] ; then
-  LIBTOOLIZE=glibtoolize
-fi
-
-# build it all.
-aclocal -I macros $ACLOCAL_FLAGS || exit 1
-autoheader || exit 1
-$LIBTOOLIZE --force --copy
-automake --include-deps --add-missing --foreign --copy || exit 1
-autoconf || exit 1
-
-# libevent
-cd libevent
-aclocal -I m4 && \
-	autoheader && \
-	$LIBTOOLIZE --force --copy && \
-	autoconf && \
-	automake --include-deps --add-missing --force-missing --copy || exit 1
-
-# Let's not fall off the end...
-exit 0
+make clean

@@ -109,9 +109,9 @@ AC_DEFUN([AC_NETATALK_LIBEVENT], [
     AC_MSG_CHECKING([whether to use bundled libevent])
     AC_ARG_WITH(
         libevent,
-        [AS_HELP_STRING([--with-libevent],[whether to use the bundled libevent (default: yes)])],
+        [AS_HELP_STRING([--with-libevent],[whether to use the bundled libevent (default: no)])],
         use_bundled_libevent=$withval,
-        use_bundled_libevent=yes
+        use_bundled_libevent=no
     )
     AC_ARG_WITH(
         libevent-header,
