@@ -58,10 +58,6 @@ afpd_CFLAGS = \
 	-D_PATH_CONFDIR=\"$(pkgconfdir)/\" \
 	-D_PATH_STATEDIR='"$(localstatedir)/netatalk/"'
 
-if HAVE_ACLS
-afpd_SOURCES += acls.c
-endif
-
 if HAVE_DBUS_GLIB
 BUILT_SOURCES += afpstats_service_glue.h
 DISTCLEANFILES += afpstats_service_glue.h

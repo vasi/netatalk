@@ -4,8 +4,7 @@ autoreconf -fi
 
 case `uname -s` in
     Darwin)
-    FLAGS="$FLAGS --without-acls \
-                  --disable-zeroconf \
+    FLAGS="$FLAGS --disable-zeroconf \
                   --with-libevent-header=/usr/local/include \
                   --with-libevent-lib=/usr/local/lib \
                   --with-afpstats"

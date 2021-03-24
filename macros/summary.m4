@@ -37,7 +37,6 @@ AC_DEFUN([AC_NETATALK_CONFIG_SUMMARY], [
 	AC_MSG_RESULT([         quota support:           $netatalk_cv_quotasupport])
 	AC_MSG_RESULT([         valid shell check:       $netatalk_cv_use_shellcheck])
 dnl	AC_MSG_RESULT([         Samba sharemode interop: $neta_cv_have_smbshmd])
-	AC_MSG_RESULT([         ACL support:             $with_acl_support])
 	AC_MSG_RESULT([         Kerberos support:        $with_kerberos])
 	AC_MSG_RESULT([         LDAP support:            $netatalk_cv_ldap])
 	AC_MSG_RESULT([         AFP stats via dbus:      $atalk_cv_with_dbus])
