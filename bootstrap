@@ -4,7 +4,9 @@ autoreconf -fi
 
 case `uname -s` in
     Darwin)
+    export XML_CATALOG_FILES="/usr/local/etc/xml/catalog"
     FLAGS="$FLAGS --disable-zeroconf \
+                  --with-docbook \
                   --with-libevent-header=/usr/local/include \
                   --with-libevent-lib=/usr/local/lib \
                   --with-afpstats"

@@ -5,26 +5,19 @@ AC_DEFUN([AX_CHECK_DOCBOOK], [
 # It's just rude to go over the net to build
 XSLTPROC_FLAGS=--nonet
 DOCBOOK_ROOT=
-for i in /etc/xml/catalog /usr/local/etc/xml/catalog /opt/local/etc/xml/catalog ;
+for i in /usr/local/etc/xml/catalog ;
 do
     if test -f $i; then
           XML_CATALOG="$i"
     fi
 done
-if test -z "$XML_CATALOG" ; then
-    for i in /usr/share/sgml/docbook/stylesheet/xsl/nwalsh /usr/share/sgml/docbook/xsl-stylesheets/ /opt/local/share/xsl/docbook-xsl/xhtml/ ;
+if test -n "$XML_CATALOG" ; then
+    for i in /usr/local/Cellar/docbook-xsl/1.79.2_1/docbook-xsl ;
     do
         if test -d "$i"; then
             DOCBOOK_ROOT=$i
         fi
     done
-    # Last resort - try net
-    if test -z "$DOCBOOK_ROOT"; then
-        XSLTPROC_FLAGS=
-    fi
-else
-    CAT_ENTRY_START='<!--'
-    CAT_ENTRY_END='-->'
 fi
 AC_CHECK_PROG(XSLTPROC,xsltproc,xsltproc,)
 XSLTPROC_WORKS=no
