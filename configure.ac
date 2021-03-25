@@ -1,5 +1,6 @@
 dnl configure.ac for netatalk
 
+NETATALK_VERSION=`cat $srcdir/VERSION`
 AC_INIT([netatalk],[m4_esyscmd([cat VERSION])])
 AC_CANONICAL_TARGET
 AM_INIT_AUTOMAKE([subdir-objects])
