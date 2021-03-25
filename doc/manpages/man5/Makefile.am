@@ -17,7 +17,7 @@ EXTRA_DIST = \
 
 CLEANFILES += $(MAN_MANPAGES)
 
-%.5 : %.5.xml
+$(MAN_MANPAGES) : %.5 : %.5.xml
 	@xsltproc $(MAN_STYLESHEET) $<
 	@cp $@ $(top_builddir)/man/man5/$@.in
 
