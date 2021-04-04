@@ -4,7 +4,7 @@ NETATALK_VERSION=`cat $srcdir/VERSION`
 AC_INIT([netatalk],[m4_esyscmd([cat VERSION])])
 AC_CANONICAL_TARGET
 AM_INIT_AUTOMAKE([subdir-objects])
-AM_CONFIG_HEADER(config.h)
+AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIRS([macros])
 AM_MAINTAINER_MODE([enable])
 AM_SILENT_RULES([yes])
@@ -12,7 +12,6 @@ AM_SILENT_RULES([yes])
 dnl Checks for programs.
 AC_PROG_AWK
 AC_PROG_CC
-AC_PROG_CC_C99
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
@@ -23,7 +22,7 @@ AC_PROG_PS
 AM_PROG_CC_C_O
 AC_C_BIGENDIAN
 AC_C_INLINE
-AC_PROG_LEX
+AC_PROG_LEX([yywrap])
 AC_PROG_YACC
 
 dnl Check if we can use attribute unused (gcc only) from ethereal
@@ -252,7 +251,6 @@ AC_CONFIG_FILES([Makefile
 	etc/Makefile
 	etc/afpd/Makefile
 	etc/cnid_dbd/Makefile
-	etc/netatalk/Makefile
 	etc/uams/Makefile
 	include/Makefile
 	include/atalk/Makefile
