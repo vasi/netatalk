@@ -186,18 +186,6 @@ AC_DEFUN([AC_NETATALK_LOCKFILE], [
         ac_cv_netatalk_lock=/var/spool/locks/netatalk
         if test x"$atalk_cv_fhs_compat" = x"yes" ; then
             ac_cv_netatalk_lock=/var/run/netatalk.pid
-        else
-            case "$host_os" in
-            *freebsd*)
-                ac_cv_netatalk_lock=/var/spool/lock/netatalk
-                ;;
-            *netbsd*|*openbsd*)
-                ac_cv_netatalk_lock=/var/run/netatalk.pid
-                ;;
-            *linux*)
-                ac_cv_netatalk_lock=/var/lock/netatalk
-                ;;
-            esac
         fi
     fi
     AC_DEFINE_UNQUOTED(PATH_NETATALK_LOCK, ["$ac_cv_netatalk_lock"], [netatalk lockfile path])
@@ -223,14 +211,6 @@ rm -rf conftest*
 case $host_cpu:$atalk_cv_cc_64bit_output in
 powerpc64:yes | s390x:yes | sparc*:yes | x86_64:yes | i386:yes)
     case $target_os in
-    solaris2*)
-        AC_MSG_RESULT([yes])
-        atalk_libname="lib/64"
-        ;;
-    *bsd* | dragonfly*)
-        AC_MSG_RESULT([no])
-        atalk_libname="lib"
-        ;;
     *)
         AC_MSG_RESULT([yes])
         atalk_libname="lib64"
@@ -339,114 +319,11 @@ AC_ARG_ENABLE(shell-check,
 )
 ])
 
-dnl Check for optional initscript install
-AC_DEFUN([AC_NETATALK_INIT_STYLE], [
-    AC_ARG_WITH(init-style,
-                [  --with-init-style       use OS specific init config [[redhat-sysv|redhat-systemd|suse-sysv|suse-systemd|gentoo-openrc|gentoo-systemd|netbsd|debian-sysv|debian-systemd|solaris|openrc|systemd]]],
-                init_style="$withval", init_style=none
-    )
-    case "$init_style" in
-    "redhat")
-	    AC_MSG_ERROR([--with-init-style=redhat is obsoleted. Use redhat-sysv or redhat-systemd.])
-        ;;
-    "redhat-sysv")
-	    AC_MSG_RESULT([enabling redhat-style sysv initscript support])
-	    ac_cv_init_dir="/etc/rc.d/init.d"
-	    ;;
-    "redhat-systemd")
-	    AC_MSG_RESULT([enabling redhat-style systemd support])
-	    ac_cv_init_dir="/usr/lib/systemd/system"
-	    ;;
-    "suse")
-	    AC_MSG_ERROR([--with-init-style=suse is obsoleted. Use suse-sysv or suse-systemd.])
-        ;;
-    "suse-sysv")
-	    AC_MSG_RESULT([enabling suse-style sysv initscript support])
-	    ac_cv_init_dir="/etc/init.d"
-	    ;;
-    "suse-systemd")
-	    AC_MSG_RESULT([enabling suse-style systemd support (>=openSUSE12.1)])
-	    ac_cv_init_dir="/usr/lib/systemd/system"
-	    ;;
-    "gentoo")
-	    AC_MSG_ERROR([--with-init-style=gentoo is obsoleted. Use gentoo-openrc or gentoo-systemd.])
-        ;;
-    "gentoo-openrc")
-	    AC_MSG_RESULT([enabling gentoo-style openrc support])
-	    ac_cv_init_dir="/etc/init.d"
-        ;;
-    "gentoo-systemd")
-	    AC_MSG_RESULT([enabling gentoo-style systemd support])
-	    ac_cv_init_dir="/usr/lib/systemd/system"
-        ;;
-    "netbsd")
-	    AC_MSG_RESULT([enabling netbsd-style initscript support])
-	    ac_cv_init_dir="/etc/rc.d"
-        ;;
-    "debian")
-	    AC_MSG_ERROR([--with-init-style=debian is obsoleted. Use debian-sysv or debian-systemd.])
-        ;;
-    "debian-sysv")
-	    AC_MSG_RESULT([enabling debian-style sysv initscript support])
-	    ac_cv_init_dir="/etc/init.d"
-        ;;
-    "debian-systemd")
-	    AC_MSG_RESULT([enabling debian-style systemd support])
-	    ac_cv_init_dir="/lib/systemd/system"
-	    ;;
-    "solaris")
-	    AC_MSG_RESULT([enabling solaris-style SMF support])
-	    ac_cv_init_dir="/lib/svc/manifest/network/"
-        ;;
-    "openrc")
-	    AC_MSG_RESULT([enabling general openrc support])
-	    ac_cv_init_dir="/etc/init.d"
-        ;;
-    "systemd")
-	    AC_MSG_RESULT([enabling general systemd support])
-	    ac_cv_init_dir="/usr/lib/systemd/system"
-        ;;
-    "none")
-	    AC_MSG_RESULT([disabling init-style support])
-	    ac_cv_init_dir="none"
-        ;;
-    *)
-	    AC_MSG_ERROR([illegal init-style])
-        ;;
-    esac
-    AM_CONDITIONAL(USE_NETBSD, test x$init_style = xnetbsd)
-    AM_CONDITIONAL(USE_REDHAT_SYSV, test x$init_style = xredhat-sysv)
-    AM_CONDITIONAL(USE_SUSE_SYSV, test x$init_style = xsuse-sysv)
-    AM_CONDITIONAL(USE_SOLARIS, test x$init_style = xsolaris)
-    AM_CONDITIONAL(USE_OPENRC, test x$init_style = xopenrc || test x$init_style = xgentoo-openrc)
-    AM_CONDITIONAL(USE_DEBIAN_SYSV, test x$init_style = xdebian-sysv)
-    AM_CONDITIONAL(USE_SYSTEMD, test x$init_style = xsystemd || test x$init_style = xredhat-systemd || test x$init_style = xsuse-systemd || test x$init_style = xgentoo-systemd)
-    AM_CONDITIONAL(USE_DEBIAN_SYSTEMD, test x$init_style = xdebian-systemd)
-    AM_CONDITIONAL(USE_UNDEF, test x$init_style = xnone)
-
-    AC_ARG_WITH(init-dir,
-                [  --with-init-dir=PATH    path to OS specific init directory],
-                ac_cv_init_dir="$withval", ac_cv_init_dir="$ac_cv_init_dir"
-    )
-    INIT_DIR="$ac_cv_init_dir"
-    AC_SUBST(INIT_DIR, ["$ac_cv_init_dir"])
-])
-
 dnl OS specific configuration
 AC_DEFUN([AC_NETATALK_OS_SPECIFIC], [
 case "$host_os" in
-	*aix*)				this_os=aix ;;
-	*freebsd*) 			this_os=freebsd ;;
-	*kfreebsd*)			this_os=kfreebsd ;;
-	*hpux11*)			this_os=hpux11 ;;
-	*irix*)				this_os=irix ;;
-	*linux*)   			this_os=linux ;;
 	*osx*)				this_os=macosx ;;
 	*darwin*)			this_os=macosx ;;
-	*netbsd*) 			this_os=netbsd ;;
-	*openbsd*) 			this_os=openbsd ;;
-	*osf*) 				this_os=tru64 ;;
-	*solaris*) 			this_os=solaris ;;
 esac
 
 case "$host_cpu" in
@@ -455,87 +332,6 @@ case "$host_cpu" in
 	mips)						this_cpu=mips ;;
 	powerpc|ppc)				this_cpu=ppc ;;
 esac
-
-dnl --------------------- GNU source
-case "$this_os" in
-	linux)	AC_DEFINE(_GNU_SOURCE, 1, [Whether to use GNU libc extensions])
-        ;;
-	kfreebsd) AC_DEFINE(_GNU_SOURCE, 1, [Whether to use GNU libc extensions])
-        ;;
-esac
-
-dnl --------------------- operating system specific flags (port from sys/*)
-
-dnl ----- FreeBSD specific -----
-if test x"$this_os" = "xfreebsd"; then
-	AC_MSG_RESULT([ * FreeBSD specific configuration])
-	AC_DEFINE(BSD4_4, 1, [BSD compatiblity macro])
-	AC_DEFINE(FREEBSD, 1, [Define if OS is FreeBSD])
-    AC_DEFINE(OPEN_NOFOLLOW_ERRNO, EMLINK, errno returned by open with O_NOFOLLOW)
-fi
-
-dnl ----- GNU/kFreeBSD specific -----
-if test x"$this_os" = "xkfreebsd"; then
-	AC_MSG_RESULT([ * GNU/kFreeBSD specific configuration])
-	AC_DEFINE(BSD4_4, 1, [BSD compatiblity macro])
-	AC_DEFINE(FREEBSD, 1, [Define if OS is FreeBSD])
-    AC_DEFINE(OPEN_NOFOLLOW_ERRNO, EMLINK, errno returned by open with O_NOFOLLOW)
-fi
-
-dnl ----- Linux specific -----
-if test x"$this_os" = "xlinux"; then
-	AC_MSG_RESULT([ * Linux specific configuration])
-    AC_DEFINE(LINUX, 1, [OS is Linux])
-	dnl ----- check if we need the quotactl wrapper
-    AC_CHECK_HEADERS(linux/dqblk_xfs.h,,
-		[AC_CHECK_HEADERS(linux/xqm.h linux/xfs_fs.h)
-        	AC_CHECK_HEADERS(xfs/libxfs.h xfs/xqm.h xfs/xfs_fs.h)]
-	)
-
-
-	dnl ----- as far as I can tell, dbtob always does the wrong thing
-	dnl ----- on every single version of linux I've ever played with.
-	dnl ----- see etc/afpd/quota.c
-	AC_DEFINE(HAVE_BROKEN_DBTOB, 1, [Define if dbtob is broken])
-fi
-
-dnl ----- NetBSD specific -----
-if test x"$this_os" = "xnetbsd"; then
-	AC_MSG_RESULT([ * NetBSD specific configuration])
-	AC_DEFINE(BSD4_4, 1, [BSD compatiblity macro])
-	AC_DEFINE(NETBSD, 1, [Define if OS is NetBSD])
-    AC_DEFINE(OPEN_NOFOLLOW_ERRNO, EFTYPE, errno returned by open with O_NOFOLLOW)
-
-	CFLAGS="-I\$(top_srcdir)/sys/netbsd $CFLAGS"
-
-	dnl ----- NetBSD does not have crypt.h, uses unistd.h -----
-	AC_DEFINE(UAM_DHX, 1, [Define if the DHX UAM modules should be compiled])
-fi
-
-dnl ----- OpenBSD specific -----
-if test x"$this_os" = "xopenbsd"; then
-	AC_MSG_RESULT([ * OpenBSD specific configuration])
-    AC_DEFINE(BSD4_4, 1, [BSD compatiblity macro])
-	dnl ----- OpenBSD does not have crypt.h, uses unistd.h -----
-	AC_DEFINE(UAM_DHX, 1, [Define if the DHX UAM modules should be compiled])
-fi
-
-dnl ----- Solaris specific -----
-if test x"$this_os" = "xsolaris"; then
-	AC_MSG_RESULT([ * Solaris specific configuration])
-	AC_DEFINE(__svr4__, 1, [Solaris compatibility macro])
-	AC_DEFINE(_ISOC9X_SOURCE, 1, [Compatibility macro])
-	AC_DEFINE(NO_STRUCT_TM_GMTOFF, 1, [Define if the gmtoff member of struct tm is not available])
-	AC_DEFINE(SOLARIS, 1, [Solaris compatibility macro])
-    AC_DEFINE(_XOPEN_SOURCE, 600, [Solaris compilation environment])
-    AC_DEFINE(__EXTENSIONS__,  1, [Solaris compilation environment])
-	init_style=solaris
-fi
-
-dnl Whether to run ldconfig after installing libraries
-AC_PATH_PROG(NETA_LDCONFIG, ldconfig, , [$PATH$PATH_SEPARATOR/sbin$PATH_SEPARATOR/bin$PATH_SEPARATOR/usr/sbin$PATH_SEPARATOR/usr/bin])
-echo NETA_LDCONFIG = $NETA_LDCONFIG
-AM_CONDITIONAL(RUN_LDCONFIG, test x"$this_os" = x"linux" -a x"$NETA_LDCONFIG" != x"")
 ])
 
 dnl Check whether to enable rpath (the default on Solaris and NetBSD)
@@ -893,24 +689,7 @@ AC_ARG_ENABLE(sendfile,
 
 if test x"$netatalk_cv_search_sendfile" = x"yes"; then
    case "$host_os" in
-   *linux*)
-        AC_DEFINE(SENDFILE_FLAVOR_LINUX,1,[Whether linux sendfile() API is available])
-        AC_CHECK_FUNC([sendfile], [netatalk_cv_HAVE_SENDFILE=yes])
-        ;;
-
-    *solaris*)
-        AC_DEFINE(SENDFILE_FLAVOR_SOLARIS, 1, [Solaris sendfile()])
-        AC_SEARCH_LIBS(sendfile, sendfile)
-        AC_CHECK_FUNC([sendfile], [netatalk_cv_HAVE_SENDFILE=yes])
-        AC_CHECK_FUNCS([sendfilev])
-        ;;
-
-    *freebsd*)
-        AC_DEFINE(SENDFILE_FLAVOR_BSD, 1, [Define if the sendfile() function uses BSD semantics])
-        AC_CHECK_FUNC([sendfile], [netatalk_cv_HAVE_SENDFILE=yes])
-        ;;
-
-    *)
+   *)
         ;;
 
     esac
@@ -924,10 +703,6 @@ fi
 dnl ------ Check for recvfile() --------
 AC_DEFUN([AC_NETATALK_RECVFILE], [
 case "$host_os" in
-*linux*)
-    AC_CHECK_FUNCS([splice], [atalk_cv_use_recvfile=yes])
-    ;;
-
 *)
     ;;
 
