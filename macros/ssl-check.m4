@@ -65,7 +65,7 @@ dnl	compile_ssl=no
 						SSL_LIBS="$SSL_LIBS -Wl,--enable-new-dtags"
 					fi
 				fi
-				AC_MSG_RESULT([$ssldir (enabling RANDNUM and DHX support)])
+				AC_MSG_RESULT([$ssldir (enabling DHX support)])
 				CFLAGS="$CFLAGS $SSL_CFLAGS"
 				LIBS="$LIBS $SSL_LIBS"
 
