@@ -69,7 +69,7 @@ static void hexdump(void *m, size_t l) {
   EA names, secondly it wants these names. In order to avoid scanning EAs twice
   we cache them in a static buffer.
 */
-int afp_listextattr(AFPObj *obj _U_, char *ibuf, size_t ibuflen _U_, char *rbuf, size_t *rbuflen)
+int afp_listextattr(AFPObj *obj , char *ibuf, size_t ibuflen , char *rbuf, size_t *rbuflen)
 {
     int                 ret, oflag = 0, adflags = 0, fd = -1;
     uint16_t            vid, bitmap, uint16;
@@ -244,7 +244,7 @@ static char attrmname[256];
     return attrmname;
 }
 
-int afp_getextattr(AFPObj *obj _U_, char *ibuf, size_t ibuflen _U_, char *rbuf, size_t *rbuflen)
+int afp_getextattr(AFPObj *obj , char *ibuf, size_t ibuflen , char *rbuf, size_t *rbuflen)
 {
     int                 ret, oflag = 0, fd = -1;
     uint16_t            vid, bitmap, attrnamelen;
@@ -339,7 +339,7 @@ int afp_getextattr(AFPObj *obj _U_, char *ibuf, size_t ibuflen _U_, char *rbuf, 
     return ret;
 }
 
-int afp_setextattr(AFPObj *obj _U_, char *ibuf, size_t ibuflen _U_, char *rbuf _U_, size_t *rbuflen)
+int afp_setextattr(AFPObj *obj , char *ibuf, size_t ibuflen , char *rbuf , size_t *rbuflen)
 {
     int                 oflag = 0, ret, fd = -1;
     uint16_t            vid, bitmap, attrnamelen;
@@ -433,7 +433,7 @@ int afp_setextattr(AFPObj *obj _U_, char *ibuf, size_t ibuflen _U_, char *rbuf _
     return ret;
 }
 
-int afp_remextattr(AFPObj *obj _U_, char *ibuf, size_t ibuflen _U_, char *rbuf _U_, size_t *rbuflen)
+int afp_remextattr(AFPObj *obj , char *ibuf, size_t ibuflen , char *rbuf , size_t *rbuflen)
 {
     int                 oflag = 0, ret, fd = -1;
     uint16_t            vid, bitmap, attrnamelen;

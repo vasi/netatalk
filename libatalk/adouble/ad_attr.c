@@ -117,7 +117,7 @@ int ad_setid (struct adouble *adp, const dev_t dev, const ino_t ino , const uint
 }
 
 /* ----------------------------- */
-uint32_t ad_getid (struct adouble *adp, const dev_t st_dev, const ino_t st_ino , const cnid_t did, const void *stamp _U_)
+uint32_t ad_getid (struct adouble *adp, const dev_t st_dev, const ino_t st_ino , const cnid_t did, const void *stamp )
 {
     uint32_t aint = 0;
     dev_t  dev;

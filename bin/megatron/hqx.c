@@ -371,7 +371,7 @@ int hqx_header_read(struct FHeader *fh)
  * hqx_header_write.
  */
 
-int hqx_header_write(struct FHeader *fh _U_)
+int hqx_header_write(struct FHeader *fh )
 {
     return( -1 );
 }

@@ -23,7 +23,7 @@
 #include <atalk/util.h>
 #include <atalk/logger.h>
 
-size_t dsi_writeinit(DSI *dsi, void *buf, const size_t buflen _U_)
+size_t dsi_writeinit(DSI *dsi, void *buf, const size_t buflen )
 {
     size_t bytes = 0;
     dsi->datasize = ntohl(dsi->header.dsi_len) - dsi->header.dsi_data.dsi_doff;

@@ -63,7 +63,7 @@
 static char *old_dbfiles[] = {"cnid.db", NULL};
 
 /* --------------- */
-static int didname(DB *dbp _U_, const DBT *pkey _U_, const DBT *pdata, DBT *skey)
+static int didname(DB *dbp , const DBT *pkey , const DBT *pdata, DBT *skey)
 {
 int len;
  
@@ -75,7 +75,7 @@ int len;
 }
  
 /* --------------- */
-static int devino(DB *dbp _U_, const DBT *pkey _U_, const DBT *pdata, DBT *skey)
+static int devino(DB *dbp , const DBT *pkey , const DBT *pdata, DBT *skey)
 {
     memset(skey, 0, sizeof(DBT));
     skey->data = (char *)pdata->data + CNID_DEVINO_OFS;

@@ -738,7 +738,7 @@ EC_CLEANUP:
     EC_EXIT;
 }
 
-static int ad_header_read_ea(const char *path, struct adouble *ad, const struct stat *hst _U_)
+static int ad_header_read_ea(const char *path, struct adouble *ad, const struct stat *hst )
 {
     EC_INIT;
     uint16_t nentries;
@@ -848,14 +848,14 @@ static int ad_mkrf(const char *path)
 }
 
 #ifdef HAVE_EAFD
-static int ad_mkrf_ea(const char *path _U_)
+static int ad_mkrf_ea(const char *path )
 {
     AFP_PANIC("ad_mkrf_ea: don't use");
     return 0;
 }
 #endif
 
-static int ad_mkrf_osx(const char *path _U_)
+static int ad_mkrf_osx(const char *path )
 {
     return 0;
 }
@@ -904,12 +904,12 @@ static int ad_mode_st(const char *path, mode_t *mode, struct stat *stbuf)
 }
 
 /* --------------------------- */
-static int ad_header_upgrade(struct adouble *ad _U_, const char *name _U_)
+static int ad_header_upgrade(struct adouble *ad , const char *name )
 {
     return 0;
 }
 
-static int ad_header_upgrade_ea(struct adouble *ad _U_, const char *name _U_)
+static int ad_header_upgrade_ea(struct adouble *ad , const char *name )
 {
     AFP_PANIC("ad_header_upgrade_ea: don't use");
     return 0;
@@ -1561,12 +1561,12 @@ off_t ad_getentryoff(const struct adouble *ad, int eid)
     AFP_PANIC("What am I doing here?");
 }
 
-const char *ad_path_ea( const char *path, int adflags _U_)
+const char *ad_path_ea( const char *path, int adflags )
 {
     return path;
 }
 
-const char *ad_path_osx(const char *path, int adflags _U_)
+const char *ad_path_osx(const char *path, int adflags )
 {
     static char pathbuf[ MAXPATHLEN + 1];
     char    c, *slash, buf[MAXPATHLEN + 1];

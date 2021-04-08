@@ -505,7 +505,7 @@ int dircache_add(const struct vol *vol,
   * Callers outside of dircache.c should call this with
   * flags = QUEUE_INDEX | DIDNAME_INDEX | DIRCACHE.
   */
-void dircache_remove(const struct vol *vol _U_, struct dir *dir, int flags)
+void dircache_remove(const struct vol *vol , struct dir *dir, int flags)
 {
     hnode_t *hn;
 

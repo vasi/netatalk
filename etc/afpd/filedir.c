@@ -37,7 +37,7 @@
 #include "filedir.h"
 #include "unix.h"
 
-int afp_getfildirparams(AFPObj *obj _U_, char *ibuf, size_t ibuflen _U_, char *rbuf, size_t *rbuflen)
+int afp_getfildirparams(AFPObj *obj , char *ibuf, size_t ibuflen , char *rbuf, size_t *rbuflen)
 {
     struct stat     *st;
     struct vol      *vol;
@@ -132,7 +132,7 @@ int afp_getfildirparams(AFPObj *obj _U_, char *ibuf, size_t ibuflen _U_, char *r
     return( AFP_OK );
 }
 
-int afp_setfildirparams(AFPObj *obj, char *ibuf, size_t ibuflen _U_, char *rbuf _U_, size_t *rbuflen)
+int afp_setfildirparams(AFPObj *obj, char *ibuf, size_t ibuflen , char *rbuf , size_t *rbuflen)
 {
     struct stat *st;
     struct vol  *vol;
@@ -410,7 +410,7 @@ exit:
 }
 
 /* -------------------------------------------- */
-int afp_rename(AFPObj *obj, char *ibuf, size_t ibuflen _U_, char *rbuf _U_, size_t *rbuflen)
+int afp_rename(AFPObj *obj, char *ibuf, size_t ibuflen , char *rbuf , size_t *rbuflen)
 {
     struct vol  *vol;
     struct dir  *sdir;
@@ -562,7 +562,7 @@ EC_CLEANUP:
 }
 
 /* ------------------------------- */
-int afp_delete(AFPObj *obj, char *ibuf, size_t ibuflen _U_, char *rbuf _U_, size_t *rbuflen)
+int afp_delete(AFPObj *obj, char *ibuf, size_t ibuflen , char *rbuf , size_t *rbuflen)
 {
     struct vol  *vol;
     struct dir  *dir;
@@ -708,7 +708,7 @@ char *ctoupath(const struct vol *vol, struct dir *dir, char *name)
 }
 
 /* ------------------------- */
-int afp_moveandrename(AFPObj *obj, char *ibuf, size_t ibuflen _U_, char *rbuf _U_, size_t *rbuflen)
+int afp_moveandrename(AFPObj *obj, char *ibuf, size_t ibuflen , char *rbuf , size_t *rbuflen)
 {
     struct vol  *vol;
     struct dir  *sdir, *ddir;

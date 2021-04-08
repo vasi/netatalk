@@ -65,8 +65,8 @@ static const char *clientname;
 #endif /* TRU64 */
 
 /* dhx passwd */
-static int pwd_login(void *obj, char *username, int ulen, struct passwd **uam_pwd _U_,
-			char *ibuf, size_t ibuflen _U_,
+static int pwd_login(void *obj, char *username, int ulen, struct passwd **uam_pwd ,
+			char *ibuf, size_t ibuflen ,
 			char *rbuf, size_t *rbuflen)
 {
     unsigned char iv[] = "CJalbert";
@@ -277,7 +277,7 @@ static int passwd_login_ext(void *obj, char *uname, struct passwd **uam_pwd,
 }
 			
 static int passwd_logincont(void *obj, struct passwd **uam_pwd,
-			    char *ibuf, size_t ibuflen _U_, 
+			    char *ibuf, size_t ibuflen ,
 			    char *rbuf, size_t *rbuflen)
 {
 #ifdef SHADOWPW

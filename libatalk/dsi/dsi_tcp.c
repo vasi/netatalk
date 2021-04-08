@@ -77,7 +77,7 @@ static void dsi_tcp_close(DSI *dsi)
 }
 
 /* alarm handler for tcp_open */
-static void timeout_handler(int sig _U_)
+static void timeout_handler(int sig )
 {
     LOG(log_error, logtype_dsi, "dsi_tcp_open: connection timed out");
     exit(EXITERR_CLNT);

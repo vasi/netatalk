@@ -143,7 +143,7 @@ static void afp_dsi_die(int sig)
 }
 
 /* SIGURG handler (primary reconnect) */
-static void afp_dsi_transfer_session(int sig _U_)
+static void afp_dsi_transfer_session(int sig )
 {
     uint16_t dsiID;
     int socket;
@@ -194,7 +194,7 @@ static void afp_dsi_transfer_session(int sig _U_)
 }
 
 /* ------------------- */
-static void afp_dsi_timedown(int sig _U_)
+static void afp_dsi_timedown(int sig )
 {
     struct sigaction	sv;
     struct itimerval	it;
@@ -243,7 +243,7 @@ static void afp_dsi_timedown(int sig _U_)
  */
 volatile int reload_request = 0;
 
-static void afp_dsi_reload(int sig _U_)
+static void afp_dsi_reload(int sig )
 {
     reload_request = 1;
 }
@@ -253,13 +253,13 @@ static void afp_dsi_reload(int sig _U_)
  */
 static volatile sig_atomic_t debug_request = 0;
 
-static void afp_dsi_debug(int sig _U_)
+static void afp_dsi_debug(int sig )
 {
     debug_request = 1;
 }
 
 /* ---------------------- */
-static void afp_dsi_getmesg (int sig _U_)
+static void afp_dsi_getmesg (int sig )
 {
     DSI *dsi = (DSI *)AFPobj->dsi;
 
@@ -268,7 +268,7 @@ static void afp_dsi_getmesg (int sig _U_)
         dsi->msg_request = 2;
 }
 
-static void alarm_handler(int sig _U_)
+static void alarm_handler(int sig )
 {
     int err;
     DSI *dsi = (DSI *)AFPobj->dsi;
@@ -338,7 +338,7 @@ static void alarm_handler(int sig _U_)
     }
 }
 
-static void child_handler(int sig _U_)
+static void child_handler(int sig )
 {
     wait(NULL);
 }

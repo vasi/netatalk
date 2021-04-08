@@ -663,7 +663,7 @@ int getfilparams(const AFPObj *obj, struct vol *vol, uint16_t bitmap, struct pat
 }
 
 /* ----------------------------- */
-int afp_createfile(AFPObj *obj, char *ibuf, size_t ibuflen _U_, char *rbuf _U_, size_t *rbuflen)
+int afp_createfile(AFPObj *obj, char *ibuf, size_t ibuflen , char *rbuf , size_t *rbuflen)
 {
     struct adouble	ad;
     struct vol		*vol;
@@ -772,7 +772,7 @@ createfile_iderr:
     return (retvalue);
 }
 
-int afp_setfilparams(AFPObj *obj, char *ibuf, size_t ibuflen _U_, char *rbuf _U_, size_t *rbuflen)
+int afp_setfilparams(AFPObj *obj, char *ibuf, size_t ibuflen , char *rbuf , size_t *rbuflen)
 {
     struct vol	*vol;
     struct dir	*dir;
@@ -1254,7 +1254,7 @@ uint32_t   hint;
 
 /* -----------------------------------
 */
-int afp_copyfile(AFPObj *obj, char *ibuf, size_t ibuflen _U_, char *rbuf _U_, size_t *rbuflen)
+int afp_copyfile(AFPObj *obj, char *ibuf, size_t ibuflen , char *rbuf , size_t *rbuflen)
 {
     struct vol	*s_vol, *d_vol;
     struct dir	*dir;
@@ -1638,7 +1638,7 @@ end:
 
 /* ------------------------------------ */
 /* return a file id */
-int afp_createid(AFPObj *obj _U_, char *ibuf, size_t ibuflen _U_, char *rbuf, size_t *rbuflen)
+int afp_createid(AFPObj *obj , char *ibuf, size_t ibuflen , char *rbuf, size_t *rbuflen)
 {
     struct stat         *st;
     struct vol		*vol;
@@ -1719,7 +1719,7 @@ struct reenum {
     cnid_t     did;
 };
 
-static int reenumerate_loop(struct dirent *de, char *mname _U_, void *data)
+static int reenumerate_loop(struct dirent *de, char *mname , void *data)
 {
     struct path   path;
     struct reenum *param = data;
@@ -1775,7 +1775,7 @@ reenumerate_id(struct vol *vol, char *name, struct dir *dir)
 
 /* ------------------------------
    resolve a file id */
-int afp_resolveid(AFPObj *obj, char *ibuf, size_t ibuflen _U_, char *rbuf, size_t *rbuflen)
+int afp_resolveid(AFPObj *obj, char *ibuf, size_t ibuflen , char *rbuf, size_t *rbuflen)
 {
     struct vol		*vol;
     struct dir		*dir;
@@ -1884,7 +1884,7 @@ retry:
 }
 
 /* ------------------------------ */
-int afp_deleteid(AFPObj *obj _U_, char *ibuf, size_t ibuflen _U_, char *rbuf _U_, size_t *rbuflen)
+int afp_deleteid(AFPObj *obj , char *ibuf, size_t ibuflen , char *rbuf , size_t *rbuflen)
 {
     struct stat         st;
     struct vol		*vol;
@@ -2020,7 +2020,7 @@ static struct adouble *find_adouble(const AFPObj *obj, struct vol *vol, struct p
 
 #define APPLETEMP ".AppleTempXXXXXX"
 
-int afp_exchangefiles(AFPObj *obj, char *ibuf, size_t ibuflen _U_, char *rbuf _U_, size_t *rbuflen)
+int afp_exchangefiles(AFPObj *obj, char *ibuf, size_t ibuflen , char *rbuf , size_t *rbuflen)
 {
     struct stat         srcst, destst;
     struct vol		*vol;

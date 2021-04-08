@@ -23,7 +23,7 @@
 
 /* ------------------------ */
 cnid_t cnid_last_add(struct _cnid_db *cdb, const struct stat *st,
-                     cnid_t did _U_, const char *name _U_, size_t len _U_, cnid_t hint _U_)
+                     cnid_t did , const char *name , size_t len , cnid_t hint )
 {
 
     /* FIXME: it relies on fact, that this is never called twice for the same file/dir. */
@@ -79,14 +79,14 @@ void cnid_last_close(struct _cnid_db *cdb)
 
 
 
-int cnid_last_delete(struct _cnid_db *cdb _U_, const cnid_t id _U_)
+int cnid_last_delete(struct _cnid_db *cdb , const cnid_t id )
 {
     return CNID_INVALID;
 }
 
 
 /* Return CNID for a given did/name. */
-cnid_t cnid_last_get(struct _cnid_db *cdb _U_, cnid_t did _U_, const char *name _U_, size_t len _U_)
+cnid_t cnid_last_get(struct _cnid_db *cdb , cnid_t did , const char *name , size_t len )
 {
     /* FIXME: it relies on fact, that this is never called twice for the same file/dir. */
     /* Propably we should look through DID tree. */
@@ -95,8 +95,8 @@ cnid_t cnid_last_get(struct _cnid_db *cdb _U_, cnid_t did _U_, const char *name 
 
 
 /* */
-cnid_t cnid_last_lookup(struct _cnid_db *cdb _U_, const struct stat *st _U_, cnid_t did _U_, 
-                        const char *name _U_, size_t len _U_)
+cnid_t cnid_last_lookup(struct _cnid_db *cdb , const struct stat *st , cnid_t did ,
+                        const char *name , size_t len )
 {
     /* FIXME: this function doesn't work in [last] scheme ! */
     /* Should be never called or CNID should be somewhat refactored again. */
@@ -156,15 +156,15 @@ struct _cnid_module cnid_last_module = {
 };
 
 /* Return the did/name pair corresponding to a CNID. */
-char *cnid_last_resolve(struct _cnid_db *cdb _U_, cnid_t * id _U_, void *buffer _U_, size_t len _U_)
+char *cnid_last_resolve(struct _cnid_db *cdb , cnid_t * id , void *buffer , size_t len )
 {
     /* FIXME: frankly, it does not work. As get, add and other functions. */
     return NULL;
 }
 
 
-int cnid_last_update(struct _cnid_db *cdb _U_, cnid_t id _U_, const struct stat *st _U_,
-                     cnid_t did  _U_, const char *name  _U_, size_t len _U_)
+int cnid_last_update(struct _cnid_db *cdb , cnid_t id , const struct stat *st ,
+                     cnid_t did  , const char *name  , size_t len )
 {
     return 0;
 }

@@ -737,12 +737,12 @@ int hash_isempty(hash_t *hash)
     return hash->nodecount == 0;
 }
 
-static hnode_t *hnode_alloc(void *context _U_)
+static hnode_t *hnode_alloc(void *context )
 {
     return malloc(sizeof *hnode_alloc(NULL));
 }
 
-static void hnode_free(hnode_t *node, void *context _U_)
+static void hnode_free(hnode_t *node, void *context )
 {
     free(node);
 }

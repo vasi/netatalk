@@ -58,7 +58,7 @@ static u_char	header_buf[ AD_HEADER_LEN ];
  * somewhat initialized; single_filed is set.
  */
 
-int single_open(char *singlefile, int flags, struct FHeader *fh, int options _U_)
+int single_open(char *singlefile, int flags, struct FHeader *fh, int options )
 {
     int			rc;
 

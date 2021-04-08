@@ -528,7 +528,7 @@ int uam_sia_validate_user(sia_collect_func_t * collect, int argc, char **argv,
 /* --- papd-specific functions (just placeholders) --- */
 struct papfile;
 
-UAM_MODULE_EXPORT void append(struct papfile *pf  _U_, const char *data _U_, int len _U_)
+UAM_MODULE_EXPORT void append(struct papfile *pf  , const char *data , int len )
 {
     return;
 }

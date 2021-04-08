@@ -348,7 +348,7 @@ EC_CLEANUP:
 }
 
 /* ------------------ */
-static void catch_child(int sig _U_) 
+static void catch_child(int sig )
 {
     sigchild = 1;
 }

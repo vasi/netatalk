@@ -94,7 +94,7 @@ struct charset_functions charset_utf8_mac =
 /* U+40000..U+FFFFF    F1..F3  80..BF  80..BF  80..BF  */
 /* U+100000..U+10FFFF  F4      80..8F  80..BF  80..BF  */
 
-static size_t utf8_pull(void *cd _U_, char **inbuf, size_t *inbytesleft,
+static size_t utf8_pull(void *cd , char **inbuf, size_t *inbytesleft,
 			 char **outbuf, size_t *outbytesleft)
 {
 	ucs2_t uc = 0;
@@ -179,7 +179,7 @@ inval:
 }
 
 /* --------------------- Convert from UTF-16 to UTF-8 -----------*/
-static size_t utf8_push(void *cd _U_, char **inbuf, size_t *inbytesleft,
+static size_t utf8_push(void *cd , char **inbuf, size_t *inbytesleft,
 			 char **outbuf, size_t *outbytesleft)
 {
 	ucs2_t uc=0;

@@ -349,7 +349,7 @@ int atalk_iconv_close (atalk_iconv_t cd)
  the following functions implement the builtin character sets in Netatalk
 *************************************************************************/
 
-static size_t ascii_pull(void *cd _U_, char **inbuf, size_t *inbytesleft,
+static size_t ascii_pull(void *cd , char **inbuf, size_t *inbytesleft,
 			 char **outbuf, size_t *outbytesleft)
 {
 	ucs2_t curchar;
@@ -377,7 +377,7 @@ static size_t ascii_pull(void *cd _U_, char **inbuf, size_t *inbytesleft,
 	return 0;
 }
 
-static size_t ascii_push(void *cd _U_, char **inbuf, size_t *inbytesleft,
+static size_t ascii_push(void *cd , char **inbuf, size_t *inbytesleft,
 			 char **outbuf, size_t *outbytesleft)
 {
 	int ir_count=0;
@@ -412,7 +412,7 @@ static size_t ascii_push(void *cd _U_, char **inbuf, size_t *inbytesleft,
 }
 
 
-static size_t iconv_copy(void *cd _U_, char **inbuf, size_t *inbytesleft,
+static size_t iconv_copy(void *cd , char **inbuf, size_t *inbytesleft,
 			 char **outbuf, size_t *outbytesleft)
 {
 	int n;

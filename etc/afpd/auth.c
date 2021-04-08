@@ -121,15 +121,15 @@ static int send_reply(const AFPObj *obj, const int err)
     return AFP_OK;
 }
 
-static int afp_errpwdexpired(AFPObj *obj _U_, char *ibuf _U_, size_t ibuflen _U_, 
-                             char *rbuf _U_, size_t *rbuflen)
+static int afp_errpwdexpired(AFPObj *obj , char *ibuf , size_t ibuflen ,
+                             char *rbuf , size_t *rbuflen)
 {
     *rbuflen = 0;
     return AFPERR_PWDEXPR;
 }
 
-static int afp_null_nolog(AFPObj *obj _U_, char *ibuf _U_, size_t ibuflen _U_, 
-                          char *rbuf _U_, size_t *rbuflen)
+static int afp_null_nolog(AFPObj *obj , char *ibuf , size_t ibuflen ,
+                          char *rbuf , size_t *rbuflen)
 {
     *rbuflen = 0;
     return( AFPERR_NOOP );
@@ -468,7 +468,7 @@ int afp_getsession(
 }
 
 /* ---------------------- */
-int afp_disconnect(AFPObj *obj, char *ibuf, size_t ibuflen _U_, char *rbuf _U_, size_t *rbuflen)
+int afp_disconnect(AFPObj *obj, char *ibuf, size_t ibuflen , char *rbuf , size_t *rbuflen)
 {
     DSI                 *dsi = (DSI *)obj->dsi;
     uint16_t           type;
@@ -776,7 +776,7 @@ int afp_logincont(AFPObj *obj, char *ibuf, size_t ibuflen, char *rbuf, size_t *r
 }
 
 
-int afp_logout(AFPObj *obj, char *ibuf _U_, size_t ibuflen  _U_, char *rbuf  _U_, size_t *rbuflen)
+int afp_logout(AFPObj *obj, char *ibuf , size_t ibuflen  , char *rbuf  , size_t *rbuflen)
 {
     DSI *dsi = (DSI *)(obj->dsi);
 
@@ -869,7 +869,7 @@ int afp_changepw(AFPObj *obj, char *ibuf, size_t ibuflen, char *rbuf, size_t *rb
 
 
 /* FPGetUserInfo */
-int afp_getuserinfo(AFPObj *obj _U_, char *ibuf, size_t ibuflen _U_, char *rbuf, size_t *rbuflen)
+int afp_getuserinfo(AFPObj *obj , char *ibuf, size_t ibuflen , char *rbuf, size_t *rbuflen)
 {
     uint8_t  thisuser;
     uint32_t id;

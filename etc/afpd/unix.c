@@ -150,7 +150,7 @@ static void utommode(const AFPObj *obj, const struct stat *stat, struct maccess 
  *
  * dir parameter is used by AFS
  */
-void accessmode(const AFPObj *obj, const struct vol *vol, char *path, struct maccess *ma, struct dir *dir _U_, struct stat *st)
+void accessmode(const AFPObj *obj, const struct vol *vol, char *path, struct maccess *ma, struct dir *dir , struct stat *st)
 {
     struct stat     sb;
 

@@ -149,7 +149,7 @@ error:
     return result;
 }
 
-static int dhx2_setup(void *obj, char *ibuf _U_, size_t ibuflen _U_,
+static int dhx2_setup(void *obj, char *ibuf , size_t ibuflen ,
                       char *rbuf, size_t *rbuflen)
 {
     int ret;
@@ -253,7 +253,7 @@ error:              /* We exit here anyway */
 }
 
 /* -------------------------------- */
-static int login(void *obj, char *username, int ulen,  struct passwd **uam_pwd _U_,
+static int login(void *obj, char *username, int ulen,  struct passwd **uam_pwd ,
                  char *ibuf, size_t ibuflen,
                  char *rbuf, size_t *rbuflen)
 {
@@ -339,7 +339,7 @@ static int passwd_login_ext(void *obj, char *uname, struct passwd **uam_pwd,
 
 /* -------------------------------- */
 
-static int logincont1(void *obj _U_, struct passwd **uam_pwd _U_,
+static int logincont1(void *obj , struct passwd **uam_pwd ,
                       char *ibuf, size_t ibuflen,
                       char *rbuf, size_t *rbuflen)
 {
@@ -481,9 +481,9 @@ exit:
     return ret;
 }
 
-static int logincont2(void *obj _U_, struct passwd **uam_pwd,
+static int logincont2(void *obj , struct passwd **uam_pwd,
                       char *ibuf, size_t ibuflen,
-                      char *rbuf _U_, size_t *rbuflen)
+                      char *rbuf , size_t *rbuflen)
 {
 #ifdef SHADOWPW
     struct spwd *sp;
