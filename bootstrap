@@ -6,7 +6,6 @@ case `uname -s` in
     Darwin)
     export XML_CATALOG_FILES="/usr/local/etc/xml/catalog"
     FLAGS="$FLAGS --disable-zeroconf \
-                  --with-docbook \
                   --with-afpstats"
     ;;
 esac

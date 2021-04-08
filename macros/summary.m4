@@ -3,12 +3,6 @@ dnl Autoconf macros, display configure summary
 AC_DEFUN([AC_NETATALK_CONFIG_SUMMARY], [
 
 	AC_MSG_RESULT([Configure summary:])
-	AC_MSG_RESULT([    INIT STYLE:])
-	if test "x$init_style" != "x"; then
-		AC_MSG_RESULT([         $init_style])
-	else
-		AC_MSG_RESULT([         none])
-	fi
 	AC_MSG_RESULT([    AFP:])
 	AC_MSG_RESULT([         Extended Attributes: $neta_cv_eas])
 	AC_MSG_RESULT([         ACL support: $ac_cv_have_acls])
@@ -42,9 +36,6 @@ dnl	AC_MSG_RESULT([         Samba sharemode interop: $neta_cv_have_smbshmd])
 	AC_MSG_RESULT([         AFP stats via dbus:      $atalk_cv_with_dbus])
 	AC_MSG_RESULT([    Paths:])
 	AC_MSG_RESULT([         Netatalk lockfile:       $ac_cv_netatalk_lock])
-	if test "x$init_style" != x"none"; then
-		AC_MSG_RESULT([         init directory:          $ac_cv_init_dir])
-	fi
 	if test x"$atalk_cv_with_dbus" = x"yes"; then
 		AC_MSG_RESULT([         dbus system directory:   $ac_cv_dbus_sysdir])
 	fi
@@ -75,11 +66,6 @@ AC_DEFUN([AC_NETATALK_LIBS_SUMMARY], [
 	AC_MSG_RESULT([    PTHREADS:])
 	AC_MSG_RESULT([        LIBS   = $PTHREAD_LIBS])
 	AC_MSG_RESULT([        CFLAGS = $PTHREAD_CFLAGS])
-	if test x"$ac_cv_have_tracker" = x"yes"; then
-		AC_MSG_RESULT([    TRACKER:])
-		AC_MSG_RESULT([        LIBS   = $TRACKER_LIBS])
-		AC_MSG_RESULT([        CFLAGS = $TRACKER_CFLAGS])
-	fi
 	if test x"$neta_cv_have_openssl" = x"yes"; then
 		AC_MSG_RESULT([    SSL:])
 		AC_MSG_RESULT([        LIBS   = $SSL_LIBS])
@@ -126,12 +112,8 @@ AC_DEFUN([AC_NETATALK_LIBS_SUMMARY], [
 		AC_MSG_RESULT([        CFLAGS = $LDAP_CFLAGS])
 	fi
     AC_MSG_RESULT([    LIBEVENT:])
-    if test x"$use_bundled_libevent" = x"yes"; then
-		AC_MSG_RESULT([        bundled])
-    else
-		AC_MSG_RESULT([        LIBS   = $LIBEVENT_LDFLAGS])
-		AC_MSG_RESULT([        CFLAGS = $LIBEVENT_CFLAGS])
-    fi
+		AC_MSG_RESULT([        LIBS   = $EVENT_LIBS])
+		AC_MSG_RESULT([        CFLAGS = $EVENT_CFLAGS])
     AC_MSG_RESULT([    TDB:])
     if test x"$use_bundled_tdb" = x"yes"; then
 		AC_MSG_RESULT([        bundled])
