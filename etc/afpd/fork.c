@@ -245,7 +245,7 @@ static int fork_setmode(const AFPObj *obj, struct adouble *adp, int eid, int acc
 }
 
 /* ----------------------- */
-int afp_openfork(AFPObj *obj _U_, char *ibuf, size_t ibuflen _U_, char *rbuf, size_t *rbuflen)
+int afp_openfork(AFPObj *obj , char *ibuf, size_t ibuflen , char *rbuf, size_t *rbuflen)
 {
     struct vol      *vol;
     struct dir      *dir;
@@ -505,7 +505,7 @@ openfork_err:
     return ret;
 }
 
-int afp_setforkparams(AFPObj *obj, char *ibuf, size_t ibuflen, char *rbuf _U_, size_t *rbuflen)
+int afp_setforkparams(AFPObj *obj, char *ibuf, size_t ibuflen, char *rbuf , size_t *rbuflen)
 {
     struct ofork    *ofork;
     struct vol      *vol;
@@ -656,7 +656,7 @@ afp_setfork_err:
 
 
 /* ---------------------- */
-static int byte_lock(AFPObj *obj _U_, char *ibuf, size_t ibuflen _U_, char *rbuf, size_t *rbuflen, int is64)
+static int byte_lock(AFPObj *obj , char *ibuf, size_t ibuflen , char *rbuf, size_t *rbuflen, int is64)
 {
     struct ofork    *ofork;
     off_t               offset, length;
@@ -775,7 +775,7 @@ static int read_file(const struct ofork *ofork, int eid, off_t offset, char *rbu
     return AFP_OK;
 }
 
-static int read_fork(AFPObj *obj, char *ibuf, size_t ibuflen _U_, char *rbuf, size_t *rbuflen, int is64)
+static int read_fork(AFPObj *obj, char *ibuf, size_t ibuflen , char *rbuf, size_t *rbuflen, int is64)
 {
     DSI          *dsi = obj->dsi;
     struct ofork *ofork;
@@ -941,7 +941,7 @@ int afp_read_ext(AFPObj *obj, char *ibuf, size_t ibuflen, char *rbuf, size_t *rb
 }
 
 /* ---------------------- */
-int afp_flush(AFPObj *obj _U_, char *ibuf, size_t ibuflen _U_, char *rbuf _U_, size_t *rbuflen)
+int afp_flush(AFPObj *obj , char *ibuf, size_t ibuflen , char *rbuf , size_t *rbuflen)
 {
     struct vol *vol;
     uint16_t vid;
@@ -958,7 +958,7 @@ int afp_flush(AFPObj *obj _U_, char *ibuf, size_t ibuflen _U_, char *rbuf _U_, s
     return( AFP_OK );
 }
 
-int afp_flushfork(AFPObj *obj _U_, char *ibuf, size_t ibuflen _U_, char *rbuf _U_, size_t *rbuflen)
+int afp_flushfork(AFPObj *obj , char *ibuf, size_t ibuflen , char *rbuf , size_t *rbuflen)
 {
     struct ofork    *ofork;
     uint16_t       ofrefnum;
@@ -988,7 +988,7 @@ int afp_flushfork(AFPObj *obj _U_, char *ibuf, size_t ibuflen _U_, char *rbuf _U
   fsync(2) on OSX is implemented differently than on other platforms.
   see: http://mirror.linux.org.au/pub/linux.conf.au/2007/video/talks/278.pdf.
 */
-int afp_syncfork(AFPObj *obj _U_, char *ibuf, size_t ibuflen _U_, char *rbuf _U_, size_t *rbuflen)
+int afp_syncfork(AFPObj *obj , char *ibuf, size_t ibuflen , char *rbuf , size_t *rbuflen)
 {
     struct ofork        *ofork;
     uint16_t           ofrefnum;
@@ -1057,7 +1057,7 @@ int flushfork(struct ofork *ofork)
     return( err );
 }
 
-int afp_closefork(AFPObj *obj, char *ibuf, size_t ibuflen _U_, char *rbuf _U_, size_t *rbuflen)
+int afp_closefork(AFPObj *obj, char *ibuf, size_t ibuflen , char *rbuf , size_t *rbuflen)
 {
     struct ofork    *ofork;
     uint16_t       ofrefnum;
@@ -1117,7 +1117,7 @@ static ssize_t write_file(struct ofork *ofork, int eid,
  * the client may have sent us a bunch of data that's not reflected
  * in reqcount et al.
  */
-static int write_fork(AFPObj *obj, char *ibuf, size_t ibuflen _U_, char *rbuf, size_t *rbuflen, int is64)
+static int write_fork(AFPObj *obj, char *ibuf, size_t ibuflen , char *rbuf, size_t *rbuflen, int is64)
 {
     struct ofork    *ofork;
     off_t           offset, saveoff, reqcount, oldsize, newsize;
@@ -1309,7 +1309,7 @@ int afp_write_ext(AFPObj *obj, char *ibuf, size_t ibuflen, char *rbuf, size_t *r
 }
 
 /* ---------------------------- */
-int afp_getforkparams(AFPObj *obj, char *ibuf, size_t ibuflen _U_, char *rbuf, size_t *rbuflen)
+int afp_getforkparams(AFPObj *obj, char *ibuf, size_t ibuflen , char *rbuf, size_t *rbuflen)
 {
     struct ofork    *ofork;
     int             ret;

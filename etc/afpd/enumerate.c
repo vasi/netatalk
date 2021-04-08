@@ -49,7 +49,7 @@ struct savedir {
 };
 #define SDBUFBRK	2048
 
-static int enumerate_loop(struct dirent *de, char *mname _U_, void *data)
+static int enumerate_loop(struct dirent *de, char *mname , void *data)
 {
     struct savedir *sd = data; 
     char *start, *end;
@@ -159,7 +159,7 @@ for_each_dirent(const struct vol *vol, char *name, dir_loop fn, void *data)
 #define REPLY_PARAM_MAXLEN (4 + 104 + 1 + MACFILELEN + 4 + 2 + UTF8FILELEN_EARLY + 1)
 
 /* ----------------------------- */
-static int enumerate(AFPObj *obj _U_, char *ibuf, size_t ibuflen _U_, 
+static int enumerate(AFPObj *obj , char *ibuf, size_t ibuflen ,
     char *rbuf, 
     size_t *rbuflen, 
     int ext)

@@ -198,7 +198,7 @@ exit:
 }
 
 
-int afp_addappl(AFPObj *obj, char *ibuf, size_t ibuflen _U_, char *rbuf _U_, size_t *rbuflen)
+int afp_addappl(AFPObj *obj, char *ibuf, size_t ibuflen , char *rbuf , size_t *rbuflen)
 {
     struct vol		*vol;
     struct dir		*dir;
@@ -287,7 +287,7 @@ int afp_addappl(AFPObj *obj, char *ibuf, size_t ibuflen _U_, char *rbuf _U_, siz
     return( AFP_OK );
 }
 
-int afp_rmvappl(AFPObj *obj, char *ibuf, size_t ibuflen _U_, char *rbuf _U_, size_t *rbuflen)
+int afp_rmvappl(AFPObj *obj, char *ibuf, size_t ibuflen , char *rbuf , size_t *rbuflen)
 {
     struct vol		*vol;
     struct dir		*dir;
@@ -359,7 +359,7 @@ int afp_rmvappl(AFPObj *obj, char *ibuf, size_t ibuflen _U_, char *rbuf _U_, siz
     return( AFP_OK );
 }
 
-int afp_getappl(AFPObj *obj, char *ibuf, size_t ibuflen _U_, char *rbuf, size_t *rbuflen)
+int afp_getappl(AFPObj *obj, char *ibuf, size_t ibuflen , char *rbuf, size_t *rbuflen)
 {
     struct vol		*vol;
     char		*p, *q;

@@ -320,7 +320,7 @@ static size_t status_netaddress(char *data, int *servoffset,
  */
 static size_t status_directorynames(char *data,
                                     int *diroffset,
-                                    const DSI *dsi _U_,
+                                    const DSI *dsi ,
                                     const struct afp_options *options)
 {
     char *begin = data;
@@ -348,7 +348,7 @@ static size_t status_directorynames(char *data,
 }
 
 static size_t status_utf8servername(char *data, int *nameoffset,
-				 const DSI *dsi _U_,
+				 const DSI *dsi ,
 				 const struct afp_options *options)
 {
     uint16_t namelen;
@@ -647,7 +647,7 @@ server_signature_done:
 }
 
 /* this is the same as asp/dsi_getstatus */
-int afp_getsrvrinfo(AFPObj *obj, char *ibuf _U_, size_t ibuflen _U_, char *rbuf, size_t *rbuflen)
+int afp_getsrvrinfo(AFPObj *obj, char *ibuf , size_t ibuflen , char *rbuf, size_t *rbuflen)
 {
     memcpy(rbuf, obj->dsi->status, obj->dsi->statuslen);
     *rbuflen = obj->dsi->statuslen;

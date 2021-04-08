@@ -1677,7 +1677,7 @@ int path_error(struct path *path, int error)
 }
 
 /* ----------------------------- */
-int afp_setdirparams(AFPObj *obj, char *ibuf, size_t ibuflen _U_, char *rbuf _U_, size_t *rbuflen)
+int afp_setdirparams(AFPObj *obj, char *ibuf, size_t ibuflen , char *rbuf , size_t *rbuflen)
 {
     struct vol  *vol;
     struct dir  *dir;
@@ -2057,7 +2057,7 @@ setprivdone:
     return err;
 }
 
-int afp_syncdir(AFPObj *obj _U_, char *ibuf, size_t ibuflen _U_, char *rbuf _U_, size_t *rbuflen)
+int afp_syncdir(AFPObj *obj , char *ibuf, size_t ibuflen , char *rbuf , size_t *rbuflen)
 {
 #ifdef HAVE_DIRFD
     DIR                  *dp;
@@ -2147,7 +2147,7 @@ int afp_syncdir(AFPObj *obj _U_, char *ibuf, size_t ibuflen _U_, char *rbuf _U_,
     return ( AFP_OK );
 }
 
-int afp_createdir(AFPObj *obj, char *ibuf, size_t ibuflen _U_, char *rbuf, size_t *rbuflen)
+int afp_createdir(AFPObj *obj, char *ibuf, size_t ibuflen , char *rbuf, size_t *rbuflen)
 {
     struct adouble  ad;
     struct vol      *vol;
@@ -2350,7 +2350,7 @@ delete_done:
     return err;
 }
 
-int afp_mapid(AFPObj *obj, char *ibuf, size_t ibuflen _U_, char *rbuf, size_t *rbuflen)
+int afp_mapid(AFPObj *obj, char *ibuf, size_t ibuflen , char *rbuf, size_t *rbuflen)
 {
     struct passwd   *pw;
     struct group    *gr;
@@ -2467,7 +2467,7 @@ int afp_mapid(AFPObj *obj, char *ibuf, size_t ibuflen _U_, char *rbuf, size_t *r
     return( AFP_OK );
 }
 
-int afp_mapname(AFPObj *obj, char *ibuf, size_t ibuflen _U_, char *rbuf, size_t *rbuflen)
+int afp_mapname(AFPObj *obj, char *ibuf, size_t ibuflen , char *rbuf, size_t *rbuflen)
 {
     struct passwd   *pw;
     struct group    *gr;
@@ -2555,7 +2555,7 @@ int afp_mapname(AFPObj *obj, char *ibuf, size_t ibuflen _U_, char *rbuf, size_t 
 /* ------------------------------------
    variable DID support
 */
-int afp_closedir(AFPObj *obj _U_, char *ibuf _U_, size_t ibuflen _U_, char *rbuf _U_, size_t *rbuflen)
+int afp_closedir(AFPObj *obj , char *ibuf , size_t ibuflen , char *rbuf , size_t *rbuflen)
 {
 #if 0
     struct vol   *vol;
@@ -2591,7 +2591,7 @@ int afp_closedir(AFPObj *obj _U_, char *ibuf _U_, size_t ibuflen _U_, char *rbuf
 /* did creation gets done automatically
  * there's a pb again with case but move it to cname
  */
-int afp_opendir(AFPObj *obj _U_, char *ibuf, size_t ibuflen  _U_, char *rbuf, size_t *rbuflen)
+int afp_opendir(AFPObj *obj , char *ibuf, size_t ibuflen  , char *rbuf, size_t *rbuflen)
 {
     struct vol      *vol;
     struct dir      *parentdir;

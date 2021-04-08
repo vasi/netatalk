@@ -44,7 +44,7 @@
 #include "status.h"
 #include "misc.h"
 
-static int afp_null(AFPObj *obj _U_, char *ibuf, size_t ibuflen _U_, char *rbuf _U_,  size_t *rbuflen)
+static int afp_null(AFPObj *obj , char *ibuf, size_t ibuflen , char *rbuf ,  size_t *rbuflen)
 {
     LOG(log_info, logtype_afpd, "afp_null handle %d", *ibuf );
     *rbuflen = 0;

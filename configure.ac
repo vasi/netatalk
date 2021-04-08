@@ -10,30 +10,8 @@ AM_MAINTAINER_MODE([enable])
 AM_SILENT_RULES([yes])
 
 dnl Checks for programs.
-AC_PROG_AWK
 AC_PROG_CC
-AC_PROG_INSTALL
-AC_PROG_LN_S
-AC_PROG_MAKE_SET
-LT_INIT([dlopen])
-AC_PROG_PERL
-AC_PROG_GREP
-AC_PROG_PS
-AM_PROG_CC_C_O
-AC_C_BIGENDIAN
-AC_C_INLINE
-AC_PROG_LEX([yywrap])
-AC_PROG_YACC
-
-dnl Check if we can use attribute unused (gcc only) from ethereal
-AC_MSG_CHECKING(to see if we can add '__attribute__((unused))' to CFLAGS)
-if test x$GCC != x ; then
-  CFLAGS="-D_U_=\"__attribute__((unused))\" $CFLAGS"
-  AC_MSG_RESULT(yes)
-else
-  CFLAGS="-D_U_=\"\" $CFLAGS"
-  AC_MSG_RESULT(no)
-fi
+LT_INIT
 
 dnl Checks for header files, some checks are obsolete, unfortunately the code
 dnl uses the resulting macros, so the code has to cleaned up too before

@@ -142,7 +142,7 @@ static int PAM_conv (int num_msg,
                      struct pam_message **msg,
 #endif
                      struct pam_response **resp,
-                     void *appdata_ptr _U_) {
+                     void *appdata_ptr ) {
     int count = 0;
     struct pam_response *reply;
 
@@ -241,7 +241,7 @@ static struct pam_conv PAM_conversation = {
 };
 
 
-static int dhx2_setup(void *obj, char *ibuf _U_, size_t ibuflen _U_,
+static int dhx2_setup(void *obj, char *ibuf , size_t ibuflen ,
                       char *rbuf, size_t *rbuflen)
 {
     int ret;
@@ -318,7 +318,7 @@ error:              /* We exit here anyway */
 }
 
 /* -------------------------------- */
-static int login(void *obj, char *username, int ulen,  struct passwd **uam_pwd _U_,
+static int login(void *obj, char *username, int ulen,  struct passwd **uam_pwd ,
                  char *ibuf, size_t ibuflen,
                  char *rbuf, size_t *rbuflen)
 {
@@ -404,7 +404,7 @@ static int pam_login_ext(void *obj, char *uname, struct passwd **uam_pwd,
 }
 
 /* -------------------------------- */
-static int logincont1(void *obj _U_, char *ibuf, size_t ibuflen, char *rbuf, size_t *rbuflen)
+static int logincont1(void *obj , char *ibuf, size_t ibuflen, char *rbuf, size_t *rbuflen)
 {
     int ret;
     size_t nwritten;
@@ -571,7 +571,7 @@ exit:
 
 static int logincont2(void *obj_in, struct passwd **uam_pwd,
                       char *ibuf, size_t ibuflen,
-                      char *rbuf _U_, size_t *rbuflen)
+                      char *rbuf , size_t *rbuflen)
 {
     AFPObj *obj = obj_in;
     int ret = AFPERR_MISC;
@@ -771,9 +771,9 @@ static int changepw_2(void *obj,
     return( logincont1(obj, ibuf, ibuflen, rbuf, rbuflen) );
 }
 
-static int changepw_3(void *obj _U_,
-                      char *ibuf, size_t ibuflen _U_,
-                      char *rbuf _U_, size_t *rbuflen _U_)
+static int changepw_3(void *obj ,
+                      char *ibuf, size_t ibuflen ,
+                      char *rbuf , size_t *rbuflen )
 {
     int ret;
     int PAM_error;
@@ -894,9 +894,9 @@ error_noctx:
     return ret;
 }
 
-static int dhx2_changepw(void *obj _U_, char *uname,
-                         struct passwd *pwd _U_, char *ibuf, size_t ibuflen _U_,
-                         char *rbuf _U_, size_t *rbuflen _U_)
+static int dhx2_changepw(void *obj , char *uname,
+                         struct passwd *pwd , char *ibuf, size_t ibuflen ,
+                         char *rbuf , size_t *rbuflen )
 {
     /* We use this to serialize the three incoming FPChangePassword calls */
     static int dhx2_changepw_status = 1;

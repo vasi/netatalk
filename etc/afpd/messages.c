@@ -108,7 +108,7 @@ void readmessage(AFPObj *obj)
 #endif /* SERVERTEXT */
 }
 
-int afp_getsrvrmesg(AFPObj *obj, char *ibuf, size_t ibuflen _U_, char *rbuf, size_t *rbuflen)
+int afp_getsrvrmesg(AFPObj *obj, char *ibuf, size_t ibuflen , char *rbuf, size_t *rbuflen)
 {
     char *message;
     uint16_t type, bitmap;

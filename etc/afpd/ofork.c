@@ -82,7 +82,7 @@ int of_flush(const struct vol *vol)
 
 int of_rename(const struct vol *vol,
               struct ofork *s_of,
-              struct dir *olddir, const char *oldpath _U_,
+              struct dir *olddir, const char *oldpath ,
               struct dir *newdir, const char *newpath)
 {
     struct ofork *of, *next;

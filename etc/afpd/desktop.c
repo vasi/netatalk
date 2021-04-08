@@ -243,7 +243,7 @@ static void create_appledesktop_folder(const struct vol * vol)
     bdestroy(olddtpath);
 }
 
-int afp_opendt(AFPObj *obj _U_, char *ibuf, size_t ibuflen _U_, char *rbuf, size_t *rbuflen)
+int afp_opendt(AFPObj *obj , char *ibuf, size_t ibuflen , char *rbuf, size_t *rbuflen)
 {
     struct vol	*vol;
     uint16_t	vid;
@@ -263,7 +263,7 @@ int afp_opendt(AFPObj *obj _U_, char *ibuf, size_t ibuflen _U_, char *rbuf, size
     return( AFP_OK );
 }
 
-int afp_closedt(AFPObj *obj _U_, char *ibuf _U_, size_t ibuflen _U_, char *rbuf _U_, size_t *rbuflen)
+int afp_closedt(AFPObj *obj , char *ibuf , size_t ibuflen , char *rbuf , size_t *rbuflen)
 {
     *rbuflen = 0;
     return( AFP_OK );
@@ -321,7 +321,7 @@ static int iconopen(struct vol *vol, u_char creator[ 4 ], int flags, int mode)
     return 0;
 }
 
-int afp_addicon(AFPObj *obj, char *ibuf, size_t ibuflen _U_, char *rbuf, size_t *rbuflen)
+int afp_addicon(AFPObj *obj, char *ibuf, size_t ibuflen , char *rbuf, size_t *rbuflen)
 {
     struct vol		*vol;
     u_char		fcreator[ 4 ], imh[ 12 ], irh[ 12 ], *p;
@@ -491,7 +491,7 @@ static const u_char	uicon[] = {
 };
 #endif
 
-int afp_geticoninfo(AFPObj *obj _U_, char *ibuf, size_t ibuflen _U_, char *rbuf, size_t *rbuflen)
+int afp_geticoninfo(AFPObj *obj , char *ibuf, size_t ibuflen , char *rbuf, size_t *rbuflen)
 {
     struct vol	*vol;
     unsigned char	fcreator[ 4 ], ih[ 12 ];
@@ -562,7 +562,7 @@ int afp_geticoninfo(AFPObj *obj _U_, char *ibuf, size_t ibuflen _U_, char *rbuf,
 }
 
 
-int afp_geticon(AFPObj *obj, char *ibuf, size_t ibuflen _U_, char *rbuf, size_t *rbuflen)
+int afp_geticon(AFPObj *obj, char *ibuf, size_t ibuflen , char *rbuf, size_t *rbuflen)
 {
     struct vol	*vol;
     off_t       offset;
@@ -875,7 +875,7 @@ static int ad_addcomment(const AFPObj *obj, struct vol *vol, struct path *path, 
 }
 
 /* ----------------------------- */
-int afp_addcomment(AFPObj *obj, char *ibuf, size_t ibuflen _U_, char *rbuf _U_, size_t *rbuflen)
+int afp_addcomment(AFPObj *obj, char *ibuf, size_t ibuflen , char *rbuf , size_t *rbuflen)
 {
     struct vol		*vol;
     struct dir		*dir;
@@ -953,7 +953,7 @@ static int ad_getcomment(struct vol *vol, struct path *path, char *rbuf, size_t 
 }
 
 /* -------------------- */
-int afp_getcomment(AFPObj *obj _U_, char *ibuf, size_t ibuflen _U_, char *rbuf, size_t *rbuflen)
+int afp_getcomment(AFPObj *obj , char *ibuf, size_t ibuflen , char *rbuf, size_t *rbuflen)
 {
     struct vol		*vol;
     struct dir		*dir;
@@ -1023,7 +1023,7 @@ static int ad_rmvcomment(const AFPObj *obj, struct vol *vol, struct path *path)
 }
 
 /* ----------------------- */
-int afp_rmvcomment(AFPObj *obj _U_, char *ibuf, size_t ibuflen _U_, char *rbuf _U_, size_t *rbuflen)
+int afp_rmvcomment(AFPObj *obj , char *ibuf, size_t ibuflen , char *rbuf , size_t *rbuflen)
 {
     struct vol		*vol;
     struct dir		*dir;

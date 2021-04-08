@@ -59,7 +59,7 @@ static int PAM_conv (int num_msg,
                      struct pam_message **msg,
 #endif
                      struct pam_response **resp,
-                     void *appdata_ptr _U_) 
+                     void *appdata_ptr )
 {
   struct pam_response *reply;
   int count;
@@ -131,8 +131,8 @@ static struct pam_conv PAM_conversation = {
 };
 
 static int login(void *obj, char *username, int ulen,  struct passwd **uam_pwd,
-		     char *ibuf, size_t ibuflen _U_,
-		     char *rbuf _U_, size_t *rbuflen _U_)
+		     char *ibuf, size_t ibuflen ,
+		     char *rbuf , size_t *rbuflen )
 {
     struct passwd *pwd;
     int err, PAM_error;
@@ -274,9 +274,9 @@ static void pam_logout(void) {
 }
 
 /* change passwd */
-static int pam_changepw(void *obj _U_, char *username,
-			struct passwd *pwd _U_, char *ibuf, size_t ibuflen _U_,
-			char *rbuf _U_, size_t *rbuflen _U_)
+static int pam_changepw(void *obj , char *username,
+			struct passwd *pwd , char *ibuf, size_t ibuflen ,
+			char *rbuf , size_t *rbuflen )
 {
     char pw[PASSWDLEN + 1];
     pam_handle_t *lpamh;

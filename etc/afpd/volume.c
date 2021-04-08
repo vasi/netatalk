@@ -534,7 +534,7 @@ static int stat_vol(const AFPObj *obj, uint16_t bitmap, struct vol *vol, char *r
 }
 
 /* ------------------------------- */
-int afp_getsrvrparms(AFPObj *obj, char *ibuf _U_, size_t ibuflen _U_, char *rbuf, size_t *rbuflen)
+int afp_getsrvrparms(AFPObj *obj, char *ibuf , size_t ibuflen , char *rbuf, size_t *rbuflen)
 {
     struct timeval  tv;
     struct stat     st;
@@ -704,7 +704,7 @@ static void server_ipc_volumes(AFPObj *obj)
 /* -------------------------
  * we are the user here
  */
-int afp_openvol(AFPObj *obj, char *ibuf, size_t ibuflen _U_, char *rbuf, size_t *rbuflen)
+int afp_openvol(AFPObj *obj, char *ibuf, size_t ibuflen , char *rbuf, size_t *rbuflen)
 {
     struct stat st;
     char    *volname;
@@ -934,7 +934,7 @@ void close_all_vol(const AFPObj *obj)
 }
 
 /* ------------------------- */
-int afp_closevol(AFPObj *obj, char *ibuf, size_t ibuflen _U_, char *rbuf _U_, size_t *rbuflen)
+int afp_closevol(AFPObj *obj, char *ibuf, size_t ibuflen , char *rbuf , size_t *rbuflen)
 {
     struct vol  *vol;
     uint16_t   vid;
@@ -1020,7 +1020,7 @@ void setvoltime(AFPObj *obj, struct vol *vol)
 }
 
 /* ------------------------- */
-int afp_getvolparams(AFPObj *obj, char *ibuf, size_t ibuflen _U_,char *rbuf, size_t *rbuflen)
+int afp_getvolparams(AFPObj *obj, char *ibuf, size_t ibuflen ,char *rbuf, size_t *rbuflen)
 {
     struct vol  *vol;
     uint16_t   vid, bitmap;
@@ -1040,7 +1040,7 @@ int afp_getvolparams(AFPObj *obj, char *ibuf, size_t ibuflen _U_,char *rbuf, siz
 }
 
 /* ------------------------- */
-int afp_setvolparams(AFPObj *obj _U_, char *ibuf, size_t ibuflen _U_, char *rbuf _U_,  size_t *rbuflen)
+int afp_setvolparams(AFPObj *obj , char *ibuf, size_t ibuflen , char *rbuf ,  size_t *rbuflen)
 {
     struct adouble ad;
     struct vol  *vol;
