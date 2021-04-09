@@ -37,7 +37,6 @@
 #include <stddef.h>
 #include <string.h>
 
-#include <atalk/compat.h>
 #include <atalk/util.h>
 #include <atalk/talloc.h>
 

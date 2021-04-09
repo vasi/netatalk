@@ -21,7 +21,6 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <atalk/dictionary.h>
-#include <atalk/compat.h>
 
 #include <stdio.h>
 #include <stdlib.h>

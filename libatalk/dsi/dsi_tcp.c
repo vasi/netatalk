@@ -15,19 +15,13 @@
 #include <string.h>
 #include <unistd.h>
 #include <errno.h>
-#ifdef HAVE_NETDB_H
 #include <netdb.h>
-#endif /* HAVE_NETDB_H */
 #include <sys/types.h>
 #include <sys/time.h>
 #include <sys/socket.h>
 #include <stdint.h>
 
 #include <sys/ioctl.h>
-#ifdef TRU64
-#include <sys/mbuf.h>
-#include <net/route.h>
-#endif /* TRU64 */
 #include <net/if.h>
 #include <netinet/tcp.h>
 #include <netinet/in.h>
@@ -36,10 +30,6 @@
 #include <signal.h>
 #include <atalk/logger.h>
 
-#ifdef __svr4__
-#include <sys/sockio.h>
-#endif /* __svr4__ */
-
 #ifdef TCPWRAP
 #include <tcpd.h>
 int allow_severity = log_info;
@@ -47,7 +37,6 @@ int deny_severity = log_warning;
 #endif /* TCPWRAP */
 
 #include <atalk/dsi.h>
-#include <atalk/compat.h>
 #include <atalk/util.h>
 #include <atalk/errchk.h>
 

@@ -17,9 +17,8 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#ifdef HAVE_GETIFADDRS
 #include <ifaddrs.h>
-#endif
+#include <netdb.h>
 
 #include <atalk/logger.h>
 #include <atalk/util.h>

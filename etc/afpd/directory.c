@@ -15,6 +15,7 @@
 #include <pwd.h>
 #include <sys/param.h>
 #include <sys/stat.h>
+#include <signal.h>
 #include <errno.h>
 #include <utime.h>
 #include <assert.h>
