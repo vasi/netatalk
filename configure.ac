@@ -13,21 +13,6 @@ dnl Checks for programs.
 AC_PROG_CC
 LT_INIT
 
-dnl Checks for header files, some checks are obsolete, unfortunately the code
-dnl uses the resulting macros, so the code has to cleaned up too before
-dnl we can remove the checks here.
-AC_CHECK_HEADERS(mntent.h unistd.h termios.h ufs/quota.h)
-AC_CHECK_HEADERS(netdb.h sgtty.h statfs.h dlfcn.h langinfo.h locale.h)
-AC_CHECK_HEADERS(sys/param.h sys/fcntl.h sys/termios.h)
-AC_CHECK_HEADERS(sys/mnttab.h sys/statvfs.h sys/stat.h sys/vfs.h)
-dnl Checks for header files, confirmed to be required as of 2011
-AC_CHECK_HEADERS([sys/mount.h], , , 
-[#ifdef HAVE_SYS_PARAM_H
-#include <sys/param.h>
-#endif
-])
-AC_CHECK_TYPES([fshare_t], [], [], [[#include <fcntl.h>]])
-
 AC_SYS_LARGEFILE([], AC_MSG_ERROR([AFP 3.x support requires Large File Support.]))
 
 dnl --------------------------------------------------------------------------
@@ -40,26 +25,10 @@ if test x"$libltdl_cv_need_uscore" = xyes; then
     AC_DEFINE(DLSYM_PREPEND_UNDERSCORE, 1, [BSD compatibility macro])
 fi
 
-dnl Special hecks
-ac_neta_haveatfuncs=yes
-AC_CHECK_FUNCS(openat renameat fstatat unlinkat, , ac_neta_haveatfuncs=no)
-if test x"$ac_neta_haveatfuncs" = x"yes" ; then
-   AC_DEFINE([_ATFILE_SOURCE], 1, AT file source)
-   AC_DEFINE([HAVE_ATFUNCS], 1, whether at funcs are available)
-fi
-AC_CHECK_MEMBERS(struct tm.tm_gmtoff,,, [#include <time.h>])
-
 dnl these tests have been comfirmed to be needed in 2011
 AC_CHECK_FUNCS(backtrace_symbols dirfd getusershell pread pwrite pselect)
 AC_CHECK_FUNCS(setlinebuf strlcat strlcpy strnlen mempcpy vasprintf asprintf)
 AC_CHECK_FUNCS(mmap utime getpagesize) dnl needed by tbd
-
-dnl search for necessary libraries
-AC_SEARCH_LIBS(gethostbyname, nsl)
-AC_SEARCH_LIBS(connect, socket)
-AC_CHECK_FUNCS(getifaddrs) dnl comes after gethostbyname and connect so it picks up the libs
-
-AX_PTHREAD(, [AC_MSG_ERROR([missing pthread_sigmask])])
 
 AC_DEFINE(OPEN_NOFOLLOW_ERRNO, ELOOP, errno returned by open with O_NOFOLLOW)
 
@@ -238,7 +207,6 @@ AC_CONFIG_FILES([Makefile
 	libatalk/cnid/dbd/Makefile
 	libatalk/cnid/tdb/Makefile
 	libatalk/cnid/mysql/Makefile
-	libatalk/compat/Makefile
 	libatalk/dsi/Makefile
 	libatalk/iniparser/Makefile
 	libatalk/talloc/Makefile

@@ -31,12 +31,9 @@
 #include <inttypes.h>
 #include <time.h>
 #include <regex.h>
-#if HAVE_LOCALE_H
 #include <locale.h>
-#endif
-#if HAVE_LANGINFO_H
 #include <langinfo.h>
-#endif
+#include <netdb.h>
 
 #include <atalk/afp.h>
 #include <atalk/util.h>
