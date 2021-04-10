@@ -24,7 +24,6 @@ AC_DEFUN([AC_NETATALK_CONFIG_SUMMARY], [
 	fi
 	AC_MSG_RESULT([    Options:])
 	AC_MSG_RESULT([         Zeroconf support:        $netatalk_cv_zeroconf])
-	AC_MSG_RESULT([         quota support:           $netatalk_cv_quotasupport])
 dnl	AC_MSG_RESULT([         Samba sharemode interop: $neta_cv_have_smbshmd])
 	AC_MSG_RESULT([         Kerberos support:        $with_kerberos])
 	AC_MSG_RESULT([         LDAP support:            $netatalk_cv_ldap])
@@ -58,9 +57,6 @@ AC_DEFUN([AC_NETATALK_LIBS_SUMMARY], [
 	AC_MSG_RESULT([    CPPFLAGS       = $CPPFLAGS])
 	AC_MSG_RESULT([    CFLAGS         = $CFLAGS])
 	AC_MSG_RESULT([    LIBS           = $LIBS])
-	AC_MSG_RESULT([    PTHREADS:])
-	AC_MSG_RESULT([        LIBS   = $PTHREAD_LIBS])
-	AC_MSG_RESULT([        CFLAGS = $PTHREAD_CFLAGS])
 	if test x"$neta_cv_have_openssl" = x"yes"; then
 		AC_MSG_RESULT([    SSL:])
 		AC_MSG_RESULT([        LIBS   = $SSL_LIBS])
@@ -75,11 +71,6 @@ AC_DEFUN([AC_NETATALK_LIBS_SUMMARY], [
 		AC_MSG_RESULT([    PAM:])
 		AC_MSG_RESULT([        LIBS   = $PAM_LIBS])
 		AC_MSG_RESULT([        CFLAGS = $PAM_CFLAGS])
-	fi
-	if test x"$netatalk_cv_use_pam" = x"yes"; then
-		AC_MSG_RESULT([    WRAP:])
-		AC_MSG_RESULT([        LIBS   = $WRAP_LIBS])
-		AC_MSG_RESULT([        CFLAGS = $WRAP_CFLAGS])
 	fi
 	if test x"$bdb_required" = x"yes"; then
 		AC_MSG_RESULT([    BDB:])

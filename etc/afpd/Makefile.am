@@ -32,9 +32,7 @@ afpd_SOURCES = \
 	main.c \
 	mangle.c \
 	messages.c  \
-	nfsquota.c \
 	ofork.c \
-	quota.c \
 	status.c \
 	switch.c \
 	uam.c \
@@ -45,7 +43,7 @@ afpd_SOURCES = \
 
 afpd_LDADD =  \
 	$(top_builddir)/libatalk/libatalk.la \
-	@LIBGCRYPT_LIBS@ @QUOTA_LIBS@ @ACL_LIBS@ @GSSAPI_LIBS@ @KRB5_LIBS@ @MYSQL_LIBS@
+	@LIBGCRYPT_LIBS@ @ACL_LIBS@ @GSSAPI_LIBS@ @KRB5_LIBS@ @MYSQL_LIBS@
 
 afpd_LDFLAGS = -export-dynamic
 
