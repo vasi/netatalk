@@ -1,13 +1,15 @@
 dnl configure.ac for netatalk
 
-NETATALK_VERSION=`cat $srcdir/VERSION`
-AC_INIT([netatalk],[m4_esyscmd([cat VERSION])])
+AC_INIT([netatalk],m4_normalize(m4_include([VERSION])))
 AC_CANONICAL_TARGET
 AM_INIT_AUTOMAKE([subdir-objects])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIRS([macros])
 AM_MAINTAINER_MODE([enable])
 AM_SILENT_RULES([yes])
+
+NETATALK_VERSION=`cat $srcdir/VERSION`
+AC_SUBST(NETATALK_VERSION)
 
 dnl Checks for programs.
 AC_PROG_CC
