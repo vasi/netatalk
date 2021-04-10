@@ -145,34 +145,6 @@ AC_DEFUN([AC_NETATALK_TDB], [
     AM_CONDITIONAL(USE_BUILTIN_TDB, test x"$use_bundled_tdb" = x"yes")
 ])
 
-dnl Filesystem Hierarchy Standard (FHS) compatibility
-AC_DEFUN([AC_NETATALK_FHS], [
-AC_MSG_CHECKING([whether to use Filesystem Hierarchy Standard (FHS) compatibility])
-AC_ARG_ENABLE(fhs,
-	[  --enable-fhs            use Filesystem Hierarchy Standard (FHS) compatibility],[
-	if test "$enableval" = "yes"; then
-		bindir="/bin"
-		sbindir="/sbin"
-		sysconfdir="/etc"
-		libdir="/lib"
-		localstatedir="/var"
-		mandir="/usr/share/man"
-		uams_path="${libdir}/netatalk"
-		PKGCONFDIR="${sysconfdir}"
-		SERVERTEXT="${localstatedir}/netatalk/msg"
-		use_pam_so=yes
-		AC_DEFINE(FHS_COMPATIBILITY, 1, [Define if you want compatibily with the FHS])
-		AC_MSG_RESULT([yes])
-        atalk_cv_fhs_compat=yes
-	else
-		AC_MSG_RESULT([no])
-        atalk_cv_fhs_compat=no
-	fi
-	],[
-		AC_MSG_RESULT([no])
-        atalk_cv_fhs_compat=no
-])])
-
 dnl netatalk lockfile path
 AC_DEFUN([AC_NETATALK_LOCKFILE], [
     AC_MSG_CHECKING([netatalk lockfile path])
@@ -209,7 +181,7 @@ fi
 rm -rf conftest*
 
 case $host_cpu:$atalk_cv_cc_64bit_output in
-powerpc64:yes | s390x:yes | sparc*:yes | x86_64:yes | i386:yes)
+x86_64:yes)
     case $target_os in
     *)
         AC_MSG_RESULT([yes])
@@ -267,71 +239,6 @@ AC_ARG_ENABLE(debugging,
 	]
 )
 
-])
-
-dnl Check for optional shadow password support
-AC_DEFUN([AC_NETATALK_SHADOW], [
-netatalk_cv_use_shadowpw=no
-AC_ARG_WITH(shadow,
-	[  --with-shadow           enable shadow password support [[auto]]],
-	[netatalk_cv_use_shadowpw="$withval"],
-	[netatalk_cv_use_shadowpw=auto]
-)
-
-if test "x$netatalk_cv_use_shadowpw" != "xno"; then
-    AC_CHECK_HEADER([shadow.h])
-    if test x"$ac_cv_header_shadow_h" = x"yes"; then
-	netatalk_cv_use_shadowpw=yes
-	AC_DEFINE(SHADOWPW, 1, [Define if shadow passwords should be used])
-    else 
-      if test "x$shadowpw" = "xyes"; then
-        AC_MSG_ERROR([shadow support not available])
-      else
-       	netatalk_cv_use_shadowpw=no
-      fi
-    fi 
-fi
-
-AC_MSG_CHECKING([whether shadow support should be enabled])
-if test "x$netatalk_cv_use_shadowpw" = "xyes"; then
-	AC_MSG_RESULT([yes])
-else
-	AC_MSG_RESULT([no])
-fi
-])
-
-dnl Check for optional valid-shell-check support
-AC_DEFUN([AC_NETATALK_SHELL_CHECK], [
-netatalk_cv_use_shellcheck=yes
-AC_MSG_CHECKING([whether checking for a valid shell should be enabled])
-AC_ARG_ENABLE(shell-check,
-	[  --disable-shell-check   disable checking for a valid shell],[
-	if test "$enableval" = "no"; then 
-		AC_DEFINE(DISABLE_SHELLCHECK, 1, [Define if shell check should be disabled])
-		AC_MSG_RESULT([no])
-		netatalk_cv_use_shellcheck=no
-	else
-		AC_MSG_RESULT([yes])
-	fi
-	],[
-		AC_MSG_RESULT([yes])
-	]
-)
-])
-
-dnl OS specific configuration
-AC_DEFUN([AC_NETATALK_OS_SPECIFIC], [
-case "$host_os" in
-	*osx*)				this_os=macosx ;;
-	*darwin*)			this_os=macosx ;;
-esac
-
-case "$host_cpu" in
-	i386|i486|i586|i686|k7)		this_cpu=x86 ;;
-	alpha)						this_cpu=alpha ;;
-	mips)						this_cpu=mips ;;
-	powerpc|ppc)				this_cpu=ppc ;;
-esac
 ])
 
 dnl Check whether to enable rpath (the default on Solaris and NetBSD)
@@ -532,39 +439,6 @@ neta_cv_eas_sys_not_found=no
 AC_CHECK_HEADERS(sys/attributes.h attr/xattr.h sys/xattr.h sys/extattr.h sys/uio.h sys/ea.h)
 
 case "$this_os" in
-
-  *osf*)
-	AC_SEARCH_LIBS(getproplist, [proplist])
-	AC_CHECK_FUNCS([getproplist fgetproplist setproplist fsetproplist],
-                   [neta_cv_eas_sys_found=yes],
-                   [neta_cv_eas_sys_not_found=yes])
-	AC_CHECK_FUNCS([delproplist fdelproplist add_proplist_entry get_proplist_entry],,
-                   [neta_cv_eas_sys_not_found=yes])
-	AC_CHECK_FUNCS([sizeof_proplist_entry],,
-                   [neta_cv_eas_sys_not_found=yes])
-  ;;
-
-  *solaris*)
-	AC_CHECK_FUNCS([attropen],
-                   [neta_cv_eas_sys_found=yes; AC_DEFINE(HAVE_EAFD, 1, [extattr API has full fledged fds for EAs])],
-                   [neta_cv_eas_sys_not_found=yes])
-  ;;
-
-  'freebsd')
-    AC_CHECK_FUNCS([extattr_delete_fd extattr_delete_file extattr_delete_link],
-                   [neta_cv_eas_sys_found=yes],
-                   [neta_cv_eas_sys_not_found=yes])
-    AC_CHECK_FUNCS([extattr_get_fd extattr_get_file extattr_get_link],,
-                   [neta_cv_eas_sys_not_found=yes])
-    AC_CHECK_FUNCS([extattr_list_fd extattr_list_file extattr_list_link],,
-                   [neta_cv_eas_sys_not_found=yes])
-    AC_CHECK_FUNCS([extattr_set_fd extattr_set_file extattr_set_link],,
-                   [neta_cv_eas_sys_not_found=yes])
-  ;;
-
-  *freebsd4* | *dragonfly* )
-    AC_DEFINE(BROKEN_EXTATTR, 1, [Does extattr API work])
-  ;;
 
   *)
 	AC_SEARCH_LIBS(getxattr, [attr])

@@ -15,16 +15,6 @@ LT_INIT
 
 AC_SYS_LARGEFILE([], AC_MSG_ERROR([AFP 3.x support requires Large File Support.]))
 
-dnl --------------------------------------------------------------------------
-dnl check if dlsym needs to add an underscore, uses libtool macros 
-dnl --------------------------------------------------------------------------
-LT_LIB_DLLOAD
-AC_CHECK_FUNCS(dlopen dlsym dlclose)
-LT_FUNC_DLSYM_USCORE
-if test x"$libltdl_cv_need_uscore" = xyes; then
-    AC_DEFINE(DLSYM_PREPEND_UNDERSCORE, 1, [BSD compatibility macro])
-fi
-
 dnl these tests have been comfirmed to be needed in 2011
 AC_CHECK_FUNCS(backtrace_symbols dirfd getusershell pread pwrite pselect)
 AC_CHECK_FUNCS(setlinebuf strlcat strlcpy strnlen mempcpy vasprintf asprintf)
@@ -35,14 +25,8 @@ AC_DEFINE(OPEN_NOFOLLOW_ERRNO, ELOOP, errno returned by open with O_NOFOLLOW)
 dnl 64bit platform check
 AC_NETATALK_64BIT_LIBS
 
-dnl OS specific checks
-AC_NETATALK_OS_SPECIFIC
-
 dnl Whether to set rpath
 AC_NETATALK_SET_RPATH
-
-dnl Check for optional AFS support
-AC_NETATALK_AFS_CHECK
 
 dnl --with-pkgconfdir check to change configuration directory location
 AC_NETATALK_CONFIG_DIRS
@@ -65,17 +49,8 @@ AC_NETATALK_CHECK_QUOTA
 dnl Check for optional Zeroconf support
 AC_NETATALK_ZEROCONF
 
-dnl Check for optional TCP-wrappers support
-AC_NETATALK_TCP_WRAPPERS
-
 dnl Check for PAM libs
 AC_NETATALK_PATH_PAM
-
-dnl Check for optional shadow password support
-AC_NETATALK_SHADOW
-	
-dnl Check for optional valid-shell-check support
-AC_NETATALK_SHELL_CHECK
 
 dnl Path where UAM modules shall be installed
 AC_ARG_WITH(uams-path, [  --with-uams-path=PATH   path to UAMs [[$libdir/netatalk/]]], [uams_path="$withval/"], [uams_path="$libdir/netatalk/"])
@@ -129,10 +104,7 @@ AC_DEVELOPER
 dnl Check for dbus-glib, for AFP stats on dbus
 AC_NETATALK_DBUS_GLIB
 
-dnl FHS stuff has to be done last because it overrides other defaults
-AC_NETATALK_FHS
-
-dnl netatalk lockfile path, must come after AC_NETATALK_FHS
+dnl netatalk lockfile path
 AC_NETATALK_LOCKFILE
 
 dnl Check for Docbook and build documentation if found

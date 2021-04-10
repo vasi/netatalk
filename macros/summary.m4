@@ -13,9 +13,6 @@ AC_DEFUN([AC_NETATALK_CONFIG_SUMMARY], [
 	if test x"$netatalk_cv_use_pam" != x"no"; then
         	uams_using_options="PAM"
 	fi
-	if test "x$netatalk_cv_use_shadowpw" = "xyes"; then
-        	uams_using_options="$uams_using_options SHADOW"
-	fi
 	if test "x$neta_cv_compile_dhx" = "xyes"; then
 		AC_MSG_RESULT([         DHX     ($uams_using_options)])
 	fi
@@ -27,9 +24,7 @@ AC_DEFUN([AC_NETATALK_CONFIG_SUMMARY], [
 	fi
 	AC_MSG_RESULT([    Options:])
 	AC_MSG_RESULT([         Zeroconf support:        $netatalk_cv_zeroconf])
-	AC_MSG_RESULT([         tcp wrapper support:     $netatalk_cv_tcpwrap])
 	AC_MSG_RESULT([         quota support:           $netatalk_cv_quotasupport])
-	AC_MSG_RESULT([         valid shell check:       $netatalk_cv_use_shellcheck])
 dnl	AC_MSG_RESULT([         Samba sharemode interop: $neta_cv_have_smbshmd])
 	AC_MSG_RESULT([         Kerberos support:        $with_kerberos])
 	AC_MSG_RESULT([         LDAP support:            $netatalk_cv_ldap])
