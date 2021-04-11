@@ -241,25 +241,6 @@ AC_ARG_ENABLE(debugging,
 
 ])
 
-dnl Check whether to enable rpath (the default on Solaris and NetBSD)
-AC_DEFUN([AC_NETATALK_SET_RPATH], [
-	AS_CASE("$this_os", [solaris|netbsd],
-		[default_rpath=yes],
-		[default_rpath=no])
-	AS_CASE("$this_os", [linux|kfreebsd],
-		[enable_dtags=yes],
-		[enable_dtags=no])
-	AC_ARG_ENABLE(rpath,
-		AS_HELP_STRING([--enable-rpath],
-			[enable RPATH/RUNPATH (default: $default_rpath)]),
-		AS_CASE("$enableval",
-			[yes], [enable_rpath=yes],
-			[no], [enable_rpath=no],
-			[AC_MSG_ERROR([bad value $enableval for --enable-rpath])]),
-		[enable_rpath=$default_rpath])
-	AC_MSG_RESULT([$enable_rpath])
-])
-
 dnl Check for building Kerberos V UAM module
 AC_DEFUN([AC_NETATALK_KRB5_UAM], [
 netatalk_cv_build_krb5_uam=no

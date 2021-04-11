@@ -17,18 +17,10 @@ LT_INIT
 
 AC_SYS_LARGEFILE([], AC_MSG_ERROR([AFP 3.x support requires Large File Support.]))
 
-dnl these tests have been comfirmed to be needed in 2011
-AC_CHECK_FUNCS(backtrace_symbols dirfd getusershell pread pwrite pselect)
-AC_CHECK_FUNCS(setlinebuf strlcat strlcpy strnlen mempcpy vasprintf asprintf)
-AC_CHECK_FUNCS(mmap utime getpagesize) dnl needed by tbd
-
 AC_DEFINE(OPEN_NOFOLLOW_ERRNO, ELOOP, errno returned by open with O_NOFOLLOW)
 
 dnl 64bit platform check
 AC_NETATALK_64BIT_LIBS
-
-dnl Whether to set rpath
-AC_NETATALK_SET_RPATH
 
 dnl --with-pkgconfdir check to change configuration directory location
 AC_NETATALK_CONFIG_DIRS
@@ -83,9 +75,6 @@ AC_NETATALK_ACL
 
 dnl Check for Extended Attributes support
 AC_NETATALK_EXTENDED_ATTRIBUTES
-
-dnl Check if realpath() takes NULL
-AC_NETATALK_REALPATH
 
 dnl Check for sendfile()
 AC_NETATALK_SENDFILE

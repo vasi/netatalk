@@ -27,22 +27,7 @@
 ssize_t adf_pwrite(struct ad_fd *ad_fd, const void *buf, size_t count, off_t offset)
 {
     ssize_t		cc;
-
-#ifndef  HAVE_PWRITE
-    if ( ad_fd->adf_off != offset ) {
-	if ( lseek( ad_fd->adf_fd, offset, SEEK_SET ) < 0 ) {
-	    return -1;
-	}
-	ad_fd->adf_off = offset;
-    }
-    cc = write( ad_fd->adf_fd, buf, count );
-    if ( cc < 0 ) {
-        return -1;
-    }
-    ad_fd->adf_off += cc;
-#else
-   cc = pwrite(ad_fd->adf_fd, buf, count, offset );
-#endif
+    cc = pwrite(ad_fd->adf_fd, buf, count, offset );
     return cc;
 }
 
