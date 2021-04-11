@@ -35,7 +35,6 @@
 #include <atalk/vfs.h>
 #include <atalk/util.h>
 #include <atalk/unix.h>
-#include <atalk/compat.h>
 
 /*
  * Store Extended Attributes inside .AppleDouble folders as follows:

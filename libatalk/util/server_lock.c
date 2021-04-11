@@ -10,6 +10,7 @@
 #include "config.h"
 #endif
 
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -23,7 +24,6 @@
 
 #include <sys/time.h>
 
-#include <atalk/compat.h>
 #include <atalk/util.h>
 
 static struct itimerval itimer;

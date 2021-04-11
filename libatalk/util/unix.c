@@ -21,6 +21,7 @@
 #include "config.h"
 #endif /* HAVE_CONFIG_H */
 
+#include <signal.h>
 #include <unistd.h>
 #include <stdint.h>
 #include <errno.h>
@@ -42,7 +43,6 @@
 #include <atalk/vfs.h>
 #include <atalk/util.h>
 #include <atalk/unix.h>
-#include <atalk/compat.h>
 #include <atalk/errchk.h>
 #include <atalk/acl.h>
 

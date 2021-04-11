@@ -59,7 +59,6 @@
 #include <atalk/util.h>
 #include <atalk/logger.h>
 #include <atalk/ea.h>
-#include <atalk/compat.h>
 #include <atalk/errchk.h>
 
 /******** Solaris EA helper function prototypes ********/
