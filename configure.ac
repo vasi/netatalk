@@ -13,9 +13,19 @@ AC_SUBST(NETATALK_VERSION)
 
 dnl Checks for programs.
 AC_PROG_CC
-LT_INIT
+LT_INIT([dlopen])
 
 AC_SYS_LARGEFILE([], AC_MSG_ERROR([AFP 3.x support requires Large File Support.]))
+
+dnl --------------------------------------------------------------------------
+dnl check if dlsym needs to add an underscore, uses libtool macros
+dnl --------------------------------------------------------------------------
+LT_LIB_DLLOAD
+AC_CHECK_FUNCS(dlopen dlsym dlclose)
+LT_FUNC_DLSYM_USCORE
+if test x"$libltdl_cv_need_uscore" = xyes; then
+    AC_DEFINE(DLSYM_PREPEND_UNDERSCORE, 1, [BSD compatibility macro])
+fi
 
 AC_DEFINE(OPEN_NOFOLLOW_ERRNO, ELOOP, errno returned by open with O_NOFOLLOW)
 
