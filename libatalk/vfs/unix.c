@@ -22,7 +22,6 @@
 #include <atalk/logger.h>
 #include <atalk/unix.h>
 #include <atalk/acl.h>
-#include <atalk/compat.h>
 #include <atalk/errchk.h>
 #include <atalk/ea.h>
 

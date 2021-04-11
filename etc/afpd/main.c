@@ -22,7 +22,6 @@
 
 #include <atalk/logger.h>
 #include <atalk/adouble.h>
-#include <atalk/compat.h>
 #include <atalk/dsi.h>
 #include <atalk/afp.h>
 #include <atalk/paths.h>
