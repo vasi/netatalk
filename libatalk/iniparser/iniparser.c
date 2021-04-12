@@ -476,13 +476,11 @@ static line_status atalk_iniparser_line(
         /* Section name */
         sscanf(line, "[%[^]]", section);
         strcpy(section, strstrip(section));
-        strcpy(section, section);
         sta = LINE_SECTION ;
     } else if (sscanf (line, "%[^=] = '%[^\']'",   key, value) == 2
            ||  sscanf (line, "%[^=] = %[^;#]",     key, value) == 2) {
         /* Usual key=value, with or without comments */
         strcpy(key, strstrip(key));
-        strcpy(key, key);
         strcpy(value, strstrip(value));
         /*
          * sscanf cannot handle '' or "" as empty values
