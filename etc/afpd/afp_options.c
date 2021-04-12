@@ -114,39 +114,11 @@ static void show_version_extended(void )
 	puts( "No" );
 #endif
 
-	printf( "  TCP wrappers support:\t" );
-#ifdef TCPWRAP
-	puts( "Yes" );
-#else
-	puts( "No" );
-#endif
-
-	printf( "         Quota support:\t" );
-#ifndef NO_QUOTA_SUPPORT
-	puts( "Yes" );
-#else
-	puts( "No" );
-#endif
-
 	printf( "   Admin group support:\t" );
 	puts( "Yes" );
 
-	printf( "    Valid shell checks:\t" );
-#ifndef DISABLE_SHELLCHECK
-	puts( "Yes" );
-#else
-	puts( "No" );
-#endif
-
 	printf( "            EA support:\t" );
 	puts( EA_MODULES );
-
-	printf( "          LDAP support:\t" );
-#ifdef HAVE_LDAP
-	puts( "Yes" );
-#else
-	puts( "No" );
-#endif
 
 	printf( "         D-Bus support:\t" );
 #ifdef HAVE_DBUS_GLIB
