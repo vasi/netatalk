@@ -1,6 +1,6 @@
 # Makefile.am for libatalk/acl/
 
-noinst_HEADERS = aclldap.h cache.h
+noinst_HEADERS = cache.h
 
 noinst_LTLIBRARIES = libacl.la
 libacl_la_SOURCES = cache.c uuid.c
