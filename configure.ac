@@ -185,7 +185,6 @@ AC_CONFIG_FILES([Makefile
 	man/Makefile
 	man/man1/Makefile
     man/man1/ad.1
-    man/man1/afppasswd.1
     man/man1/afpstats.1
     man/man1/apple_dump.1
     man/man1/asip-status.pl.1
