@@ -10,6 +10,6 @@ case `uname -s` in
     ;;
 esac
 
-./configure $FLAGS "$@" CC=gcc-10 RANLIB="ranlib -no_warning_for_no_symbols"
+./configure $FLAGS "$@" RANLIB="ranlib -no_warning_for_no_symbols"
 
 make clean
