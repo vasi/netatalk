@@ -41,7 +41,6 @@ noinst_HEADERS = \
 	errchk.h \
 	ftw.h \
 	dsi.h \
-	ldapconfig.h \
 	talloc.h \
 	dalloc.h \
 	byteorder.h \

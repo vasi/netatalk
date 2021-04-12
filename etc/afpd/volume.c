@@ -41,10 +41,6 @@
 #include <atalk/netatalk_conf.h>
 #include <atalk/server_ipc.h>
 
-#ifdef HAVE_LDAP
-#include <atalk/ldapconfig.h>
-#endif /* HAVE_LDAP */
-
 #ifdef CNID_DB
 #include <atalk/cnid.h>
 #endif /* CNID_DB*/
@@ -364,12 +360,7 @@ static int getvolparams(const AFPObj *obj, uint16_t bitmap, struct vol *vol, str
                         ashort |= VOLPBIT_ATTR_UNIXPRIV;
                     if (vol->v_flags & AFPVOL_TM)
                         ashort |= VOLPBIT_ATTR_TM;
-#ifdef HAVE_LDAP
-                    if (!ldap_config_valid || vol->v_flags & AFPVOL_NONETIDS)
-                        ashort |= VOLPBIT_ATTR_NONETIDS;
-#else
                     ashort |= VOLPBIT_ATTR_NONETIDS;
-#endif
                     if (obj->afp_version >= 32) {
                         if (vol->v_vfs_ea)
                             ashort |= VOLPBIT_ATTR_EXT_ATTRS;
