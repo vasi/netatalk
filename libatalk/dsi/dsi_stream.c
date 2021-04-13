@@ -407,12 +407,6 @@ ssize_t dsi_stream_read_file(DSI *dsi, const int fromfd, off_t offset, const siz
                 len = 0;
 #if defined(HAVE_SENDFILEV) || defined(FREEBSD)
                 len = (size_t)nwritten;
-#elif defined(SOLARIS)
-                if (pos > offset) {
-                    /* we actually have sent sth., adjust counters and keep trying */
-                    len = pos - offset;
-                    offset = pos;
-                }
 #endif /* HAVE_SENDFILEV */
 
                 if (dsi_peek(dsi) != 0) {

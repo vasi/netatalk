@@ -40,23 +40,7 @@
 
 #include "ad_lock.h"
 
-#if defined(SENDFILE_FLAVOR_LINUX)
-#include <sys/sendfile.h>
-
-ssize_t sys_sendfile(int tofd, int fromfd, off_t *offset, size_t count)
-{
-    return sendfile(tofd, fromfd, offset, count);
-}
-
-#elif defined(SENDFILE_FLAVOR_SOLARIS)
-#include <sys/sendfile.h>
-
-ssize_t sys_sendfile(int tofd, int fromfd, off_t *offset, size_t count)
-{
-    return sendfile(tofd, fromfd, offset, count);
-}
-
-#elif defined(SENDFILE_FLAVOR_BSD )
+#if defined(SENDFILE_FLAVOR_BSD )
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/uio.h>
