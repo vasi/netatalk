@@ -19,31 +19,7 @@
 #include <config.h>
 #endif
 
-#if HAVE_ATTR_XATTR_H
-#include <attr/xattr.h>
-#elif HAVE_SYS_XATTR_H
 #include <sys/xattr.h>
-#endif
-
-#ifdef HAVE_SYS_EA_H
-#include <sys/ea.h>
-#endif
-
-#ifdef HAVE_SYS_EXTATTR_H
-#include <sys/extattr.h>
-#endif
-
-#ifdef SOLARIS
-#include <sys/attr.h>
-#endif
-
-/* FIXME: are the ACL includes really neccessary here ? */
-#ifdef HAVE_SOLARIS_ACLS
-#include <sys/acl.h>
-#endif
-#ifdef HAVE_FREEBSD_SUNACL
-#include <sunacl.h>
-#endif
 
 #ifndef ENOATTR
 #define ENOATTR ENODATA
@@ -79,11 +55,6 @@ enum {
 #if !defined(HAVE_SETXATTR)
 #define XATTR_CREATE  0x1       /* set value, fail if attr already exists */
 #define XATTR_REPLACE 0x2       /* set value, fail if attr does not exist */
-#endif
-
-#ifdef SOLARIS
-#define SMB_ATTR_PREFIX "SUNWsmb:"
-#define SMB_ATTR_PREFIX_LEN (sizeof (SMB_ATTR_PREFIX) - 1)
 #endif
 
 /* Names for our Extended Attributes adouble data */
