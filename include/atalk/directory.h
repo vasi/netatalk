@@ -35,13 +35,7 @@
 #include <atalk/unicode.h>
 
 /* setgid directories */
-#ifndef DIRBITS
-# if (defined AFS) || (defined FREEBSD)
-#  define DIRBITS 0
-# else /* AFS */
 #  define DIRBITS S_ISGID
-# endif /* AFS */
-#endif /* DIRBITS */
 
 /* reserved directory id's */
 #define DIRDID_ROOT_PARENT    htonl(1)  /* parent directory of root */
@@ -50,7 +44,6 @@
 /* struct dir.d_flags */
 #define DIRF_FSMASK	   (3<<0)
 #define DIRF_NOFS	   (0<<0)
-#define DIRF_AFS	   (1<<0)
 #define DIRF_UFS	   (1<<1)
 #define DIRF_ISFILE    (1<<3) /* it's cached file, not a directory */
 #define DIRF_OFFCNT    (1<<4) /* offsprings count is valid */
