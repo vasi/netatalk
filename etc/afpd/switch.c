@@ -152,7 +152,7 @@ AFPCmd postauth_switch[] = {
     NULL, NULL, NULL, NULL,
     NULL, NULL, NULL, NULL,					/*  88 -  95 */
     NULL, NULL, NULL, NULL,
-    afp_getdiracl, afp_setdiracl, afp_afschangepw, NULL,	/*  96 - 103 */
+    NULL, NULL, NULL, NULL,	                /*  96 - 103 */
     NULL, NULL, NULL, NULL,
     NULL, NULL, NULL, NULL,					/* 104 - 111 */
     NULL, NULL, NULL, NULL,
