@@ -38,36 +38,54 @@ typedef enum _line_status_ {
 
 /*-------------------------------------------------------------------------*/
 /**
-  @brief    Remove blanks at the beginning and the end of a string.
-  @param    s   String to parse.
-  @return   ptr to statically allocated string.
+  @brief    Duplicate a string
+  @param    s String to duplicate
+  @return   Pointer to a newly allocated string, to be freed with free()
 
-  This function returns a pointer to a statically allocated string,
-  which is identical to the input string, except that all blank
-  characters at the end and the beg. of the string have been removed.
-  Do not free or modify the returned string! Since the returned string
-  is statically allocated, it will be modified at each function call
-  (not re-entrant).
+  This is a replacement for strdup(). This implementation is provided
+  for systems that do not have it.
  */
 /*--------------------------------------------------------------------------*/
-static char * strstrip(char * s)
+static char * xstrdup(const char * s)
 {
-    static char l[ASCIILINESZ+1];
-    char * last ;
+    char * t ;
+    size_t len ;
+    if (!s)
+        return NULL ;
 
-    if (s==NULL) return NULL ;
+    len = strlen(s) + 1 ;
+    t = (char*) malloc(len) ;
+    if (t) {
+        memcpy(t, s, len) ;
+    }
+    return t ;
+}
 
+/*-------------------------------------------------------------------------*/
+/**
+  @brief    Remove blanks at the beginning and the end of a string.
+  @param    str  String to parse and alter.
+  @return   unsigned New size of the string.
+ */
+/*--------------------------------------------------------------------------*/
+static unsigned strstrip(char * s)
+{
+    char *last = NULL ;
+    char *dest = s;
+
+    if (s==NULL) return 0;
+
+    last = s + strlen(s);
     while (isspace((int)*s) && *s) s++;
-    memset(l, 0, ASCIILINESZ+1);
-    strcpy(l, s);
-    last = l + strlen(l);
-    while (last > l) {
+    while (last > s) {
         if (!isspace((int)*(last-1)))
             break ;
         last -- ;
     }
     *last = (char)0;
-    return (char*)l ;
+
+    memmove(dest,s,last - s + 1);
+    return last - s;
 }
 
 /*-------------------------------------------------------------------------*/
@@ -459,11 +477,11 @@ static line_status atalk_iniparser_line(
     char * value)
 {
     line_status sta ;
-    char        line[ASCIILINESZ+1];
-    int         len ;
+    char * line = NULL;
+    size_t      len ;
 
-    strcpy(line, strstrip(input_line));
-    len = (int)strlen(line);
+    line = xstrdup(input_line);
+    len = strstrip(line);
 
     sta = LINE_UNPROCESSED ;
     if (len<1) {
@@ -475,13 +493,12 @@ static line_status atalk_iniparser_line(
     } else if (line[0]=='[' && line[len-1]==']') {
         /* Section name */
         sscanf(line, "[%[^]]", section);
-        strcpy(section, strstrip(section));
+        strstrip(section);
         sta = LINE_SECTION ;
     } else if (sscanf (line, "%[^=] = '%[^\']'",   key, value) == 2
            ||  sscanf (line, "%[^=] = %[^;#]",     key, value) == 2) {
         /* Usual key=value, with or without comments */
-        strcpy(key, strstrip(key));
-        strcpy(value, strstrip(value));
+        strstrip(key);
         /*
          * sscanf cannot handle '' or "" as empty values
          * this is done here
@@ -498,8 +515,7 @@ static line_status atalk_iniparser_line(
          * key=;
          * key=#
          */
-        strcpy(key, strstrip(key));
-        strcpy(key, key);
+        strstrip(key);
         value[0]=0 ;
         sta = LINE_VALUE ;
     } else {
