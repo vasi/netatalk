@@ -137,7 +137,7 @@ charset_t add_charset(const char* name)
             return (c1);
     }
 
-    if ( cur_charset_t >= MAX_CHARSETS )  {
+    if ( (int)cur_charset_t >= MAX_CHARSETS )  {
         LOG (log_debug, logtype_default, "Adding charset %s failed, too many charsets (max. %u allowed)",
              name, MAX_CHARSETS);
         return (charset_t) -1;
