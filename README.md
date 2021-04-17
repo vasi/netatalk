@@ -24,5 +24,7 @@ git clone https://github.com/dgsga/Netatalk3.git
 5. cd to the repo then:
 
 ./bootstrap
+
 make
+
 sudo make install
