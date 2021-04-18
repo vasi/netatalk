@@ -12,7 +12,7 @@ do
     fi
 done
 if test -n "$XML_CATALOG" ; then
-    for i in /usr/local/Cellar/docbook-xsl/1.79.2_1/docbook-xsl ;
+    for i in $(BREW --prefix docbook-xsl 2>/dev/null)/docbook-xsl ;
     do
         if test -d "$i"; then
             DOCBOOK_ROOT=$i
