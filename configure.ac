@@ -90,9 +90,6 @@ AC_NETATALK_RECVFILE
 dnl Check for libevent
 AC_NETATALK_LIBEVENT
 
-dnl Check whether bundled tdb shall be used
-AC_NETATALK_TDB
-
 dnl Check for dbus-glib, for AFP stats on dbus
 AC_NETATALK_DBUS_GLIB
 
@@ -165,15 +162,12 @@ AC_CONFIG_FILES([Makefile
 	libatalk/adouble/Makefile
 	libatalk/bstring/Makefile
 	libatalk/cnid/Makefile
-	libatalk/cnid/cdb/Makefile
 	libatalk/cnid/last/Makefile
 	libatalk/cnid/dbd/Makefile
-	libatalk/cnid/tdb/Makefile
 	libatalk/cnid/mysql/Makefile
 	libatalk/dsi/Makefile
 	libatalk/iniparser/Makefile
 	libatalk/talloc/Makefile
-	libatalk/tdb/Makefile
 	libatalk/unicode/Makefile
 	libatalk/unicode/charsets/Makefile
 	libatalk/util/Makefile
