@@ -91,21 +91,9 @@ AC_DEFUN([AC_NETATALK_LIBS_SUMMARY], [
 		AC_MSG_RESULT([        LIBS   = $ZEROCONF_LIBS])
 		AC_MSG_RESULT([        CFLAGS = $ZEROCONF_CFLAGS])
 	fi
-	if test x"$netatalk_cv_ldap" = x"yes"; then
-		AC_MSG_RESULT([    LDAP:])
-		AC_MSG_RESULT([        LIBS   = $LDAP_LDFLAGS $LDAP_LIBS])
-		AC_MSG_RESULT([        CFLAGS = $LDAP_CFLAGS])
-	fi
     AC_MSG_RESULT([    LIBEVENT:])
 		AC_MSG_RESULT([        LIBS   = $EVENT_LIBS])
 		AC_MSG_RESULT([        CFLAGS = $EVENT_CFLAGS])
-    AC_MSG_RESULT([    TDB:])
-    if test x"$use_bundled_tdb" = x"yes"; then
-		AC_MSG_RESULT([        bundled])
-    else
-		AC_MSG_RESULT([        LIBS   = $TDB_LIBS])
-		AC_MSG_RESULT([        CFLAGS = $TDB_CFLAGS])
-    fi
 	if test x"$ac_cv_with_cnid_mysql" = x"yes"; then
 		AC_MSG_RESULT([    MySQL:])
 		AC_MSG_RESULT([        LIBS   = $MYSQL_LIBS])

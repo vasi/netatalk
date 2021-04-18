@@ -53,9 +53,3 @@ libatalk_la_DEPENDENCIES = \
 
 libatalk_la_LDFLAGS = -version-info $(VERSION_INFO)
 
-if USE_BUILTIN_TDB
-SUBDIRS += tdb
-libatalk_la_LIBADD += tdb/libtdb.la
-libatalk_la_DEPENDENCIES += tdb/libtdb.la
-endif
-

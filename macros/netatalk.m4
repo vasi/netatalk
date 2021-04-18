@@ -107,31 +107,6 @@ AC_DEFUN([AC_NETATALK_LIBEVENT], [
     )
 ])
 
-dnl Whether to disable bundled tdb
-AC_DEFUN([AC_NETATALK_TDB], [
-    AC_ARG_WITH(
-        tdb,
-        [AS_HELP_STRING([--with-tdb],[whether to use the bundled tdb (default: yes)])],
-        use_bundled_tdb=$withval,
-        use_bundled_tdb=yes
-    )
-    AC_MSG_CHECKING([whether to use bundled tdb])
-    AC_MSG_RESULT([$use_bundled_tdb])
-
-    if test x"$use_bundled_tdb" = x"yes" ; then
-        AC_DEFINE(USE_BUILTIN_TDB, 1, [Use internal tbd])
-    else
-        if test -z "$TDB_LIBS" ; then
-            PKG_CHECK_MODULES(TDB, tdb, , [AC_MSG_ERROR([couldn't find tdb with pkg-config])])
-        fi
-        use_bundled_tdb=no
-    fi        
-
-    AC_SUBST(TDB_CFLAGS)
-    AC_SUBST(TDB_LIBS)
-    AM_CONDITIONAL(USE_BUILTIN_TDB, test x"$use_bundled_tdb" = x"yes")
-])
-
 dnl netatalk lockfile path
 AC_DEFUN([AC_NETATALK_LOCKFILE], [
     AC_MSG_CHECKING([netatalk lockfile path])
