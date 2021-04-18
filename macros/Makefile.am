@@ -9,7 +9,6 @@ EXTRA_DIST = \
 	libgcrypt.m4		\
 	netatalk.m4		\
 	pam-check.m4		\
-	perl-check.m4		\
 	ps-check.m4		\
 	ssl-check.m4		\
 	summary.m4		\
