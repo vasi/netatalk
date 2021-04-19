@@ -77,9 +77,6 @@ AC_NETATALK_KERBEROS
 dnl Check for overwrite the config files or not
 AC_NETATALK_OVERWRITE_CONFIG
 
-dnl Check for ACL support
-AC_NETATALK_ACL
-
 dnl Check for Extended Attributes support
 AC_NETATALK_EXTENDED_ATTRIBUTES
 

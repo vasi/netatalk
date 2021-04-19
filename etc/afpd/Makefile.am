@@ -42,7 +42,7 @@ afpd_SOURCES = \
 
 afpd_LDADD =  \
 	$(top_builddir)/libatalk/libatalk.la \
-	@LIBGCRYPT_LIBS@ @ACL_LIBS@ @GSSAPI_LIBS@ @KRB5_LIBS@ @MYSQL_LIBS@
+	@LIBGCRYPT_LIBS@ @GSSAPI_LIBS@ @KRB5_LIBS@ @MYSQL_LIBS@
 
 afpd_LDFLAGS = -export-dynamic
 

@@ -290,34 +290,6 @@ AC_MSG_RESULT([$OVERWRITE_CONFIG])
 AC_SUBST(OVERWRITE_CONFIG)
 ])
 
-dnl Check for ACL support
-AC_DEFUN([AC_NETATALK_ACL], [
-ac_cv_have_acls=no
-AC_MSG_CHECKING(whether to support ACLs)
-AC_ARG_WITH(acls,
-    [AS_HELP_STRING([--with-acls],
-        [Include ACL support (default=no)])],
-    [ case "$withval" in
-      yes|no)
-          with_acl_support="$withval"
-		  ;;
-      *)
-          with_acl_support=no
-          ;;
-      esac ],
-    [with_acl_support=no])
-AC_MSG_RESULT($with_acl_support)
-
-if test x"$with_acl_support" = x"no"; then
-	AC_MSG_RESULT(Disabling ACL support)
-fi
-
-if test x"$ac_cv_have_acls" = x"no" ; then
-		AC_MSG_NOTICE(ACL support is not avaliable)
-fi
-AC_SUBST(ACL_LIBS)
-])
-
 dnl Check for Extended Attributes support
 AC_DEFUN([AC_NETATALK_EXTENDED_ATTRIBUTES], [
 neta_cv_eas="ad"
@@ -362,7 +334,7 @@ esac
 if test x"$ac_cv_func_getxattr" = x"yes" ; then
 	AC_CACHE_CHECK([whether xattr interface takes additional options], smb_attr_cv_xattr_add_opt, [
 		old_LIBS=$LIBS
-		LIBS="$LIBS $ACL_LIBS"
+		LIBS="$LIBS"
 		AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
 			#include <sys/types.h>
 			#if HAVE_ATTR_XATTR_H
