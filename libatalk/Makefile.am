@@ -27,7 +27,7 @@ lib_LTLIBRARIES = libatalk.la
 libatalk_la_SOURCES = dummy.c
 
 libatalk_la_LIBADD  = \
-	@ACL_LIBS@ @MYSQL_LIBS@ \
+	@MYSQL_LIBS@ \
 	acl/libacl.la \
 	adouble/libadouble.la	\
 	bstring/libbstring.la \

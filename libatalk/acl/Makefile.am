@@ -6,5 +6,5 @@ noinst_LTLIBRARIES = libacl.la
 libacl_la_SOURCES = cache.c uuid.c
 libacl_la_CFLAGS =
 libacl_la_LDFLAGS =
-libacl_la_LIBADD  = @ACL_LIBS@
+libacl_la_LIBADD  =
 
