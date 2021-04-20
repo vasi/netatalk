@@ -13,6 +13,7 @@ AC_SUBST(NETATALK_VERSION)
 
 dnl Checks for programs.
 AC_PROG_CC
+AC_PROG_PERL
 LT_INIT([dlopen])
 
 AC_SYS_LARGEFILE([], AC_MSG_ERROR([AFP 3.x support requires Large File Support.]))
