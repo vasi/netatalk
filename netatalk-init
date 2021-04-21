@@ -1,8 +1,14 @@
-#Startup daemon for Netatalk on macOS
+# Startup daemon for Netatalk on macOS
 
 #!/bin/zsh
 
 set -e
+
+# root check
+if [ "$(id -u)" != "0" ]; then
+   printf "Error: The startup daemon for Netatalk needs to be executed with sudo privileges.\n" 1>&2
+   exit 1
+fi
 
 PREFIX=/usr/local
 
