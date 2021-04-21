@@ -1,10 +1,11 @@
 EXTRA_DIST = \
+	ax-pthread.m4		\
 	cnid-backend.m4		\
-	config-checks.m4	\
+	config-checks.m4		\
 	db3-check.m4		\
 	grep-check.m4		\
 	gssapi-check.m4		\
-	iconv.m4		\
+	iconv.m4			\
 	largefile-check.m4	\
 	libgcrypt.m4		\
 	netatalk.m4		\
