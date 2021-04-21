@@ -345,7 +345,7 @@ Allow Kerberos V for authentication (optional)
 .PP
 uam path = \fIpath\fR \fB(G)\fR
 .RS 4
-Sets the default path for UAMs for this server (default is @libdir@/netatalk)\&.
+Sets the default path for UAMs for this server (default is @prefix@/lib/netatalk)\&.
 .RE
 .SS "Charset Options"
 .PP
@@ -681,7 +681,7 @@ Specifies the icon model that appears on clients\&. Defaults to off\&. Note that
 signature = <text> \fB(G)\fR
 .RS 4
 Specify a server signature\&. The maximum length is 16 characters\&. This option is useful for clustered environments, to provide fault isolation etc\&. By default, afpd generate signature and saving it to
-@localstatedir@/netatalk/afp_signature\&.conf
+@prefix@/var/netatalk/afp_signature\&.conf
 automatically (based on random number)\&. See also asip\-status\&.pl(1)\&.
 .RE
 .PP
@@ -740,7 +740,7 @@ Send optional AFP messages for vetoed files\&. Then whenever a client tries to a
 vol dbpath = \fIpath\fR \fB(G)/(V)\fR
 .RS 4
 Sets the database information to be stored in path\&. You have to specify a writable location, even if the volume is read only\&. The default is
-@localstatedir@/netatalk/CNID/$v/\&.
+@prefix@/var/netatalk/CNID/$v/\&.
 .RE
 .PP
 vol dbnest = \fIBOOLEAN\fR (default: \fIno\fR) \fB(G)\fR
@@ -1453,7 +1453,7 @@ and
 .SH "CNID BACKENDS"
 .PP
 The AFP protocol mostly refers to files and directories by ID and not by name\&. Netatalk needs a way to store these ID\*(Aqs in a persistent way, to achieve this several different CNID backends are available\&. The CNID Databases are by default located in the
-@localstatedir@/netatalk/CNID/(volumename)/\&.AppleDB/
+@prefix@/var/netatalk/CNID/(volumename)/\&.AppleDB/
 directory\&.
 .PP
 cdb
