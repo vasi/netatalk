@@ -141,12 +141,12 @@ process will look in the message directory configured at build time for a file n
 configuration file used by afpd
 .RE
 .PP
-@localstatedir@/netatalk/afp_signature\&.conf
+@prefix@/var/netatalk/afp_signature\&.conf
 .RS 4
 list of server signature
 .RE
 .PP
-@localstatedir@/netatalk/afp_voluuid\&.conf
+@prefix@/var/netatalk/afp_voluuid\&.conf
 .RS 4
 list of UUID for Time Machine volume
 .RE
