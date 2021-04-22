@@ -57,8 +57,8 @@ static gpointer afpstats_thread(gpointer _data)
 
     dbus_g_object_type_install_info(AFPSTATS_TYPE_OBJECT, &dbus_glib_afpstats_obj_object_info);
    
-    if (!(bus = dbus_g_bus_get_private(DBUS_BUS_SYSTEM, ctxt, &error))) {
-        LOG(log_error, logtype_afpd,"Couldn't connect to system bus: %s", error->message);
+    if (!(bus = dbus_g_bus_get_private(DBUS_BUS_SESSION, ctxt, &error))) {
+        LOG(log_error, logtype_afpd,"Couldn't connect to session bus: %s", error->message);
         return NULL;
     }
 
