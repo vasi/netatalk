@@ -1,17 +1,12 @@
 #! /bin/zsh
 
-# De-perl-ified and de-IPed by Chris Kobayashi
+# Original macusers perl script was de-perlified and de-IPed by Chris Kobayashi
 
-# Modified for macOS.
-# Support has also been added for 16 character usernames.
-
-PS_STR="-eo user:32,pid,ppid,c,stime,tty,time,cmd";
-
-IFS=$'\n'
+# Modified for macOS by dgsga.
 
 echo -e 'PID\tUID\tUser\tSince'
 
-ps -awwxopid,uid,user,start,command | \
+ps -eo pid,uid,user,start,command | \
     grep afpd | \
     grep -v root | \
     tr -s ' ' | \
