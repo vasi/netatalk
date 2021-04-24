@@ -1,6 +1,6 @@
 # Makefile.am for top level of netatalk package
 
-SUBDIRS = include libatalk bin config etc contrib distrib doc man macros test
+SUBDIRS = include libatalk bin config etc contrib distrib doc man macros
 
 EXTRA_DIST = CONTRIBUTORS COPYRIGHT COPYING NEWS VERSION
 
