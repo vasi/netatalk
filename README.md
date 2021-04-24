@@ -15,7 +15,7 @@ sudo xcode-select --install
 
 3. Install Netatalk3's dependencies from Homebrew:
 
-brew install automake autoconf libtool libgcrypt berkeley-db openssl libevent dbus dbus-glib pkg-config
+brew install automake autoconf libtool libgcrypt berkeley-db openssl libevent mysql pkg-config
 
 4. Clone the repo:
 
