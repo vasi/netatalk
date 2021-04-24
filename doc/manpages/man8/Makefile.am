@@ -6,14 +6,12 @@ CLEANFILES =
 MAN_MANPAGES = \
 	afpd.8 \
 	cnid_dbd.8 \
-	cnid_metad.8 \
-	netatalk.8
+	cnid_metad.8
 
 EXTRA_DIST = \
 	afpd.8.xml \
 	cnid_dbd.8.xml \
-	cnid_metad.8.xml \
-	netatalk.8.xml
+	cnid_metad.8.xml
 
 CLEANFILES += $(MAN_MANPAGES)
 
