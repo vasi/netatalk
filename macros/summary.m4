@@ -23,15 +23,10 @@ AC_DEFUN([AC_NETATALK_CONFIG_SUMMARY], [
 		AC_MSG_RESULT([         Kerberos V])
 	fi
 	AC_MSG_RESULT([    Options:])
-	AC_MSG_RESULT([         Zeroconf support:        $netatalk_cv_zeroconf])
 dnl	AC_MSG_RESULT([         Samba sharemode interop: $neta_cv_have_smbshmd])
 	AC_MSG_RESULT([         Kerberos support:        $with_kerberos])
-	AC_MSG_RESULT([         AFP stats via dbus:      $atalk_cv_with_dbus])
 	AC_MSG_RESULT([    Paths:])
 	AC_MSG_RESULT([         Netatalk lockfile:       $ac_cv_netatalk_lock])
-	if test x"$atalk_cv_with_dbus" = x"yes"; then
-		AC_MSG_RESULT([         dbus system directory:   $ac_cv_dbus_sysdir])
-	fi
 	if test x"$use_pam_so" = x"yes"; then
 	   if test x"$netatalk_cv_install_pam" = x"yes"; then
 		AC_MSG_RESULT([         pam config directory:    $ac_cv_pamdir])
@@ -86,12 +81,7 @@ AC_DEFUN([AC_NETATALK_LIBS_SUMMARY], [
 		AC_MSG_RESULT([        LIBS   = $CUPS_LIBS])
 		AC_MSG_RESULT([        CFLAGS = $CUPS_CFLAGS])
 	fi
-	if test x"$netatalk_cv_zeroconf" = x"yes"; then
-		AC_MSG_RESULT([    ZEROCONF:])
-		AC_MSG_RESULT([        LIBS   = $ZEROCONF_LIBS])
-		AC_MSG_RESULT([        CFLAGS = $ZEROCONF_CFLAGS])
-	fi
-    AC_MSG_RESULT([    LIBEVENT:])
+	AC_MSG_RESULT([    LIBEVENT:])
 		AC_MSG_RESULT([        LIBS   = $EVENT_LIBS])
 		AC_MSG_RESULT([        CFLAGS = $EVENT_CFLAGS])
 	if test x"$ac_cv_with_cnid_mysql" = x"yes"; then

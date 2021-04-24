@@ -103,9 +103,6 @@ AC_NETATALK_CHECK_ICONV
 dnl Check for CNID database backends
 AC_NETATALK_CNID([bdb_required=yes],[bdb_required=no])
 
-dnl Check for optional Zeroconf support
-AC_NETATALK_ZEROCONF
-
 dnl Check for PAM libs
 AC_NETATALK_PATH_PAM
 
@@ -142,9 +139,6 @@ AC_NETATALK_RECVFILE
 
 dnl Check for libevent
 AC_NETATALK_LIBEVENT
-
-dnl Check for dbus-glib, for AFP stats on dbus
-AC_NETATALK_DBUS_GLIB
 
 dnl netatalk lockfile path
 AC_NETATALK_LOCKFILE
@@ -229,7 +223,6 @@ AC_CONFIG_FILES([Makefile
 	man/Makefile
 	man/man1/Makefile
     man/man1/ad.1
-    man/man1/afpstats.1
     man/man1/apple_dump.1
     man/man1/asip-status.pl.1
     man/man1/dbd.1

@@ -6,11 +6,9 @@ autoreconf -fi
 case `uname -s` in
     Darwin)
     export XML_CATALOG_FILES="/usr/local/etc/xml/catalog"
-    FLAGS="$FLAGS --disable-zeroconf \
-                  --with-afpstats"
     ;;
 esac
 
-./configure $FLAGS "$@" RANLIB="ranlib -no_warning_for_no_symbols"
+./configure RANLIB="ranlib -no_warning_for_no_symbols"
 
 make clean
