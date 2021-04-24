@@ -5,7 +5,6 @@ AC_DEFUN([AC_NETATALK_CONFIG_SUMMARY], [
 	AC_MSG_RESULT([Configure summary:])
 	AC_MSG_RESULT([    AFP:])
 	AC_MSG_RESULT([         Extended Attributes: $neta_cv_eas])
-	AC_MSG_RESULT([         ACL support: $ac_cv_have_acls])
 	AC_MSG_RESULT([    CNID:])
 	AC_MSG_RESULT([         backends: $compiled_backends])
 	AC_MSG_RESULT([    UAMS:])
@@ -23,7 +22,6 @@ AC_DEFUN([AC_NETATALK_CONFIG_SUMMARY], [
 		AC_MSG_RESULT([         Kerberos V])
 	fi
 	AC_MSG_RESULT([    Options:])
-dnl	AC_MSG_RESULT([         Samba sharemode interop: $neta_cv_have_smbshmd])
 	AC_MSG_RESULT([         Kerberos support:        $with_kerberos])
 	AC_MSG_RESULT([    Paths:])
 	AC_MSG_RESULT([         Netatalk lockfile:       $ac_cv_netatalk_lock])
@@ -48,23 +46,20 @@ AC_DEFUN([AC_NETATALK_LIBS_SUMMARY], [
 	dnl # Display summary of libraries detected
 
 	AC_MSG_RESULT([Compilation summary:])
-	AC_MSG_RESULT([    CPPFLAGS       = $CPPFLAGS])
 	AC_MSG_RESULT([    CFLAGS         = $CFLAGS])
-	AC_MSG_RESULT([    LIBS           = $LIBS])
 	if test x"$neta_cv_have_openssl" = x"yes"; then
 		AC_MSG_RESULT([    SSL:])
 		AC_MSG_RESULT([        LIBS   = $SSL_LIBS])
 		AC_MSG_RESULT([        CFLAGS = $SSL_CFLAGS])
 	fi
-        if test x"$neta_cv_have_libgcrypt" = x"yes"; then
-                AC_MSG_RESULT([    LIBGCRYPT:])
-                AC_MSG_RESULT([        LIBS   = $LIBGCRYPT_LIBS])
-                AC_MSG_RESULT([        CFLAGS = $LIBGCRYPT_CFLAGS])
-        fi
+    if test x"$neta_cv_have_libgcrypt" = x"yes"; then
+        AC_MSG_RESULT([    LIBGCRYPT:])
+        AC_MSG_RESULT([        LIBS   = $LIBGCRYPT_LIBS])
+        AC_MSG_RESULT([        CFLAGS = $LIBGCRYPT_CFLAGS])
+    fi
 	if test x"$netatalk_cv_use_pam" = x"yes"; then
 		AC_MSG_RESULT([    PAM:])
 		AC_MSG_RESULT([        LIBS   = $PAM_LIBS])
-		AC_MSG_RESULT([        CFLAGS = $PAM_CFLAGS])
 	fi
 	if test x"$bdb_required" = x"yes"; then
 		AC_MSG_RESULT([    BDB:])

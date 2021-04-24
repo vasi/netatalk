@@ -12,56 +12,13 @@ NETATALK_VERSION=`cat $srcdir/VERSION`
 AC_SUBST(NETATALK_VERSION)
 
 dnl Checks for programs.
-AC_PROG_AWK
 AC_PROG_CC
-AC_PROG_INSTALL
-AC_PROG_LN_S
-AC_PROG_MAKE_SET
-LT_INIT([dlopen])
 AC_PROG_PERL
-AC_PROG_GREP
-AC_PROG_PS
-AM_PROG_CC_C_O
-AC_C_BIGENDIAN
-AC_C_INLINE
-AC_PROG_LEX([yywrap])
-AC_PROG_YACC
-
-dnl Check if we can use attribute unused (gcc only) from ethereal
-AC_MSG_CHECKING(to see if we can add '__attribute__((unused))' to CFLAGS)
-if test x$GCC != x ; then
-  CFLAGS="-D_U_=\"__attribute__((unused))\" $CFLAGS"
-  AC_MSG_RESULT(yes)
-else
-  CFLAGS="-D_U_=\"\" $CFLAGS"
-  AC_MSG_RESULT(no)
-fi
-
-dnl Checks for header files, some checks are obsolete, unfortunately the code
-dnl uses the resulting macros, so the code has to cleaned up too before
-dnl we can remove the checks here.
-AC_CHECK_HEADERS(mntent.h unistd.h termios.h ufs/quota.h)
-AC_CHECK_HEADERS(netdb.h sgtty.h statfs.h dlfcn.h langinfo.h locale.h)
-AC_CHECK_HEADERS(sys/param.h sys/fcntl.h sys/termios.h)
-AC_CHECK_HEADERS(sys/mnttab.h sys/statvfs.h sys/stat.h sys/vfs.h)
-AC_CHECK_HEADERS([sys/mount.h], , ,
-[#ifdef HAVE_SYS_PARAM_H
-#include <sys/param.h>
-#endif
-])
-AC_CHECK_TYPES([fshare_t], [], [], [[#include <fcntl.h>]])
+LT_INIT
 
 AC_SYS_LARGEFILE([], AC_MSG_ERROR([AFP 3.x support requires Large File Support.]))
 
-dnl --------------------------------------------------------------------------
-dnl check if dlsym needs to add an underscore, uses libtool macros
-dnl --------------------------------------------------------------------------
-LT_LIB_DLLOAD
-AC_CHECK_FUNCS(dlopen dlsym dlclose)
-LT_FUNC_DLSYM_USCORE
-if test x"$libltdl_cv_need_uscore" = xyes; then
-    AC_DEFINE(DLSYM_PREPEND_UNDERSCORE, 1, [BSD compatibility macro])
-fi
+AC_DEFINE(OPEN_NOFOLLOW_ERRNO, ELOOP, errno returned by open with O_NOFOLLOW)
 
 dnl Special checks
 ac_neta_haveatfuncs=yes
@@ -70,20 +27,11 @@ if test x"$ac_neta_haveatfuncs" = x"yes" ; then
    AC_DEFINE([_ATFILE_SOURCE], 1, AT file source)
    AC_DEFINE([HAVE_ATFUNCS], 1, whether at funcs are available)
 fi
-AC_CHECK_MEMBERS(struct tm.tm_gmtoff,,, [#include <time.h>])
 
-dnl these tests have been comfirmed to be needed in 2021
-AC_CHECK_FUNCS(backtrace_symbols dirfd getusershell pread pwrite pselect)
-AC_CHECK_FUNCS(setlinebuf strlcat strlcpy strnlen mempcpy vasprintf asprintf)
-
-dnl search for necessary libraries
+dnl Search for necessary libraries
 AC_SEARCH_LIBS(gethostbyname, nsl)
 AC_SEARCH_LIBS(connect, socket)
 AC_CHECK_FUNCS(getifaddrs) dnl comes after gethostbyname and connect so it picks up the libs
-
-AX_PTHREAD(, [AC_MSG_ERROR([missing pthread_sigmask])])
-
-AC_DEFINE(OPEN_NOFOLLOW_ERRNO, ELOOP, errno returned by open with O_NOFOLLOW)
 
 dnl 64bit platform check
 AC_NETATALK_64BIT_LIBS
@@ -133,10 +81,6 @@ AC_NETATALK_OVERWRITE_CONFIG
 dnl Check for Extended Attributes support
 AC_NETATALK_EXTENDED_ATTRIBUTES
 
-dnl Check for sendfile()
-AC_NETATALK_SENDFILE
-AC_NETATALK_RECVFILE
-
 dnl Check for libevent
 AC_NETATALK_LIBEVENT
 
@@ -155,7 +99,6 @@ AC_SUBST(UAMS_PATH)
 
 AM_CONDITIONAL(HAVE_LIBGCRYPT, test x$neta_cv_have_libgcrypt = xyes)
 AM_CONDITIONAL(HAVE_OPENSSL, test x$neta_cv_have_openssl = xyes)
-AM_CONDITIONAL(HAVE_ACLS, test x"$ac_cv_have_acls" = x"yes")
 AM_CONDITIONAL(USE_DHX, test x$neta_cv_compile_dhx = xyes)
 AM_CONDITIONAL(USE_DHX2, test x$neta_cv_compile_dhx2 = xyes)
 AM_CONDITIONAL(USE_PAM_SO, test x$use_pam_so = xyes)
@@ -164,7 +107,6 @@ AM_CONDITIONAL(BUILD_PAM, test x$compile_pam = xyes)
 AM_CONDITIONAL(DEFAULT_HOOK, test x$neta_cv_have_libgcrypt != xyes && test x$neta_cv_have_openssl != xyes)
 AM_CONDITIONAL(USE_BDB, test x$bdb_required = xyes)
 AM_CONDITIONAL(HAVE_ATFUNCS, test x"$ac_neta_haveatfuncs" = x"yes")
-AM_CONDITIONAL(USE_SHADOWPW, test x$shadowpw = xyes)
 
 dnl Enable silent Automake rules if present                                                                           
 m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])])
