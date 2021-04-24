@@ -3,21 +3,16 @@
 SUBDIRS = pam
 SUFFIXES = .tmpl .
 
-TMPLFILES = afp.conf.tmpl dbus-session.conf.tmpl
-GENFILES = afp.conf dbus-session.conf
+TMPLFILES = afp.conf.tmpl
+GENFILES = afp.conf
 CLEANFILES = $(GENFILES)
-EXTRA_DIST = $(TMPLFILES) extmap.conf netatalk-dbus.conf
+EXTRA_DIST = $(TMPLFILES) extmap.conf
 
 OVERWRITE_CONFIG = @OVERWRITE_CONFIG@
 
 CONFFILES = extmap.conf
 
 pkgconfdir = @PKGCONFDIR@
-
-if HAVE_DBUS_GLIB
-dbusservicedir = $(DBUS_SYS_DIR)
-dbusservice_DATA = netatalk-dbus.conf
-endif
 
 #
 # rule to parse template files

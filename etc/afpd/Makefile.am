@@ -2,7 +2,7 @@
 
 pkgconfdir = @PKGCONFDIR@
 BUILT_SOURCES =
-EXTRA_DIST = afpstats-service.xml afpstats_service_glue.h
+EXTRA_DIST =
 CLEANFILES =
 DISTCLEANFILES =
 
@@ -50,29 +50,11 @@ afpd_CFLAGS = \
 	@GSSAPI_CFLAGS@ @KRB5_CFLAGS@\
 	-DAPPLCNAME \
 	-DSERVERTEXT=\"$(SERVERTEXT)/\" \
-	-D_PATH_AFPDPWFILE=\"$(pkgconfdir)/afppasswd\" \
 	-D_PATH_AFPDUAMPATH=\"$(UAMS_PATH)/\" \
 	-D_PATH_CONFDIR=\"$(pkgconfdir)/\" \
 	-D_PATH_STATEDIR='"$(localstatedir)/netatalk/"'
 
-if HAVE_DBUS_GLIB
-BUILT_SOURCES += afpstats_service_glue.h
-DISTCLEANFILES += afpstats_service_glue.h
-
-afpstats_service_glue.h: afpstats-service.xml
-	$(LIBTOOL) --mode=execute \
-		dbus-binding-tool \
-			--prefix=afpstats_obj \
-			--mode=glib-server \
-			--output=afpstats_service_glue.h \
-			$(top_srcdir)/etc/afpd/afpstats-service.xml
-
-afpd_SOURCES += afpstats.c afpstats_obj.c
-afpd_CFLAGS  += $(DBUS_CFLAGS) $(DBUS_GLIB_CFLAGS) $(DBUS_GTHREAD_CFLAGS) -DDBUS_COMPILATION
-afpd_LDFLAGS += $(DBUS_LIBS) $(DBUS_GLIB_LIBS) $(DBUS_GTHREAD_LIBS) -ldbus-glib-1
-endif
-
 noinst_HEADERS = auth.h afp_config.h desktop.h directory.h fce_api_internal.h file.h \
 	 filedir.h fork.h icon.h mangle.h misc.h status.h switch.h \
 	 uam_auth.h uid.h unix.h volume.h hash.h extattrs.h \
-	 dircache.h afpstats_obj.h afpstats.h
+	 dircache.h
