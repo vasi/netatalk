@@ -180,9 +180,6 @@ AC_CONFIG_FILES([Makefile
   man/man8/afpd.8
   man/man8/cnid_dbd.8
   man/man8/cnid_metad.8
-  man/man8/netatalk.8
-	test/Makefile
-	test/afpd/Makefile
 	])
 AC_CONFIG_COMMANDS([default],[chmod a+x distrib/config/netatalk-config contrib/shell_utils/apple_*
 ],[])

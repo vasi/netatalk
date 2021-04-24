@@ -3,7 +3,6 @@
 man_MANS = \
 	afpd.8 \
 	cnid_dbd.8 \
-	cnid_metad.8 \
-	netatalk.8
+	cnid_metad.8
 
 DISTCLEANFILES = $(man_MANS)
