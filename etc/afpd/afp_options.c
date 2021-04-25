@@ -101,31 +101,14 @@ static void show_version( void )
  * Show extended version information about afpd and Netatalk.
  * Used by "afp -V".
  */
-static void show_version_extended(void )
-{
-	show_version( );
+static void show_version_extended(void) {
+  show_version();
 
-	printf( "      Zeroconf support:\t" );
-#if defined (HAVE_MDNS)
-	puts( "mDNSResponder" );
-#elif defined (HAVE_AVAHI)
-	puts( "Avahi" );
-#else
-	puts( "No" );
-#endif
+  printf("   Admin group support:\t");
+  puts("Yes");
 
-	printf( "   Admin group support:\t" );
-	puts( "Yes" );
-
-	printf( "            EA support:\t" );
-	puts( EA_MODULES );
-
-	printf( "         D-Bus support:\t" );
-#ifdef HAVE_DBUS_GLIB
-	puts( "Yes" );
-#else
-	puts( "No" );
-#endif
+  printf("            EA support:\t");
+  puts(EA_MODULES);
 }
 
 /*
