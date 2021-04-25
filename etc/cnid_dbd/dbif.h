@@ -19,7 +19,7 @@
      with a filename. Pass a db_param here for on-disk databases.
   4. Call dbif_open to finally open the CNID database itself. Pass db_param
      here for in-memory database.
-  
+
   Querying the CNID database
   --------------------------
   Call dbif_[get|pget|put|del]. They map to the corresponding BerkeleyDB calls
@@ -27,11 +27,11 @@
 
   Transactions
   ------------
-  We use AUTO_COMMIT for the BDB database accesses. This avoids explicit transactions
-  for every bdb access which speeds up reads. But in order to be able to rollback
-  in case of errors we start a transaction once we encounter the first write from
-  dbif_put or dbif_del.
-  Thus you shouldn't call dbif_txn_[begin|abort|commit], they're used internally.
+  We use AUTO_COMMIT for the BDB database accesses. This avoids explicit
+  transactions for every bdb access which speeds up reads. But in order to be
+  able to rollback in case of errors we start a transaction once we encounter
+  the first write from dbif_put or dbif_del. Thus you shouldn't call
+  dbif_txn_[begin|abort|commit], they're used internally.
 
   Checkpoiting
   ------------
@@ -45,9 +45,9 @@
   ----------------------
 
   On cnid_dbd shutdown we reopen the environment with recovery, close and then
-  remove it. This enables an upgraded netatalk installation possibly linked against
-  a newer bdb lib to succesfully open/create an environment and then silently
-  upgrade the database itself. How nice!
+  remove it. This enables an upgraded netatalk installation possibly linked
+  against a newer bdb lib to succesfully open/create an environment and then
+  silently upgrade the database itself. How nice!
 */
 
 #ifndef CNID_DBD_DBIF_H
@@ -58,36 +58,36 @@
 #include "db_param.h"
 
 #define DBIF_DB_CNT 4
- 
-#define DBIF_CNID          0
-#define DBIF_IDX_DEVINO    1
-#define DBIF_IDX_DIDNAME   2
-#define DBIF_IDX_NAME      3
 
-#define LOCKFILENAME  "lock"
-#define LOCK_FREE          0
-#define LOCK_UNLOCK        1
-#define LOCK_EXCL          2
-#define LOCK_SHRD          3
+#define DBIF_CNID 0
+#define DBIF_IDX_DEVINO 1
+#define DBIF_IDX_DIDNAME 2
+#define DBIF_IDX_NAME 3
+
+#define LOCKFILENAME "lock"
+#define LOCK_FREE 0
+#define LOCK_UNLOCK 1
+#define LOCK_EXCL 2
+#define LOCK_SHRD 3
 
 /* Structures */
 typedef struct {
-    char     *name;
-    DB       *db;
-    uint32_t flags;
-    uint32_t openflags;
-    DBTYPE   type;
+  char *name;
+  DB *db;
+  uint32_t flags;
+  uint32_t openflags;
+  DBTYPE type;
 } db_table;
 
 typedef struct {
-    DB_ENV   *db_env;
-    struct db_param db_param;
-    DB_TXN   *db_txn;
-    DBC      *db_cur;              /* for dbif_walk */
-    char     *db_envhome;
-    char     *db_filename;
-    FILE     *db_errlog;
-    db_table db_table[DBIF_DB_CNT];
+  DB_ENV *db_env;
+  struct db_param db_param;
+  DB_TXN *db_txn;
+  DBC *db_cur; /* for dbif_walk */
+  char *db_envhome;
+  char *db_filename;
+  FILE *db_errlog;
+  db_table db_table[DBIF_DB_CNT];
 } DBD;
 
 extern DBD *dbif_init(const char *envhome, const char *dbname);

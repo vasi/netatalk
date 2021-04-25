@@ -17,8 +17,7 @@
 #include <atalk/logger.h>
 
 /* OpenSession. set up the connection */
-void dsi_opensession(DSI *dsi)
-{
+void dsi_opensession(DSI *dsi) {
   size_t i = 0;
   uint32_t servquant;
   uint32_t replcsize;
@@ -27,8 +26,9 @@ void dsi_opensession(DSI *dsi)
   size_t option_len;
 
   if (setnonblock(dsi->socket, 1) < 0) {
-      LOG(log_error, logtype_dsi, "dsi_opensession: setnonblock: %s", strerror(errno));
-      AFP_PANIC("setnonblock error");
+    LOG(log_error, logtype_dsi, "dsi_opensession: setnonblock: %s",
+        strerror(errno));
+    AFP_PANIC("setnonblock error");
   }
 
   /* parse options */
@@ -37,16 +37,16 @@ void dsi_opensession(DSI *dsi)
     option_len = dsi->commands[i++];
 
     if (i + option_len > dsi->cmdlen) {
-      LOG(log_error, logtype_dsi, "option %"PRIu8" too large: %zu",
-          cmd, option_len);
+      LOG(log_error, logtype_dsi, "option %" PRIu8 " too large: %zu", cmd,
+          option_len);
       exit(EXITERR_CLNT);
     }
 
     switch (cmd) {
     case DSIOPT_ATTNQUANT:
       if (option_len != sizeof(dsi->attn_quantum)) {
-        LOG(log_error, logtype_dsi, "option %"PRIu8" bad length: %zu",
-            cmd, option_len);
+        LOG(log_error, logtype_dsi, "option %" PRIu8 " bad length: %zu", cmd,
+            option_len);
         exit(EXITERR_CLNT);
       }
       memcpy(&dsi->attn_quantum, &dsi->commands[i], option_len);
@@ -66,20 +66,22 @@ void dsi_opensession(DSI *dsi)
   dsi->header.dsi_data.dsi_code = 0;
   /* dsi->header.dsi_command = DSIFUNC_OPEN;*/
 
-  dsi->cmdlen = 2 * (2 + sizeof(uint32_t)); /* length of data. dsi_send uses it. */
+  dsi->cmdlen =
+      2 * (2 + sizeof(uint32_t)); /* length of data. dsi_send uses it. */
 
   /* DSI Option Server Request Quantum */
   dsi->commands[0] = DSIOPT_SERVQUANT;
   dsi->commands[1] = sizeof(servquant);
-  servquant = htonl(( dsi->server_quantum < DSI_SERVQUANT_MIN ||
-	      dsi->server_quantum > DSI_SERVQUANT_MAX ) ? 
-	    DSI_SERVQUANT_DEF : dsi->server_quantum);
+  servquant = htonl((dsi->server_quantum < DSI_SERVQUANT_MIN ||
+                     dsi->server_quantum > DSI_SERVQUANT_MAX)
+                        ? DSI_SERVQUANT_DEF
+                        : dsi->server_quantum);
   memcpy(dsi->commands + 2, &servquant, sizeof(servquant));
 
   /* AFP replaycache size option */
   offs = 2 + sizeof(replcsize);
   dsi->commands[offs] = DSIOPT_REPLCSIZE;
-  dsi->commands[offs+1] = sizeof(replcsize);
+  dsi->commands[offs + 1] = sizeof(replcsize);
   replcsize = htonl(REPLAYCACHE_SIZE);
   memcpy(dsi->commands + offs + 2, &replcsize, sizeof(replcsize));
   dsi_send(dsi);

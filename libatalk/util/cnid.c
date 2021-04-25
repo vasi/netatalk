@@ -64,74 +64,76 @@
  *     "/afp_volume/dir/subdir"
  *
  * @param path     (r) path relative to cwd() or absolute
- * @param volpath  (r) volume path that path is a subdir of (has been computed in volinfo funcs)
+ * @param volpath  (r) volume path that path is a subdir of (has been computed
+ * in volinfo funcs)
  *
  * @returns relative path in new bstring, caller must bdestroy it
  */
-bstring rel_path_in_vol(const char *path, const char *volpath)
-{
-    EC_INIT;
-    int cwd = -1;
-    bstring fpath = NULL;
-    char *dname = NULL;
-    struct stat st;
+bstring rel_path_in_vol(const char *path, const char *volpath) {
+  EC_INIT;
+  int cwd = -1;
+  bstring fpath = NULL;
+  char *dname = NULL;
+  struct stat st;
 
-    if (path == NULL || volpath == NULL)
-        return NULL;
+  if (path == NULL || volpath == NULL)
+    return NULL;
 
-    EC_NEG1_LOG(cwd = open(".", O_RDONLY));
-    EC_ZERO( lstat(path, &st) );
+  EC_NEG1_LOG(cwd = open(".", O_RDONLY));
+  EC_ZERO(lstat(path, &st));
 
-    if (path[0] == '/') {
-        EC_NULL(fpath = bfromcstr(path));
-    } else {
-        switch (S_IFMT & st.st_mode) {
-        case S_IFREG:
-        case S_IFLNK:
-            EC_NULL_LOG(dname = strdup(path));
-            EC_ZERO_LOGSTR(chdir(dirname(dname)), "chdir(%s): %s", dirname, strerror(errno));
-            free(dname);
-            dname = NULL;
-            EC_NULL(fpath = bfromcstr(getcwdpath()));
-            BSTRING_STRIP_SLASH(fpath);
-            EC_ZERO(bcatcstr(fpath, "/"));
-            EC_NULL_LOG(dname = strdup(path));
-            EC_ZERO(bcatcstr(fpath, basename(dname)));
-            break;
+  if (path[0] == '/') {
+    EC_NULL(fpath = bfromcstr(path));
+  } else {
+    switch (S_IFMT & st.st_mode) {
+    case S_IFREG:
+    case S_IFLNK:
+      EC_NULL_LOG(dname = strdup(path));
+      EC_ZERO_LOGSTR(chdir(dirname(dname)), "chdir(%s): %s", dirname,
+                     strerror(errno));
+      free(dname);
+      dname = NULL;
+      EC_NULL(fpath = bfromcstr(getcwdpath()));
+      BSTRING_STRIP_SLASH(fpath);
+      EC_ZERO(bcatcstr(fpath, "/"));
+      EC_NULL_LOG(dname = strdup(path));
+      EC_ZERO(bcatcstr(fpath, basename(dname)));
+      break;
 
-        case S_IFDIR:
-            EC_ZERO_LOGSTR(chdir(path), "chdir(%s): %s", path, strerror(errno));
-            EC_NULL(fpath = bfromcstr(getcwdpath()));
-            break;
+    case S_IFDIR:
+      EC_ZERO_LOGSTR(chdir(path), "chdir(%s): %s", path, strerror(errno));
+      EC_NULL(fpath = bfromcstr(getcwdpath()));
+      break;
 
-        default:
-            EC_FAIL;
-        }
+    default:
+      EC_FAIL;
     }
+  }
 
-    BSTRING_STRIP_SLASH(fpath);
+  BSTRING_STRIP_SLASH(fpath);
 
-    /*
-     * Now we have eg:
-     *   fpath:   /Volume/netatalk/dir/bla
-     *   volpath: /Volume/netatalk/
-     * we want: "dir/bla"
-     */
-    int len = strlen(volpath);
-    if (volpath[len-1] != '/')
-        /* in case volpath has no trailing slash */
-        len ++;
-    EC_ZERO(bdelete(fpath, 0, len));
+  /*
+   * Now we have eg:
+   *   fpath:   /Volume/netatalk/dir/bla
+   *   volpath: /Volume/netatalk/
+   * we want: "dir/bla"
+   */
+  int len = strlen(volpath);
+  if (volpath[len - 1] != '/')
+    /* in case volpath has no trailing slash */
+    len++;
+  EC_ZERO(bdelete(fpath, 0, len));
 
 EC_CLEANUP:
-    if (dname) free(dname);
-    if (cwd != -1) {
-        fchdir(cwd);
-        close(cwd);
-    }
-    if (ret != 0)
-        return NULL;
-    return fpath;
+  if (dname)
+    free(dname);
+  if (cwd != -1) {
+    fchdir(cwd);
+    close(cwd);
+  }
+  if (ret != 0)
+    return NULL;
+  return fpath;
 }
 
 /*!
@@ -143,8 +145,8 @@ EC_CLEANUP:
  * (b) absolute:
  *     "/afp_volume/dir/subdir"
  *
- * path MUST be pointing inside vol, this is usually the case as vol has been build from
- * path using loadvolinfo and friends.
+ * path MUST be pointing inside vol, this is usually the case as vol has been
+ * build from path using loadvolinfo and friends.
  *
  * @param cdb     (r) CNID db handle
  * @param volpath (r) UNIX path of volume
@@ -153,49 +155,42 @@ EC_CLEANUP:
  *
  * @returns CNID of path
  */
-cnid_t cnid_for_path(struct _cnid_db *cdb,
-                     const char *volpath,
-                     const char *path,
-                     cnid_t *did)
-{
-    EC_INIT;
+cnid_t cnid_for_path(struct _cnid_db *cdb, const char *volpath,
+                     const char *path, cnid_t *did) {
+  EC_INIT;
 
-    cnid_t cnid;
-    bstring rpath = NULL;
-    bstring statpath = NULL;
-    struct bstrList *l = NULL;
-    struct stat st;
+  cnid_t cnid;
+  bstring rpath = NULL;
+  bstring statpath = NULL;
+  struct bstrList *l = NULL;
+  struct stat st;
 
-    cnid = htonl(2);
+  cnid = htonl(2);
 
-    EC_NULL(rpath = rel_path_in_vol(path, volpath));
-    EC_NULL(statpath = bfromcstr(volpath));
-    EC_ZERO(bcatcstr(statpath, "/"));
+  EC_NULL(rpath = rel_path_in_vol(path, volpath));
+  EC_NULL(statpath = bfromcstr(volpath));
+  EC_ZERO(bcatcstr(statpath, "/"));
 
-    l = bsplit(rpath, '/');
-    for (int i = 0; i < l->qty ; i++) {
-        *did = cnid;
+  l = bsplit(rpath, '/');
+  for (int i = 0; i < l->qty; i++) {
+    *did = cnid;
 
-        EC_ZERO( bconcat(statpath, l->entry[i]) );
-        EC_ZERO( lstat(cfrombstr(statpath), &st) );
+    EC_ZERO(bconcat(statpath, l->entry[i]));
+    EC_ZERO(lstat(cfrombstr(statpath), &st));
 
-        if ((cnid = cnid_add(cdb,
-                             &st,
-                             *did,
-                             cfrombstr(l->entry[i]),
-                             blength(l->entry[i]),
-                             0)) == CNID_INVALID) {
-            EC_FAIL;
-        }
-        EC_ZERO(bcatcstr(statpath, "/"));
+    if ((cnid = cnid_add(cdb, &st, *did, cfrombstr(l->entry[i]),
+                         blength(l->entry[i]), 0)) == CNID_INVALID) {
+      EC_FAIL;
     }
+    EC_ZERO(bcatcstr(statpath, "/"));
+  }
 
 EC_CLEANUP:
-    bdestroy(rpath);
-    bstrListDestroy(l);
-    bdestroy(statpath);
-    if (ret != 0)
-        return CNID_INVALID;
+  bdestroy(rpath);
+  bstrListDestroy(l);
+  bdestroy(statpath);
+  if (ret != 0)
+    return CNID_INVALID;
 
-    return cnid;
+  return cnid;
 }

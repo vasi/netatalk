@@ -18,27 +18,26 @@
 #include <atalk/afp.h>
 
 #ifndef MIN
-#define MIN(a,b) ((a) < (b) ? (a) : (b))
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
 #endif /* MIN */
 
 /* send an attention. this may get called at any time, so we can't use
- * DSI buffers to send one. 
+ * DSI buffers to send one.
    return 0 on error
- 
+
  */
-int dsi_attention(DSI *dsi, AFPUserBytes flags)
-{
+int dsi_attention(DSI *dsi, AFPUserBytes flags) {
   /* header + AFPUserBytes */
   char block[DSI_BLOCKSIZ + sizeof(AFPUserBytes)];
   uint32_t len, nlen;
   uint16_t id;
 
   if (dsi->flags & DSI_SLEEPING)
-      return 1;
+    return 1;
 
   if (dsi->in_write) {
-      return -1;
-  }      
+    return -1;
+  }
   id = htons(dsi_serverID(dsi));
   flags = htons(flags);
   len = MIN(sizeof(flags), dsi->attn_quantum);

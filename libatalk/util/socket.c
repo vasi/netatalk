@@ -5,7 +5,7 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
- 
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -40,7 +40,7 @@
 #include <atalk/errchk.h>
 #include <atalk/standards.h>
 
-static char ipv4mapprefix[] = {0,0,0,0,0,0,0,0,0,0,0xff,0xff};
+static char ipv4mapprefix[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0xff, 0xff};
 
 /*!
  * @brief set or unset non-blocking IO on a fd
@@ -51,230 +51,234 @@ static char ipv4mapprefix[] = {0,0,0,0,0,0,0,0,0,0,0xff,0xff};
  *
  * @returns   0 on success, -1 on failure
  */
-int setnonblock(int fd, int cmd)
-{
-    int ofdflags;
-    int fdflags;
+int setnonblock(int fd, int cmd) {
+  int ofdflags;
+  int fdflags;
 
-    if ((fdflags = ofdflags = fcntl(fd, F_GETFL, 0)) == -1)
-        return -1;
+  if ((fdflags = ofdflags = fcntl(fd, F_GETFL, 0)) == -1)
+    return -1;
 
-    if (cmd)
-        fdflags |= O_NONBLOCK;
-    else
-        fdflags &= ~O_NONBLOCK;
+  if (cmd)
+    fdflags |= O_NONBLOCK;
+  else
+    fdflags &= ~O_NONBLOCK;
 
-    if (fdflags != ofdflags)
-        if (fcntl(fd, F_SETFL, fdflags) == -1)
-            return -1;
+  if (fdflags != ofdflags)
+    if (fcntl(fd, F_SETFL, fdflags) == -1)
+      return -1;
 
-    return 0;
+  return 0;
 }
 
 /*!
  * non-blocking drop-in replacement for read with timeout using select
  *
- * @param socket          (r)  socket, if in blocking mode, pass "setnonblocking" arg as 1
+ * @param socket          (r)  socket, if in blocking mode, pass
+ * "setnonblocking" arg as 1
  * @param data            (rw) buffer for the read data
  * @param lenght          (r)  how many bytes to read
- * @param setnonblocking  (r)  when non-zero this func will enable and disable non blocking
- *                             io mode for the socket
- * @param timeout         (r)  number of seconds to try reading, 0 means no timeout
+ * @param setnonblocking  (r)  when non-zero this func will enable and disable
+ * non blocking io mode for the socket
+ * @param timeout         (r)  number of seconds to try reading, 0 means no
+ * timeout
  *
  * @returns number of bytes actually read or -1 on timeout or error
  */
-ssize_t readt(int socket, void *data, const size_t length, int setnonblocking, int timeout)
-{
-    size_t stored = 0;
-    ssize_t len = 0;
-    struct timeval now, end, tv;
-    fd_set rfds;
-    int ret;
+ssize_t readt(int socket, void *data, const size_t length, int setnonblocking,
+              int timeout) {
+  size_t stored = 0;
+  ssize_t len = 0;
+  struct timeval now, end, tv;
+  fd_set rfds;
+  int ret;
 
-    FD_ZERO(&rfds);
+  FD_ZERO(&rfds);
 
-    if (setnonblocking) {
-        if (setnonblock(socket, 1) != 0)
-            return -1;
-    }
+  if (setnonblocking) {
+    if (setnonblock(socket, 1) != 0)
+      return -1;
+  }
 
-    /* Calculate end time */
-    if (timeout) {
-        (void)gettimeofday(&now, NULL);
-        end = now;
-        end.tv_sec += timeout;
-    }
+  /* Calculate end time */
+  if (timeout) {
+    (void)gettimeofday(&now, NULL);
+    end = now;
+    end.tv_sec += timeout;
+  }
 
-    while (stored < length) {
-        len = recv(socket, (char *) data + stored, length - stored, 0);
-        if (len == -1) {
+  while (stored < length) {
+    len = recv(socket, (char *)data + stored, length - stored, 0);
+    if (len == -1) {
+      switch (errno) {
+      case EINTR:
+        continue;
+      case EAGAIN:
+        FD_SET(socket, &rfds);
+        if (timeout) {
+          tv.tv_usec = 0;
+          tv.tv_sec = timeout;
+        }
+
+        while ((ret = select(socket + 1, &rfds, NULL, NULL,
+                             timeout ? &tv : NULL)) < 1) {
+          switch (ret) {
+          case 0:
+            LOG(log_debug, logtype_dsi, "select timeout %d s", timeout);
+            errno = EAGAIN;
+            goto exit;
+
+          default: /* -1 */
             switch (errno) {
             case EINTR:
-                continue;
-            case EAGAIN:
-                FD_SET(socket, &rfds);
-                if (timeout) {
-                    tv.tv_usec = 0;
-                    tv.tv_sec  = timeout;
+              if (timeout) {
+                (void)gettimeofday(&now, NULL);
+                if (now.tv_sec > end.tv_sec ||
+                    (now.tv_sec == end.tv_sec && now.tv_usec >= end.tv_usec)) {
+                  LOG(log_debug, logtype_afpd, "select timeout %d s", timeout);
+                  goto exit;
                 }
-
-                while ((ret = select(socket + 1, &rfds, NULL, NULL, timeout ? &tv : NULL)) < 1) {
-                    switch (ret) {
-                    case 0:
-                        LOG(log_debug, logtype_dsi, "select timeout %d s", timeout);
-                        errno = EAGAIN;
-                        goto exit;
-
-                    default: /* -1 */
-                        switch (errno) {
-                        case EINTR:
-                            if (timeout) {
-                                (void)gettimeofday(&now, NULL);
-                                if (now.tv_sec > end.tv_sec
-                                    ||
-                                    (now.tv_sec == end.tv_sec && now.tv_usec >= end.tv_usec)) {
-                                    LOG(log_debug, logtype_afpd, "select timeout %d s", timeout);
-                                    goto exit;
-                                }
-                                if (now.tv_usec > end.tv_usec) {
-                                    tv.tv_usec = 1000000 + end.tv_usec - now.tv_usec;
-                                    tv.tv_sec  = end.tv_sec - now.tv_sec - 1;
-                                } else {
-                                    tv.tv_usec = end.tv_usec - now.tv_usec;
-                                    tv.tv_sec  = end.tv_sec - now.tv_sec;
-                                }
-                            }
-                            FD_SET(socket, &rfds);
-                            continue;
-                        case EBADF:
-                            /* possibly entered disconnected state, don't spam log here */
-                            LOG(log_debug, logtype_afpd, "select: %s", strerror(errno));
-                            stored = -1;
-                            goto exit;
-                        default:
-                            LOG(log_error, logtype_afpd, "select: %s", strerror(errno));
-                            stored = -1;
-                            goto exit;
-                        }
-                    }
-                } /* while (select) */
-                continue;
-            } /* switch (errno) */
-            LOG(log_error, logtype_afpd, "read: %s", strerror(errno));
-            stored = -1;
-            goto exit;
-        } /* (len == -1) */
-        else if (len > 0)
-            stored += len;
-        else
-            break;
-    } /* while (stored < length) */
+                if (now.tv_usec > end.tv_usec) {
+                  tv.tv_usec = 1000000 + end.tv_usec - now.tv_usec;
+                  tv.tv_sec = end.tv_sec - now.tv_sec - 1;
+                } else {
+                  tv.tv_usec = end.tv_usec - now.tv_usec;
+                  tv.tv_sec = end.tv_sec - now.tv_sec;
+                }
+              }
+              FD_SET(socket, &rfds);
+              continue;
+            case EBADF:
+              /* possibly entered disconnected state, don't spam log here */
+              LOG(log_debug, logtype_afpd, "select: %s", strerror(errno));
+              stored = -1;
+              goto exit;
+            default:
+              LOG(log_error, logtype_afpd, "select: %s", strerror(errno));
+              stored = -1;
+              goto exit;
+            }
+          }
+        } /* while (select) */
+        continue;
+      } /* switch (errno) */
+      LOG(log_error, logtype_afpd, "read: %s", strerror(errno));
+      stored = -1;
+      goto exit;
+    } /* (len == -1) */
+    else if (len > 0)
+      stored += len;
+    else
+      break;
+  } /* while (stored < length) */
 
 exit:
-    if (setnonblocking) {
-        if (setnonblock(socket, 0) != 0)
-            return -1;
-    }
+  if (setnonblocking) {
+    if (setnonblock(socket, 0) != 0)
+      return -1;
+  }
 
-    if (len == -1 && stored == 0)
-        /* last read or select got an error and we haven't got yet anything => return -1*/
-        return -1;
-    return stored;
+  if (len == -1 && stored == 0)
+    /* last read or select got an error and we haven't got yet anything =>
+     * return -1*/
+    return -1;
+  return stored;
 }
 
 /*!
  * non-blocking drop-in replacement for read with timeout using select
  *
- * @param socket          (r)  socket, if in blocking mode, pass "setnonblocking" arg as 1
+ * @param socket          (r)  socket, if in blocking mode, pass
+ * "setnonblocking" arg as 1
  * @param data            (rw) buffer for the read data
  * @param lenght          (r)  how many bytes to read
- * @param setnonblocking  (r)  when non-zero this func will enable and disable non blocking
- *                             io mode for the socket
+ * @param setnonblocking  (r)  when non-zero this func will enable and disable
+ * non blocking io mode for the socket
  * @param timeout         (r)  number of seconds to try reading
  *
  * @returns number of bytes actually read or -1 on fatal error
  */
-ssize_t writet(int socket, void *data, const size_t length, int setnonblocking, int timeout)
-{
-    size_t stored = 0;
-    ssize_t len = 0;
-    struct timeval now, end, tv;
-    fd_set rfds;
-    int ret;
+ssize_t writet(int socket, void *data, const size_t length, int setnonblocking,
+               int timeout) {
+  size_t stored = 0;
+  ssize_t len = 0;
+  struct timeval now, end, tv;
+  fd_set rfds;
+  int ret;
 
-    if (setnonblocking) {
-        if (setnonblock(socket, 1) != 0)
-            return -1;
-    }
+  if (setnonblocking) {
+    if (setnonblock(socket, 1) != 0)
+      return -1;
+  }
 
-    /* Calculate end time */
-    (void)gettimeofday(&now, NULL);
-    end = now;
-    end.tv_sec += timeout;
+  /* Calculate end time */
+  (void)gettimeofday(&now, NULL);
+  end = now;
+  end.tv_sec += timeout;
 
-    while (stored < length) {
-        len = write(socket, (char *) data + stored, length - stored);
-        if (len == -1) {
-            switch (errno) {
-            case EINTR:
-                continue;
-            case EAGAIN:
-                FD_ZERO(&rfds);
-                FD_SET(socket, &rfds);
-                tv.tv_usec = 0;
-                tv.tv_sec  = timeout;
-                        
-                while ((ret = select(socket + 1, &rfds, NULL, NULL, &tv)) < 1) {
-                    switch (ret) {
-                    case 0:
-                        LOG(log_warning, logtype_afpd, "select timeout %d s", timeout);
-                        goto exit;
+  while (stored < length) {
+    len = write(socket, (char *)data + stored, length - stored);
+    if (len == -1) {
+      switch (errno) {
+      case EINTR:
+        continue;
+      case EAGAIN:
+        FD_ZERO(&rfds);
+        FD_SET(socket, &rfds);
+        tv.tv_usec = 0;
+        tv.tv_sec = timeout;
 
-                    default: /* -1 */
-                        if (errno == EINTR) {
-                            (void)gettimeofday(&now, NULL);
-                            if (now.tv_sec >= end.tv_sec && now.tv_usec >= end.tv_usec) {
-                                LOG(log_warning, logtype_afpd, "select timeout %d s", timeout);
-                                goto exit;
-                            }
-                            if (now.tv_usec > end.tv_usec) {
-                                tv.tv_usec = 1000000 + end.tv_usec - now.tv_usec;
-                                tv.tv_sec  = end.tv_sec - now.tv_sec - 1;
-                            } else {
-                                tv.tv_usec = end.tv_usec - now.tv_usec;
-                                tv.tv_sec  = end.tv_sec - now.tv_sec;
-                            }
-                            FD_ZERO(&rfds);
-                            FD_SET(socket, &rfds);
-                            continue;
-                        }
-                        LOG(log_error, logtype_afpd, "select: %s", strerror(errno));
-                        stored = -1;
-                        goto exit;
-                    }
-                } /* while (select) */
-                continue;
-            } /* switch (errno) */
-            LOG(log_error, logtype_afpd, "read: %s", strerror(errno));
+        while ((ret = select(socket + 1, &rfds, NULL, NULL, &tv)) < 1) {
+          switch (ret) {
+          case 0:
+            LOG(log_warning, logtype_afpd, "select timeout %d s", timeout);
+            goto exit;
+
+          default: /* -1 */
+            if (errno == EINTR) {
+              (void)gettimeofday(&now, NULL);
+              if (now.tv_sec >= end.tv_sec && now.tv_usec >= end.tv_usec) {
+                LOG(log_warning, logtype_afpd, "select timeout %d s", timeout);
+                goto exit;
+              }
+              if (now.tv_usec > end.tv_usec) {
+                tv.tv_usec = 1000000 + end.tv_usec - now.tv_usec;
+                tv.tv_sec = end.tv_sec - now.tv_sec - 1;
+              } else {
+                tv.tv_usec = end.tv_usec - now.tv_usec;
+                tv.tv_sec = end.tv_sec - now.tv_sec;
+              }
+              FD_ZERO(&rfds);
+              FD_SET(socket, &rfds);
+              continue;
+            }
+            LOG(log_error, logtype_afpd, "select: %s", strerror(errno));
             stored = -1;
             goto exit;
-        } /* (len == -1) */
-        else if (len > 0)
-            stored += len;
-        else
-            break;
-    } /* while (stored < length) */
+          }
+        } /* while (select) */
+        continue;
+      } /* switch (errno) */
+      LOG(log_error, logtype_afpd, "read: %s", strerror(errno));
+      stored = -1;
+      goto exit;
+    } /* (len == -1) */
+    else if (len > 0)
+      stored += len;
+    else
+      break;
+  } /* while (stored < length) */
 
 exit:
-    if (setnonblocking) {
-        if (setnonblock(socket, 0) != 0)
-            return -1;
-    }
+  if (setnonblocking) {
+    if (setnonblock(socket, 0) != 0)
+      return -1;
+  }
 
-    if (len == -1 && stored == 0)
-        /* last read or select got an error and we haven't got yet anything => return -1*/
-        return -1;
-    return stored;
+  if (len == -1 && stored == 0)
+    /* last read or select got an error and we haven't got yet anything =>
+     * return -1*/
+    return -1;
+  return stored;
 }
 
 /*!
@@ -285,37 +289,38 @@ exit:
  *
  * @param  sa        (r) pointer to an struct sockaddr
  *
- * @returns pointer to a static string cotaining the converted address as string.\n
- *          On error pointers to "0.0.0.0" or "::0" are returned.
+ * @returns pointer to a static string cotaining the converted address as
+ * string.\n On error pointers to "0.0.0.0" or "::0" are returned.
  */
-const char *getip_string(const struct sockaddr *sa)
-{
-    static char ip4[INET_ADDRSTRLEN];
-    static char ip6[INET6_ADDRSTRLEN];
+const char *getip_string(const struct sockaddr *sa) {
+  static char ip4[INET_ADDRSTRLEN];
+  static char ip6[INET6_ADDRSTRLEN];
 
-    switch (sa->sa_family) {
+  switch (sa->sa_family) {
 
-    case AF_INET: {
-        const struct sockaddr_in *sai4 = (const struct sockaddr_in *)sa;
-        if ((inet_ntop(AF_INET, &(sai4->sin_addr), ip4, INET_ADDRSTRLEN)) == NULL)
-            return "0.0.0.0";
-        return ip4;
-    }
-    case AF_INET6: {
-        const struct sockaddr_in6 *sai6 = (const struct sockaddr_in6 *)sa;
-        if ((inet_ntop(AF_INET6, &(sai6->sin6_addr), ip6, INET6_ADDRSTRLEN)) == NULL)
-            return "::0";
+  case AF_INET: {
+    const struct sockaddr_in *sai4 = (const struct sockaddr_in *)sa;
+    if ((inet_ntop(AF_INET, &(sai4->sin_addr), ip4, INET_ADDRSTRLEN)) == NULL)
+      return "0.0.0.0";
+    return ip4;
+  }
+  case AF_INET6: {
+    const struct sockaddr_in6 *sai6 = (const struct sockaddr_in6 *)sa;
+    if ((inet_ntop(AF_INET6, &(sai6->sin6_addr), ip6, INET6_ADDRSTRLEN)) ==
+        NULL)
+      return "::0";
 
-        /* Deal with IPv6 mapped IPv4 addresses*/
-        if ((memcmp(sai6->sin6_addr.s6_addr, ipv4mapprefix, sizeof(ipv4mapprefix))) == 0)
-            return (strrchr(ip6, ':') + 1);
-        return ip6;
-    }
-    default:
-        return "getip_string ERROR";
-    }
+    /* Deal with IPv6 mapped IPv4 addresses*/
+    if ((memcmp(sai6->sin6_addr.s6_addr, ipv4mapprefix,
+                sizeof(ipv4mapprefix))) == 0)
+      return (strrchr(ip6, ':') + 1);
+    return ip6;
+  }
+  default:
+    return "getip_string ERROR";
+  }
 
-    /* We never get here */
+  /* We never get here */
 }
 
 /*!
@@ -325,17 +330,16 @@ const char *getip_string(const struct sockaddr *sa)
  *
  * @returns port as unsigned int
  */
-unsigned int getip_port(const struct sockaddr  *sa)
-{
-    if (sa->sa_family == AF_INET) { /* IPv4 */
-        const struct sockaddr_in *sai4 = (const struct sockaddr_in *)sa;
-        return ntohs(sai4->sin_port);
-    } else {                       /* IPv6 */
-        const struct sockaddr_in6 *sai6 = (const struct sockaddr_in6 *)sa;
-        return ntohs(sai6->sin6_port);
-    }
+unsigned int getip_port(const struct sockaddr *sa) {
+  if (sa->sa_family == AF_INET) { /* IPv4 */
+    const struct sockaddr_in *sai4 = (const struct sockaddr_in *)sa;
+    return ntohs(sai4->sin_port);
+  } else { /* IPv6 */
+    const struct sockaddr_in6 *sai6 = (const struct sockaddr_in6 *)sa;
+    return ntohs(sai6->sin6_port);
+  }
 
-    /* We never get here */
+  /* We never get here */
 }
 
 /*!
@@ -349,45 +353,46 @@ unsigned int getip_port(const struct sockaddr  *sa)
  * @param  ai        (rw) pointer to an struct sockaddr
  * @parma  mask      (r) number of maskbits
  */
-void apply_ip_mask(struct sockaddr *sa, int mask)
-{
+void apply_ip_mask(struct sockaddr *sa, int mask) {
 
-    switch (sa->sa_family) {
-    case AF_INET: {
-        if (mask >= 32)
-            return;
+  switch (sa->sa_family) {
+  case AF_INET: {
+    if (mask >= 32)
+      return;
 
-        struct sockaddr_in *si = (struct sockaddr_in *)sa;
-        uint32_t nmask = mask ? ~((1 << (32 - mask)) - 1) : 0;
-        si->sin_addr.s_addr &= htonl(nmask);
-        break;
+    struct sockaddr_in *si = (struct sockaddr_in *)sa;
+    uint32_t nmask = mask ? ~((1 << (32 - mask)) - 1) : 0;
+    si->sin_addr.s_addr &= htonl(nmask);
+    break;
+  }
+  case AF_INET6: {
+    if (mask >= 128)
+      return;
+
+    int i, maskbytes, maskbits;
+    struct sockaddr_in6 *si6 = (struct sockaddr_in6 *)sa;
+
+    /* Deal with IPv6 mapped IPv4 addresses*/
+    if ((memcmp(si6->sin6_addr.s6_addr, ipv4mapprefix,
+                sizeof(ipv4mapprefix))) == 0) {
+      mask += 96;
+      if (mask >= 128)
+        return;
     }
-    case AF_INET6: {
-        if (mask >= 128)
-            return;
 
-        int i, maskbytes, maskbits;
-        struct sockaddr_in6 *si6 = (struct sockaddr_in6 *)sa;
+    maskbytes =
+        (128 - mask) / 8; /* maskbytes really are those that will be 0'ed */
+    maskbits = mask % 8;
 
-        /* Deal with IPv6 mapped IPv4 addresses*/
-        if ((memcmp(si6->sin6_addr.s6_addr, ipv4mapprefix, sizeof(ipv4mapprefix))) == 0) {
-            mask += 96;
-            if (mask >= 128)
-                return;
-        }
-
-        maskbytes = (128 - mask) / 8; /* maskbytes really are those that will be 0'ed */
-        maskbits = mask % 8;
-
-        for (i = maskbytes - 1; i >= 0; i--)
-            si6->sin6_addr.s6_addr[15 - i] = 0;
-        if (maskbits)
-            si6->sin6_addr.s6_addr[15 - maskbytes] &= ~((1 << (8 - maskbits)) - 1);
-        break;
-    }
-    default:
-        break;
-    }
+    for (i = maskbytes - 1; i >= 0; i--)
+      si6->sin6_addr.s6_addr[15 - i] = 0;
+    if (maskbits)
+      si6->sin6_addr.s6_addr[15 - maskbytes] &= ~((1 << (8 - maskbits)) - 1);
+    break;
+  }
+  default:
+    break;
+  }
 }
 
 /*!
@@ -401,20 +406,19 @@ void apply_ip_mask(struct sockaddr *sa, int mask)
  *
  * @note IPv6 mapped IPv4 addresses are treated as IPv4 addresses.
  */
-int compare_ip(const struct sockaddr *sa1, const struct sockaddr *sa2)
-{
-    int ret;
-    char *ip1;
-    const char *ip2;
+int compare_ip(const struct sockaddr *sa1, const struct sockaddr *sa2) {
+  int ret;
+  char *ip1;
+  const char *ip2;
 
-    ip1 = strdup(getip_string(sa1));
-    ip2 = getip_string(sa2);
+  ip1 = strdup(getip_string(sa1));
+  ip2 = getip_string(sa2);
 
-    ret = strcmp(ip1, ip2);
+  ret = strcmp(ip1, ip2);
 
-    free(ip1);
+  free(ip1);
 
-    return ret;
+  return ret;
 }
 
 /*!
@@ -436,98 +440,97 @@ int compare_ip(const struct sockaddr *sa1, const struct sockaddr *sa2)
  * If the function returns -1, then the contents of address and port are
  * undefined.
  */
-int tokenize_ip_port(const char *ipurl, char **address, char **port)
-{
-    EC_INIT;
-    char *p = NULL;
-    char *s;
+int tokenize_ip_port(const char *ipurl, char **address, char **port) {
+  EC_INIT;
+  char *p = NULL;
+  char *s;
 
-    AFP_ASSERT(ipurl && address && port);
-    EC_NULL( p = strdup(ipurl));
+  AFP_ASSERT(ipurl && address && port);
+  EC_NULL(p = strdup(ipurl));
 
-    /* Either ipv4, ipv4:port, ipv6, [ipv6] or [ipv6]:port */
+  /* Either ipv4, ipv4:port, ipv6, [ipv6] or [ipv6]:port */
 
-    if (!strchr(p, ':')) {
-        /* IPv4 address without port */
-        *address = p;
-        p = NULL;  /* prevent free() */
-        *port = NULL;
-        EC_EXIT_STATUS(0);
-    }
+  if (!strchr(p, ':')) {
+    /* IPv4 address without port */
+    *address = p;
+    p = NULL; /* prevent free() */
+    *port = NULL;
+    EC_EXIT_STATUS(0);
+  }
 
-    /* Either ipv4:port, ipv6, [ipv6] or [ipv6]:port */
+  /* Either ipv4:port, ipv6, [ipv6] or [ipv6]:port */
 
-    if (strchr(p, '.')) {
-        /* ipv4:port */
-        *address = p;
-        p = strchr(p, ':');
-        *p = '\0';
-        EC_NULL( *port = strdup(p + 1));
-        p = NULL; /* prevent free() */
-        EC_EXIT_STATUS(0);
-    }
+  if (strchr(p, '.')) {
+    /* ipv4:port */
+    *address = p;
+    p = strchr(p, ':');
+    *p = '\0';
+    EC_NULL(*port = strdup(p + 1));
+    p = NULL; /* prevent free() */
+    EC_EXIT_STATUS(0);
+  }
 
-    /* Either ipv6, [ipv6] or [ipv6]:port */
+  /* Either ipv6, [ipv6] or [ipv6]:port */
 
-    if (p[0] != '[') {
-        /* ipv6 */
-        *address = p;
-        p = NULL;  /* prevent free() */
-        *port = NULL;
-        EC_EXIT_STATUS(0);
-    }
+  if (p[0] != '[') {
+    /* ipv6 */
+    *address = p;
+    p = NULL; /* prevent free() */
+    *port = NULL;
+    EC_EXIT_STATUS(0);
+  }
 
-    /* [ipv6] or [ipv6]:port */
+  /* [ipv6] or [ipv6]:port */
 
-    EC_NULL( *address = strdup(p + 1) );
+  EC_NULL(*address = strdup(p + 1));
 
-    if ((s = strchr(*address, ']')) == NULL) {
-        LOG(log_error, logtype_dsi, "tokenize_ip_port: malformed ipv6 address %s\n", ipurl);
-        EC_FAIL;
-    }
-    *s = '\0';
-    /* address now points to the ipv6 address without [] */
+  if ((s = strchr(*address, ']')) == NULL) {
+    LOG(log_error, logtype_dsi, "tokenize_ip_port: malformed ipv6 address %s\n",
+        ipurl);
+    EC_FAIL;
+  }
+  *s = '\0';
+  /* address now points to the ipv6 address without [] */
 
-    if (s[1] == ':') {
-        /* [ipv6]:port */
-        EC_NULL( *port = strdup(s + 2) );
-    } else {
-        /* [ipv6] */
-        *port = NULL;
-    }
+  if (s[1] == ':') {
+    /* [ipv6]:port */
+    EC_NULL(*port = strdup(s + 2));
+  } else {
+    /* [ipv6] */
+    *port = NULL;
+  }
 
 EC_CLEANUP:
-    if (p)
-        free(p);
-    EC_EXIT;
+  if (p)
+    free(p);
+  EC_EXIT;
 }
 
 /**
  * Allocate and initialize atalk socket event struct
  **/
-struct asev *asev_init(int max)
-{
-    struct asev *asev = calloc(1, sizeof(struct asev));
+struct asev *asev_init(int max) {
+  struct asev *asev = calloc(1, sizeof(struct asev));
 
-    if (asev == NULL) {
-        return NULL;
-    }
+  if (asev == NULL) {
+    return NULL;
+  }
 
-    /* Initialize with space for all possibly active fds */
-    asev->fdset = calloc(max, sizeof(struct pollfd));
-    asev->data = calloc(max, sizeof(struct asev_data));
+  /* Initialize with space for all possibly active fds */
+  asev->fdset = calloc(max, sizeof(struct pollfd));
+  asev->data = calloc(max, sizeof(struct asev_data));
 
-    if (asev->fdset == NULL || asev->data == NULL) {
-        free(asev->fdset);
-        free(asev->data);
-        free(asev);
-        return NULL;
-    }
+  if (asev->fdset == NULL || asev->data == NULL) {
+    free(asev->fdset);
+    free(asev->data);
+    free(asev);
+    return NULL;
+  }
 
-    asev->max = max;
-    asev->used = 0;
+  asev->max = max;
+  asev->used = 0;
 
-    return asev;
+  return asev;
 }
 
 /**
@@ -536,26 +539,23 @@ struct asev *asev_init(int max)
  * This uses an additional array of struct polldata which stores type
  * information (enum fdtype) and a pointer to anciliary user data.
  **/
-bool asev_add_fd(struct asev *asev,
-                 int fd,
-                 enum asev_fdtype fdtype,
-                 void *private)
-{
-    if (asev == NULL) {
-        return false;
-    }
+bool asev_add_fd(struct asev *asev, int fd, enum asev_fdtype fdtype,
+                 void *private) {
+  if (asev == NULL) {
+    return false;
+  }
 
-    if (!(asev->used < asev->max)) {
-        return false;
-    }
+  if (!(asev->used < asev->max)) {
+    return false;
+  }
 
-    asev->fdset[asev->used].fd = fd;
-    asev->fdset[asev->used].events = POLLIN;
-    asev->data[asev->used].fdtype = fdtype;
-    asev->data[asev->used].private = private;
-    asev->used++;
+  asev->fdset[asev->used].fd = fd;
+  asev->fdset[asev->used].events = POLLIN;
+  asev->data[asev->used].fdtype = fdtype;
+  asev->data[asev->used].private = private;
+  asev->used++;
 
-    return true;
+  return true;
 }
 
 /**
@@ -563,174 +563,175 @@ bool asev_add_fd(struct asev *asev,
  *
  * @returns true if the fd was deleted, otherwise false
  **/
-bool asev_del_fd(struct asev *asev, int fd)
-{
-    int i;
-    int numafter;
+bool asev_del_fd(struct asev *asev, int fd) {
+  int i;
+  int numafter;
 
-    if (asev == NULL) {
-        return false;
-    }
-
-    if (asev->used == 0) {
-        LOG(log_error, logtype_cnid, "asev_del_fd: empty");
-        return false;
-    }
-
-    for (i = 0; i < asev->used; i++) {
-        /*
-         * Scan the array for a matching fd
-         */
-        if (asev->fdset[i].fd == fd) {
-            /*
-             * found fd
-             */
-            if ((i + 1) == asev->used) {
-                /*
-                 * it's the last (or only) array element, simply null it
-                 */
-                asev->fdset[i].fd = -1;
-                asev->data[i].fdtype = 0;
-                asev->data[i].private = NULL;
-            } else {
-                /*
-                 * Move down by one all subsequent elements
-                 */
-                numafter = asev->used - (i + 1);
-                memmove(&asev->fdset[i], &asev->fdset[i+1],
-                        numafter * sizeof(struct pollfd));
-                memmove(&asev->data[i], &asev->data[i+1],
-                        numafter * sizeof(struct asev_data));
-            }
-            asev->used--;
-            return true;
-        }
-    }
-
+  if (asev == NULL) {
     return false;
+  }
+
+  if (asev->used == 0) {
+    LOG(log_error, logtype_cnid, "asev_del_fd: empty");
+    return false;
+  }
+
+  for (i = 0; i < asev->used; i++) {
+    /*
+     * Scan the array for a matching fd
+     */
+    if (asev->fdset[i].fd == fd) {
+      /*
+       * found fd
+       */
+      if ((i + 1) == asev->used) {
+        /*
+         * it's the last (or only) array element, simply null it
+         */
+        asev->fdset[i].fd = -1;
+        asev->data[i].fdtype = 0;
+        asev->data[i].private = NULL;
+      } else {
+        /*
+         * Move down by one all subsequent elements
+         */
+        numafter = asev->used - (i + 1);
+        memmove(&asev->fdset[i], &asev->fdset[i + 1],
+                numafter * sizeof(struct pollfd));
+        memmove(&asev->data[i], &asev->data[i + 1],
+                numafter * sizeof(struct asev_data));
+      }
+      asev->used--;
+      return true;
+    }
+  }
+
+  return false;
 }
 
 /* Length of the space taken up by a padded control message of length len */
 #ifndef CMSG_SPACE
-#define CMSG_SPACE(len) (__CMSG_ALIGN(sizeof(struct cmsghdr)) + __CMSG_ALIGN(len))
+#define CMSG_SPACE(len)                                                        \
+  (__CMSG_ALIGN(sizeof(struct cmsghdr)) + __CMSG_ALIGN(len))
 #endif
 
 /*
  * Receive a fd on a suitable socket
  * @args fd          (r) PF_UNIX socket to receive on
- * @args nonblocking (r) 0: fd is in blocking mode - 1: fd is nonblocking, poll for 1 sec
+ * @args nonblocking (r) 0: fd is in blocking mode - 1: fd is nonblocking, poll
+ * for 1 sec
  * @returns fd on success, -1 on error
  */
-int recv_fd(int fd, int nonblocking)
-{
-    int ret;
-    struct msghdr msgh;
-    struct iovec iov[1];
-    struct cmsghdr *cmsgp = NULL;
-    char buf[CMSG_SPACE(sizeof(int))];
-    char dbuf[80];
-    struct pollfd pollfds[1];
+int recv_fd(int fd, int nonblocking) {
+  int ret;
+  struct msghdr msgh;
+  struct iovec iov[1];
+  struct cmsghdr *cmsgp = NULL;
+  char buf[CMSG_SPACE(sizeof(int))];
+  char dbuf[80];
+  struct pollfd pollfds[1];
 
-    pollfds[0].fd = fd;
-    pollfds[0].events = POLLIN;
+  pollfds[0].fd = fd;
+  pollfds[0].events = POLLIN;
 
-    memset(&msgh,0,sizeof(msgh));
-    memset(buf,0,sizeof(buf));
+  memset(&msgh, 0, sizeof(msgh));
+  memset(buf, 0, sizeof(buf));
 
-    msgh.msg_name = NULL;
-    msgh.msg_namelen = 0;
+  msgh.msg_name = NULL;
+  msgh.msg_namelen = 0;
 
-    msgh.msg_iov = iov;
-    msgh.msg_iovlen = 1;
+  msgh.msg_iov = iov;
+  msgh.msg_iovlen = 1;
 
-    iov[0].iov_base = dbuf;
-    iov[0].iov_len = sizeof(dbuf);
+  iov[0].iov_base = dbuf;
+  iov[0].iov_len = sizeof(dbuf);
 
-    msgh.msg_control = buf;
-    msgh.msg_controllen = sizeof(buf);
+  msgh.msg_control = buf;
+  msgh.msg_controllen = sizeof(buf);
 
-    if (nonblocking) {
-        do {
-            ret = poll(pollfds, 1, 2000); /* poll 2 seconds, evtl. multipe times (EINTR) */
-        } while ( ret == -1 && errno == EINTR );
-        if (ret != 1)
-            return -1;
-        ret = recvmsg(fd, &msgh, 0);
-    } else {
-        do  {
-            ret = recvmsg(fd, &msgh, 0);
-        } while ( ret == -1 && errno == EINTR );
-    }
+  if (nonblocking) {
+    do {
+      ret = poll(pollfds, 1,
+                 2000); /* poll 2 seconds, evtl. multipe times (EINTR) */
+    } while (ret == -1 && errno == EINTR);
+    if (ret != 1)
+      return -1;
+    ret = recvmsg(fd, &msgh, 0);
+  } else {
+    do {
+      ret = recvmsg(fd, &msgh, 0);
+    } while (ret == -1 && errno == EINTR);
+  }
 
-    if ( ret == -1 ) {
-        return -1;
-    }
-
-    for ( cmsgp = CMSG_FIRSTHDR(&msgh); cmsgp != NULL; cmsgp = CMSG_NXTHDR(&msgh,cmsgp) ) {
-        if ( cmsgp->cmsg_level == SOL_SOCKET && cmsgp->cmsg_type == SCM_RIGHTS ) {
-            return *(int *) CMSG_DATA(cmsgp);
-        }
-    }
-
-    if ( ret == sizeof (int) )
-        errno = *(int *)dbuf; /* Rcvd errno */
-    else
-        errno = ENOENT;    /* Default errno */
-
+  if (ret == -1) {
     return -1;
+  }
+
+  for (cmsgp = CMSG_FIRSTHDR(&msgh); cmsgp != NULL;
+       cmsgp = CMSG_NXTHDR(&msgh, cmsgp)) {
+    if (cmsgp->cmsg_level == SOL_SOCKET && cmsgp->cmsg_type == SCM_RIGHTS) {
+      return *(int *)CMSG_DATA(cmsgp);
+    }
+  }
+
+  if (ret == sizeof(int))
+    errno = *(int *)dbuf; /* Rcvd errno */
+  else
+    errno = ENOENT; /* Default errno */
+
+  return -1;
 }
 
 /*
  * Send a fd across a suitable socket
  */
-int send_fd(int socket, int fd)
-{
-    int ret;
-    struct msghdr msgh;
-    struct iovec iov[1];
-    struct cmsghdr *cmsgp = NULL;
-    char *buf;
-    size_t size;
-    int er=0;
+int send_fd(int socket, int fd) {
+  int ret;
+  struct msghdr msgh;
+  struct iovec iov[1];
+  struct cmsghdr *cmsgp = NULL;
+  char *buf;
+  size_t size;
+  int er = 0;
 
-    size = CMSG_SPACE(sizeof fd);
-    buf = malloc(size);
-    if (!buf) {
-        LOG(log_error, logtype_cnid, "error in sendmsg: %s", strerror(errno));
-        return -1;
-    }
+  size = CMSG_SPACE(sizeof fd);
+  buf = malloc(size);
+  if (!buf) {
+    LOG(log_error, logtype_cnid, "error in sendmsg: %s", strerror(errno));
+    return -1;
+  }
 
-    memset(&msgh,0,sizeof (msgh));
-    memset(buf,0, size);
+  memset(&msgh, 0, sizeof(msgh));
+  memset(buf, 0, size);
 
-    msgh.msg_name = NULL;
-    msgh.msg_namelen = 0;
+  msgh.msg_name = NULL;
+  msgh.msg_namelen = 0;
 
-    msgh.msg_iov = iov;
-    msgh.msg_iovlen = 1;
+  msgh.msg_iov = iov;
+  msgh.msg_iovlen = 1;
 
-    iov[0].iov_base = &er;
-    iov[0].iov_len = sizeof(er);
+  iov[0].iov_base = &er;
+  iov[0].iov_len = sizeof(er);
 
-    msgh.msg_control = buf;
-    msgh.msg_controllen = size;
+  msgh.msg_control = buf;
+  msgh.msg_controllen = size;
 
-    cmsgp = CMSG_FIRSTHDR(&msgh);
-    cmsgp->cmsg_level = SOL_SOCKET;
-    cmsgp->cmsg_type = SCM_RIGHTS;
-    cmsgp->cmsg_len = CMSG_LEN(sizeof(fd));
+  cmsgp = CMSG_FIRSTHDR(&msgh);
+  cmsgp->cmsg_level = SOL_SOCKET;
+  cmsgp->cmsg_type = SCM_RIGHTS;
+  cmsgp->cmsg_len = CMSG_LEN(sizeof(fd));
 
-    *((int *)CMSG_DATA(cmsgp)) = fd;
-    msgh.msg_controllen = cmsgp->cmsg_len;
+  *((int *)CMSG_DATA(cmsgp)) = fd;
+  msgh.msg_controllen = cmsgp->cmsg_len;
 
-    do  {
-        ret = sendmsg(socket,&msgh, 0);
-    } while ( ret == -1 && errno == EINTR );
-    if (ret == -1) {
-        LOG(log_error, logtype_cnid, "error in sendmsg: %s", strerror(errno));
-        free(buf);
-        return -1;
-    }
+  do {
+    ret = sendmsg(socket, &msgh, 0);
+  } while (ret == -1 && errno == EINTR);
+  if (ret == -1) {
+    LOG(log_error, logtype_cnid, "error in sendmsg: %s", strerror(errno));
     free(buf);
-    return 0;
+    return -1;
+  }
+  free(buf);
+  return 0;
 }

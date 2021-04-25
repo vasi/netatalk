@@ -18,34 +18,35 @@
 #include "dbd.h"
 #include "pack.h"
 
-int dbd_search(DBD *dbd, struct cnid_dbd_rqst *rqst, struct cnid_dbd_rply *rply)
-{
-    DBT key;
-    int results;
-    static char resbuf[DBD_MAX_SRCH_RSLTS * sizeof(cnid_t)];
+int dbd_search(DBD *dbd, struct cnid_dbd_rqst *rqst,
+               struct cnid_dbd_rply *rply) {
+  DBT key;
+  int results;
+  static char resbuf[DBD_MAX_SRCH_RSLTS * sizeof(cnid_t)];
 
-    LOG(log_debug, logtype_cnid, "dbd_search(\"%s\"):", rqst->name);
+  LOG(log_debug, logtype_cnid, "dbd_search(\"%s\"):", rqst->name);
 
-    memset(&key, 0, sizeof(key));
-    rply->name = resbuf;
-    rply->namelen = 0;
+  memset(&key, 0, sizeof(key));
+  rply->name = resbuf;
+  rply->namelen = 0;
 
-    key.data = (char *)rqst->name;
-    key.size = rqst->namelen;
+  key.data = (char *)rqst->name;
+  key.size = rqst->namelen;
 
-    if ((results = dbif_search(dbd, &key, resbuf)) < 0) {
-        LOG(log_error, logtype_cnid, "dbd_search(\"%s\"): db error", rqst->name);
-        rply->result = CNID_DBD_RES_ERR_DB;
-        return -1;
-    }
-    if (results) {
-        LOG(log_debug, logtype_cnid, "dbd_search(\"%s\"): %d matches", rqst->name, results);
-        rply->namelen = results * sizeof(cnid_t);
-        rply->result = CNID_DBD_RES_OK;
-    } else {
-        LOG(log_debug, logtype_cnid, "dbd_search(\"%s\"): no matches", rqst->name);
-        rply->result = CNID_DBD_RES_NOTFOUND;
-    }
+  if ((results = dbif_search(dbd, &key, resbuf)) < 0) {
+    LOG(log_error, logtype_cnid, "dbd_search(\"%s\"): db error", rqst->name);
+    rply->result = CNID_DBD_RES_ERR_DB;
+    return -1;
+  }
+  if (results) {
+    LOG(log_debug, logtype_cnid, "dbd_search(\"%s\"): %d matches", rqst->name,
+        results);
+    rply->namelen = results * sizeof(cnid_t);
+    rply->result = CNID_DBD_RES_OK;
+  } else {
+    LOG(log_debug, logtype_cnid, "dbd_search(\"%s\"): no matches", rqst->name);
+    rply->result = CNID_DBD_RES_NOTFOUND;
+  }
 
-    return 1;
+  return 1;
 }

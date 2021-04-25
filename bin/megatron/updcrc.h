@@ -4,13 +4,13 @@
 #ifndef _UPDCRC_H
 #define _UPDCRC_H 1
 
-#define W	16	/* bits in CRC:16	16	16	*/
+#define W 16 /* bits in CRC:16	16	16	*/
 
-    /* data type that holds a W-bit unsigned integer */
+/* data type that holds a W-bit unsigned integer */
 #if W <= 16
-#  define WTYPE	unsigned short
+#define WTYPE unsigned short
 #else /* W <= 16 */
-#  define WTYPE   u_int32_t
+#define WTYPE u_int32_t
 #endif /* W <= 16 */
 
 WTYPE updcrc(WTYPE icrc, unsigned char *icp, int icnt);

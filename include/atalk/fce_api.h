@@ -1,4 +1,4 @@
-/* 
+/*
  * File:   fce_api.h
  * Author: mw
  *
@@ -8,42 +8,40 @@
  */
 
 #ifndef _FCE_API_H
-#define	_FCE_API_H
+#define _FCE_API_H
 
 #include <atalk/globals.h>
 
-#define FCE_PACKET_VERSION  2
+#define FCE_PACKET_VERSION 2
 
 /*
  * Public FCE events
  */
-#define FCE_FILE_MODIFY     1
-#define FCE_FILE_DELETE     2
-#define FCE_DIR_DELETE      3
-#define FCE_FILE_CREATE     4
-#define FCE_DIR_CREATE      5
-#define FCE_FILE_MOVE       6
-#define FCE_DIR_MOVE        7
-#define FCE_LOGIN           8
-#define FCE_LOGOUT          9
+#define FCE_FILE_MODIFY 1
+#define FCE_FILE_DELETE 2
+#define FCE_DIR_DELETE 3
+#define FCE_FILE_CREATE 4
+#define FCE_DIR_CREATE 5
+#define FCE_FILE_MOVE 6
+#define FCE_DIR_MOVE 7
+#define FCE_LOGIN 8
+#define FCE_LOGOUT 9
 /* keep in sync with public FCE events */
-#define FCE_FIRST_EVENT     FCE_FILE_MODIFY
-#define FCE_LAST_EVENT      FCE_LOGOUT
-
+#define FCE_FIRST_EVENT FCE_FILE_MODIFY
+#define FCE_LAST_EVENT FCE_LOGOUT
 
 /*
  * Private FCE events
  */
-#define FCE_CONN_START     42
-#define FCE_CONN_BROKEN    99
-
+#define FCE_CONN_START 42
+#define FCE_CONN_BROKEN 99
 
 /* fce_packet.fce_magic */
-#define FCE_PACKET_MAGIC  "at_fcapi"
+#define FCE_PACKET_MAGIC "at_fcapi"
 
 /* flags for "fce_ev_info" of additional info to send in events */
-#define FCE_EV_INFO_PID     (1 << 0)
-#define FCE_EV_INFO_USER    (1 << 1)
+#define FCE_EV_INFO_PID (1 << 0)
+#define FCE_EV_INFO_USER (1 << 1)
 #define FCE_EV_INFO_SRCPATH (1 << 2)
 
 /*
@@ -51,7 +49,7 @@
  *
  *      1         2         3         4         5         6         7          8
  * +---------+---------+---------+---------+---------+---------+----------+----------+
- * |                                   FCE magic                                     |
+ * |                                   FCE magic |
  * +---------+---------+---------+---------+---------+---------+----------+----------+
  * | version |
  * +---------+
@@ -67,7 +65,7 @@
  *
  *      1         2         3         4         5         6         7          8
  * +---------+---------+---------+---------+---------+---------+----------+----------+
- * |                                   FCE magic                                     |
+ * |                                   FCE magic |
  * +---------+---------+---------+---------+---------+---------+----------+----------+
  * | version |
  * +---------+
@@ -77,13 +75,13 @@
  * +---------+
  * | padding |
  * +---------+---------+---------+---------+---------+---------+----------+----------+
- * |                                    reserved                                     |
+ * |                                    reserved |
  * +---------+---------+---------+---------+---------+---------+----------+----------+
  * |               event ID                |
  * +---------+---------+---------+---------+
  * ... optional:
  * +---------+---------+---------+---------+---------+---------+----------+----------+
- * |                                      pid                                        |
+ * |                                      pid |
  * +---------+---------+---------+---------+---------+---------+----------+----------+
  * ...
  * ... optional:
@@ -110,18 +108,18 @@
  */
 
 struct fce_packet {
-    char          fcep_magic[8];
-    unsigned char fcep_version;
-    unsigned char fcep_options;
-    unsigned char fcep_event;
-    uint32_t      fcep_event_id;
-    uint64_t      fcep_pid;
-    uint16_t      fcep_userlen;
-    char          fcep_user[MAXPATHLEN];
-    uint16_t      fcep_pathlen1;
-    char          fcep_path1[MAXPATHLEN];
-    uint16_t      fcep_pathlen2;
-    char          fcep_path2[MAXPATHLEN];
+  char fcep_magic[8];
+  unsigned char fcep_version;
+  unsigned char fcep_options;
+  unsigned char fcep_event;
+  uint32_t fcep_event_id;
+  uint64_t fcep_pid;
+  uint16_t fcep_userlen;
+  char fcep_user[MAXPATHLEN];
+  uint16_t fcep_pathlen1;
+  char fcep_path1[MAXPATHLEN];
+  uint16_t fcep_pathlen2;
+  char fcep_path2[MAXPATHLEN];
 };
 
 typedef uint32_t fce_ev_t;
@@ -130,13 +128,13 @@ struct path;
 struct ofork;
 
 void fce_pending_events(const AFPObj *obj);
-int fce_register(const AFPObj *obj, fce_ev_t event, const char *path, const char *oldpath);
-int fce_add_udp_socket(const char *target );  // IP or IP:Port
-int fce_set_coalesce(const char *coalesce_opt ); // all|delete|create
-int fce_set_events(const char *events);     /* fmod,fdel,ddel,fcre,dcre */
+int fce_register(const AFPObj *obj, fce_ev_t event, const char *path,
+                 const char *oldpath);
+int fce_add_udp_socket(const char *target);     // IP or IP:Port
+int fce_set_coalesce(const char *coalesce_opt); // all|delete|create
+int fce_set_events(const char *events);         /* fmod,fdel,ddel,fcre,dcre */
 
 #define FCE_DEFAULT_PORT 12250
 #define FCE_DEFAULT_PORT_STRING "12250"
 
-#endif	/* _FCE_API_H */
-
+#endif /* _FCE_API_H */

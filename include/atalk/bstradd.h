@@ -5,7 +5,7 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
- 
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -29,11 +29,11 @@
 #define cfrombstr(b) ((char *)((b)->data))
 
 /* strip slashes from end of a bstring */
-#define BSTRING_STRIP_SLASH(a)                      \
-    do {                                            \
-        while (bchar((a), blength(a) - 1) == '/')   \
-            bdelete((a), blength(a) - 1, 1);        \
-    } while (0);
+#define BSTRING_STRIP_SLASH(a)                                                 \
+  do {                                                                         \
+    while (bchar((a), blength(a) - 1) == '/')                                  \
+      bdelete((a), blength(a) - 1, 1);                                         \
+  } while (0);
 
 typedef struct tagbstring static_bstring;
 
@@ -43,5 +43,5 @@ extern int bunrefcstr(bstring b);
 extern struct bstrList *bstrListCreateMin(int min);
 extern int bstrListPush(struct bstrList *sl, bstring bs);
 extern bstring bstrListPop(struct bstrList *sl);
-extern bstring bjoinInv(const struct bstrList * bl, const_bstring sep);
+extern bstring bjoinInv(const struct bstrList *bl, const_bstring sep);
 #endif /* ATALK_BSTRADD_H */

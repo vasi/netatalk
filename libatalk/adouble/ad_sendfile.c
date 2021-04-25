@@ -3,14 +3,14 @@
  * All rights reserved. See COPYRIGHT.
  *
  * NOTE: the following uses the fact that sendfile() only exists on
- * machines with SA_RESTART behaviour. this is all very machine specific. 
+ * machines with SA_RESTART behaviour. this is all very machine specific.
  *
  * sendfile chainsaw from samba.
  Unix SMB/Netbios implementation.
  Version 2.2.x / 3.0.x
  sendfile implementations.
  Copyright (C) Jeremy Allison 2002.
- 
+
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation; either version 2 of the License, or
@@ -19,7 +19,7 @@
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU General Public License for more details.
- 
+
  You should have received a copy of the GNU General Public License
  along with this program; if not, write to the Free Software
  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -33,49 +33,45 @@
 #include <stdio.h>
 #include <sys/socket.h>
 #include <sys/uio.h>
-#include <errno.h>  
+#include <errno.h>
 
 #include <atalk/adouble.h>
 #include <atalk/logger.h>
 
 #include "ad_lock.h"
 
-#if defined(SENDFILE_FLAVOR_BSD )
+#if defined(SENDFILE_FLAVOR_BSD)
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/uio.h>
-ssize_t sys_sendfile(int tofd, int fromfd, off_t *offset, size_t count)
-{
-    off_t len;
-    int ret;
+ssize_t sys_sendfile(int tofd, int fromfd, off_t *offset, size_t count) {
+  off_t len;
+  int ret;
 
-    ret = sendfile(fromfd, tofd, *offset, count, NULL, &len, 0);
+  ret = sendfile(fromfd, tofd, *offset, count, NULL, &len, 0);
 
-    *offset += len;
+  *offset += len;
 
-    if (ret != 0)
-        return -1;
-    return len;
+  if (ret != 0)
+    return -1;
+  return len;
 }
 
 #else
 
-ssize_t sys_sendfile(int out_fd, int in_fd, off_t *_offset, size_t count)
-{
-    /* No sendfile syscall. */
-    errno = ENOSYS;
-    return -1;
+ssize_t sys_sendfile(int out_fd, int in_fd, off_t *_offset, size_t count) {
+  /* No sendfile syscall. */
+  errno = ENOSYS;
+  return -1;
 }
 #endif
 
 /* ------------------------------- */
-int ad_readfile_init(const struct adouble *ad, 
-				       const int eid, off_t *off,
-				       const int end)
-{
+int ad_readfile_init(const struct adouble *ad, const int eid, off_t *off,
+                     const int end) {
   int fd;
 
-  if (end) 
+  if (end)
     *off = ad_size(ad, eid) - *off;
 
   if (eid == ADEID_DFORK) {

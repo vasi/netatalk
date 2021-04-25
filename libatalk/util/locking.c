@@ -5,7 +5,7 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
- 
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -82,14 +82,13 @@
  *
  * @sa read_lock, write_lock, unlock
  */
-int lock_reg(int fd, int cmd, int type, off_t offset, int whence, off_t len)
-{
-    struct flock lock;
+int lock_reg(int fd, int cmd, int type, off_t offset, int whence, off_t len) {
+  struct flock lock;
 
-    lock.l_type = type;
-    lock.l_start = offset;
-    lock.l_whence = whence;
-    lock.l_len = len;
+  lock.l_type = type;
+  lock.l_start = offset;
+  lock.l_whence = whence;
+  lock.l_len = len;
 
-    return (fcntl(fd, cmd, &lock));
+  return (fcntl(fd, cmd, &lock));
 }

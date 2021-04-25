@@ -35,52 +35,51 @@
 #include <atalk/logger.h>
 #include <atalk/util.h>
 
-ssize_t adf_pread(struct ad_fd *ad_fd, void *buf, size_t count, off_t offset)
-{
-    ssize_t     cc;
-    cc = pread(ad_fd->adf_fd, buf, count, offset );
-    return cc;
+ssize_t adf_pread(struct ad_fd *ad_fd, void *buf, size_t count, off_t offset) {
+  ssize_t cc;
+  cc = pread(ad_fd->adf_fd, buf, count, offset);
+  return cc;
 }
 
 /* XXX: locks have to be checked before each stream of consecutive
  *      ad_reads to prevent a denial in the middle from causing
  *      problems. */
-ssize_t ad_read( struct adouble *ad, const uint32_t eid, off_t off, char *buf, const size_t buflen)
-{
-    ssize_t     cc;
-    off_t r_off = 0;
+ssize_t ad_read(struct adouble *ad, const uint32_t eid, off_t off, char *buf,
+                const size_t buflen) {
+  ssize_t cc;
+  off_t r_off = 0;
 
-    /* We're either reading the data fork (and thus the data file)
-     * or we're reading anything else (and thus the header file). */
-    if ( eid == ADEID_DFORK ) {
-        if (ad->ad_data_fork.adf_syml !=0 ) {
-            /* It's a symlink, we already have the target in adf_syml */
-            cc = strlen(ad->ad_data_fork.adf_syml);
-            if (buflen < cc)
-                /* Request buffersize is too small, force AFPERR_PARAM */
-                return -1;
-            memcpy(buf, ad->ad_data_fork.adf_syml, cc);
-        } else {
-            cc = adf_pread(&ad->ad_data_fork, buf, buflen, off);
-        }
+  /* We're either reading the data fork (and thus the data file)
+   * or we're reading anything else (and thus the header file). */
+  if (eid == ADEID_DFORK) {
+    if (ad->ad_data_fork.adf_syml != 0) {
+      /* It's a symlink, we already have the target in adf_syml */
+      cc = strlen(ad->ad_data_fork.adf_syml);
+      if (buflen < cc)
+        /* Request buffersize is too small, force AFPERR_PARAM */
+        return -1;
+      memcpy(buf, ad->ad_data_fork.adf_syml, cc);
     } else {
-        if (! AD_RSRC_OPEN(ad))
-            /* resource fork is not open ( cf etc/afp/fork.c) */
-            return 0;
+      cc = adf_pread(&ad->ad_data_fork, buf, buflen, off);
+    }
+  } else {
+    if (!AD_RSRC_OPEN(ad))
+      /* resource fork is not open ( cf etc/afp/fork.c) */
+      return 0;
 
-        if (ad->ad_vers == AD_VERSION_EA) {
+    if (ad->ad_vers == AD_VERSION_EA) {
 #ifdef HAVE_EAFD
-            r_off = off;
+      r_off = off;
 #else
-            r_off = off + ADEDOFF_RFORK_OSX;
+      r_off = off + ADEDOFF_RFORK_OSX;
 #endif
-        } else {
-            r_off = ad_getentryoff(ad, eid) + off;
-        }
-
-        if (( cc = adf_pread( &ad->ad_resource_fork, buf, buflen, r_off )) < 0 )
-            return( -1 );
+    } else {
+      r_off = ad_getentryoff(ad, eid) + off;
     }
 
-    return( cc );
+    if ((cc = adf_pread(&ad->ad_resource_fork, buf, buflen, r_off)) < 0)
+      return (-1);
+  }
+
+  return (cc);
 }

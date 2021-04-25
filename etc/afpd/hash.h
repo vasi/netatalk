@@ -28,8 +28,8 @@ extern void hash_set_allocator(hash_t *, hnode_alloc_t, hnode_free_t, void *);
 extern void hash_destroy(hash_t *);
 extern void hash_free_nodes(hash_t *);
 extern void hash_free(hash_t *);
-extern hash_t *hash_init(hash_t *, hashcount_t, hash_comp_t,
-	hash_fun_t, hnode_t **, hashcount_t);
+extern hash_t *hash_init(hash_t *, hashcount_t, hash_comp_t, hash_fun_t,
+                         hnode_t **, hashcount_t);
 extern void hash_insert(hash_t *, hnode_t *, const void *);
 extern hnode_t *hash_lookup(hash_t *, const void *);
 extern hnode_t *hash_delete(hash_t *, hnode_t *);

@@ -32,15 +32,15 @@ typedef uint32_t hash_val_t;
 extern int hash_val_t_bit;
 
 #ifndef HASH_VAL_T_BIT
-#define HASH_VAL_T_BIT ((int) hash_val_t_bit)
+#define HASH_VAL_T_BIT ((int)hash_val_t_bit)
 #endif
 
 /*
  * Hash chain node structure.
  * Notes:
  * 1. This preprocessing directive is for debugging purposes.  The effect is
- *    that if the preprocessor symbol KAZLIB_OPAQUE_DEBUG is defined prior to the
- *    inclusion of this header,  then the structure shall be declared as having
+ *    that if the preprocessor symbol KAZLIB_OPAQUE_DEBUG is defined prior to
+ * the inclusion of this header,  then the structure shall be declared as having
  *    the single member   int __OPAQUE__.   This way, any attempts by the
  *    client code to violate the principles of information hiding (by accessing
  *    the structure directly) can be diagnosed at translation time. However,
@@ -60,14 +60,14 @@ extern int hash_val_t_bit;
  */
 
 typedef struct hnode_t {
-    #if defined(HASH_IMPLEMENTATION) || !defined(KAZLIB_OPAQUE_DEBUG)	/* 1 */
-    struct hnode_t *hash_next;		/* 2 */
-    const void *hash_key;		/* 3 */
-    void *hash_data;			/* 4 */
-    hash_val_t hash_hkey;		/* 5 */
-    #else
-    int hash_dummy;
-    #endif
+#if defined(HASH_IMPLEMENTATION) || !defined(KAZLIB_OPAQUE_DEBUG) /* 1 */
+  struct hnode_t *hash_next;                                      /* 2 */
+  const void *hash_key;                                           /* 3 */
+  void *hash_data;                                                /* 4 */
+  hash_val_t hash_hkey;                                           /* 5 */
+#else
+  int hash_dummy;
+#endif
 } hnode_t;
 
 /*
@@ -136,23 +136,23 @@ typedef void (*hnode_free_t)(hnode_t *, void *);
  */
 
 typedef struct hash_t {
-    #if defined(HASH_IMPLEMENTATION) || !defined(KAZLIB_OPAQUE_DEBUG)
-    struct hnode_t **hash_table;		/* 1 */
-    hashcount_t hash_nchains;			/* 2 */
-    hashcount_t hash_nodecount;			/* 3 */
-    hashcount_t hash_maxcount;			/* 4 */
-    hashcount_t hash_highmark;			/* 5 */
-    hashcount_t hash_lowmark;			/* 6 */
-    hash_comp_t hash_compare;			/* 7 */
-    hash_fun_t hash_function;			/* 8 */
-    hnode_alloc_t hash_allocnode;
-    hnode_free_t hash_freenode;
-    void *hash_context;
-    hash_val_t hash_mask;			/* 9 */
-    int hash_dynamic;				/* 10 */
-    #else
-    int hash_dummy;
-    #endif
+#if defined(HASH_IMPLEMENTATION) || !defined(KAZLIB_OPAQUE_DEBUG)
+  struct hnode_t **hash_table; /* 1 */
+  hashcount_t hash_nchains;    /* 2 */
+  hashcount_t hash_nodecount;  /* 3 */
+  hashcount_t hash_maxcount;   /* 4 */
+  hashcount_t hash_highmark;   /* 5 */
+  hashcount_t hash_lowmark;    /* 6 */
+  hash_comp_t hash_compare;    /* 7 */
+  hash_fun_t hash_function;    /* 8 */
+  hnode_alloc_t hash_allocnode;
+  hnode_free_t hash_freenode;
+  void *hash_context;
+  hash_val_t hash_mask; /* 9 */
+  int hash_dynamic;     /* 10 */
+#else
+  int hash_dummy;
+#endif
 } hash_t;
 
 /*
@@ -166,14 +166,13 @@ typedef struct hash_t {
  */
 
 typedef struct hscan_t {
-    #if defined(HASH_IMPLEMENTATION) || !defined(KAZLIB_OPAQUE_DEBUG)
-    hash_t *hash_table;		/* 1 */
-    hash_val_t hash_chain;	/* 2 */
-    hnode_t *hash_next;		/* 3 */
-    #else
-    int hash_dummy;
-    #endif
+#if defined(HASH_IMPLEMENTATION) || !defined(KAZLIB_OPAQUE_DEBUG)
+  hash_t *hash_table;    /* 1 */
+  hash_val_t hash_chain; /* 2 */
+  hnode_t *hash_next;    /* 3 */
+#else
+  int hash_dummy;
+#endif
 } hscan_t;
-
 
 #endif /* ATALK_HASH_H */

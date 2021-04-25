@@ -20,15 +20,15 @@
 #endif
 
 #if !defined(__FreeBSD__) && !defined(__NetBSD__) && !defined(__OpenBSD__)
-# ifndef _XOPEN_SOURCE
-#  define _XOPEN_SOURCE 600
-# endif
-# ifndef __EXTENSIONS__
-#  define __EXTENSIONS__
-# endif
-# ifndef _GNU_SOURCE
-#  define _GNU_SOURCE
-# endif
+#ifndef _XOPEN_SOURCE
+#define _XOPEN_SOURCE 600
+#endif
+#ifndef __EXTENSIONS__
+#define __EXTENSIONS__
+#endif
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
 #endif
 
 #endif /* ATALK_STANDARDS_H */

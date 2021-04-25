@@ -5,7 +5,7 @@
 #include <atalk/globals.h>
 #include <atalk/dsi.h>
 
-extern int configinit (AFPObj *);
-extern void configfree (AFPObj *, DSI *);
+extern int configinit(AFPObj *);
+extern void configfree(AFPObj *, DSI *);
 
 #endif
