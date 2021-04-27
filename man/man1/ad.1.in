@@ -1,13 +1,13 @@
 '\" t
 .\"     Title: ad
-.\"    Author: [FIXME: author] [see http://www.docbook.org/tdg5/en/html/author]
+.\"    Author: [see the "AUTHOR" section]
 .\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
 .\"      Date: 05 Dec 2015
-.\"    Manual: @NETATALK_VERSION@
-.\"    Source: @NETATALK_VERSION@
+.\"    Manual: Netatalk AFP fileserver Manual
+.\"    Source: Netatalk
 .\"  Language: English
 .\"
-.TH "AD" "1" "05 Dec 2015" "@NETATALK_VERSION@" "@NETATALK_VERSION@"
+.TH "AD" "1" "05 Dec 2015" "Netatalk" "Netatalk AFP fileserver Manual"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -249,3 +249,7 @@ Report bugs to the Netatalk\-devel list <netatalk\-devel@lists\&.sourceforge\&.n
 .PP
 \fBdbd\fR(1),
 \fBapple_dump\fR(1)\&.
+.SH "AUTHOR"
+.PP
+See
+\m[blue]\fBhttps://sourceforge\&.net/p/netatalk/code/ci/master/tree/AUTHORS\fR\m[]

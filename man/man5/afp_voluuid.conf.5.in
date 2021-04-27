@@ -1,13 +1,13 @@
 '\" t
 .\"     Title: afp_voluuid.conf
-.\"    Author: [FIXME: author] [see http://www.docbook.org/tdg5/en/html/author]
+.\"    Author: [see the "AUTHOR" section]
 .\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
 .\"      Date: 23 Mar 2012
-.\"    Manual: @NETATALK_VERSION@
-.\"    Source: @NETATALK_VERSION@
+.\"    Manual: Netatalk AFP fileserver Manual
+.\"    Source: Netatalk
 .\"  Language: English
 .\"
-.TH "AFP_VOLUUID\&.CONF" "5" "23 Mar 2012" "@NETATALK_VERSION@" "@NETATALK_VERSION@"
+.TH "AFP_VOLUUID\&.CONF" "5" "23 Mar 2012" "Netatalk" "Netatalk AFP fileserver Manual"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -85,3 +85,7 @@ mary 6331E2D1\-446C\-B68C\-3066\-D685AADBE911
 \fBafp.conf\fR(5),
 \fBavahi-daemon\fR(8),
 \fBmDNSResponder\fR(8)
+.SH "AUTHOR"
+.PP
+See
+\m[blue]\fBhttps://sourceforge\&.net/p/netatalk/code/ci/master/tree/AUTHORS\fR\m[]

@@ -1,13 +1,13 @@
 '\" t
 .\"     Title: uniconv
-.\"    Author: [FIXME: author] [see http://www.docbook.org/tdg5/en/html/author]
+.\"    Author: [see the "AUTHOR" section]
 .\" Generator: DocBook XSL Stylesheets vsnapshot <http://docbook.sf.net/>
 .\"      Date: 19 Jan 2013
-.\"    Manual: @NETATALK_VERSION@
-.\"    Source: @NETATALK_VERSION@
+.\"    Manual: Netatalk AFP fileserver Manual
+.\"    Source: Netatalk
 .\"  Language: English
 .\"
-.TH "UNICONV" "1" "19 Jan 2013" "@NETATALK_VERSION@" "@NETATALK_VERSION@"
+.TH "UNICONV" "1" "19 Jan 2013" "Netatalk" "Netatalk AFP fileserver Manual"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -201,3 +201,7 @@ example%\fB uniconv \-f UTF8 \-t ASCII \-m MAC_CYRILLIC /path/to/share\fR
 .SH "SEE ALSO"
 .PP
 \fBafp.conf\fR(5),\fBafpd\fR(8),\fBiconv\fR(1),\fBcnid_metad\fR(8),\fBcnid_dbd\fR(8)
+.SH "AUTHOR"
+.PP
+See
+\m[blue]\fBhttps://sourceforge\&.net/p/netatalk/code/ci/master/tree/AUTHORS\fR\m[]
