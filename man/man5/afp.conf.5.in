@@ -46,7 +46,7 @@ The file consists of sections and parameters\&. A section begins with the name o
 .RS 4
 .\}
 .nf
-    \fIname\fR = \fIvalue \fR
+\fIname\fR = \fIvalue \fR
     
 .fi
 .if n \{\
@@ -62,7 +62,7 @@ Only the first equals sign in a parameter is significant\&. Whitespace before or
 Any line beginning with a semicolon (\(lq;\(rq) or a hash (\(lq#\(rq) character is ignored, as are lines containing only whitespace\&.
 .PP
 Any line ending in a
-\(lq \e \(rq
+\(lq\e\(rq
 is continued on the next line in the customary UNIX fashion\&.
 .PP
 The values following the equals sign in parameters are all either a string (no quotes needed) or a boolean, which may be given as yes/no, 1/0 or true/false\&. Case is not significant in boolean values, but is preserved in string values\&. Some items such as "file perm"s are numeric\&.
@@ -983,6 +983,7 @@ mode
 .RS 4
 ACLs are additionally mapped to the UNIX mode of the filesystem object\&.
 .RE
+.sp
 .RE
 .PP
 If you want to be able to display ACLs on the client, you must setup both client and server as part on a authentication domain (directory service, eg LDAP, Open Directory, Active Directory)\&. The reason is, in OS X ACLs are bound to UUIDs, not just uid\*(Aqs or gid\*(Aqs\&. Therefor Netatalk must be able to map every filesystem uid and gid to a UUID so that it can return the server side ACLs which are bound to UNIX uid and gid mapped to OS X UUIDs\&.
@@ -1010,6 +1011,7 @@ sasl
 .RS 4
 SASL\&. Not yet supported !
 .RE
+.sp
 .RE
 .PP
 ldap auth dn = \fIdn\fR \fB(G)\fR
@@ -1095,6 +1097,7 @@ ms\-guid
 .RS 4
 Binary objectGUID from Active Directory
 .RE
+.sp
 .RE
 .PP
 ldap user filter = \fISTRING (default: unused)\fR \fB(G)\fR
@@ -1266,6 +1269,7 @@ file perm = 0660 directory perm =
 .if n \{\
 .RE
 .\}
+.sp
 
 .RE
 .PP

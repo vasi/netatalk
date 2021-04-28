@@ -164,6 +164,7 @@ UTF8 Servername: myserver
 .if n \{\
 .RE
 .\}
+.sp
 .SH "REPORTING BUGS"
 .PP
 Report bugs to the Netatalk\-devel list <netatalk\-devel@lists\&.sourceforge\&.net>\&.
