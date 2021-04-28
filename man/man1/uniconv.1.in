@@ -157,7 +157,9 @@ convert 1\&.x CAP encoded volume to UTF\-8, clients used MacRoman codepage, cnid
 .RS 4
 .\}
 .nf
-example%\fB uniconv \-c dbd \-f ASCII \-t UTF8 \-m MAC_ROMAN /path/to/share\fR
+      example%
+      \fB uniconv \-c dbd \-f ASCII \-t UTF8 \-m MAC_ROMAN /path/to/share\fR
+    
 .fi
 .if n \{\
 .RE
@@ -169,7 +171,9 @@ convert iso8859\-1 volume to UTF\-8, cnidscheme is cdb:
 .RS 4
 .\}
 .nf
-example%\fB uniconv \-c cdb \-f ISO\-8859\-1 \-t UTF8 \-m MAC_ROMAN /path/to/share\fR
+      example%
+      \fB uniconv \-c cdb \-f ISO\-8859\-1 \-t UTF8 \-m MAC_ROMAN /path/to/share\fR
+    
 .fi
 .if n \{\
 .RE
@@ -181,7 +185,9 @@ convert 1\&.x volume using iso8859\-1 adapted NLS to HEX encoding:
 .RS 4
 .\}
 .nf
-example%\fB uniconv \-f ISO\-8859\-ADAPTED \-t ASCII \-m MAC_ROMAN/path/to/share\fR
+      example%
+      \fB uniconv \-f ISO\-8859\-ADAPTED \-t ASCII \-m MAC_ROMAN/path/to/share\fR
+    
 .fi
 .if n \{\
 .RE
@@ -193,7 +199,9 @@ convert UTF\-8 volume to HEX, for MacCyrillic clients:
 .RS 4
 .\}
 .nf
-example%\fB uniconv \-f UTF8 \-t ASCII \-m MAC_CYRILLIC /path/to/share\fR
+      example%
+      \fB uniconv \-f UTF8 \-t ASCII \-m MAC_CYRILLIC /path/to/share\fR
+    
 .fi
 .if n \{\
 .RE

@@ -71,7 +71,7 @@ and
 \fI\&._DIR\fR\&.
 .RE
 .PP
-\fB\-e\fR \fIFILE\fR|\fIDIR\fR
+\fB\-e\fR\fIFILE\fR|\fIDIR\fR
 .RS 4
 Dump extended attribute of
 \fIFILE\fR

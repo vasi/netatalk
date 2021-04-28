@@ -31,7 +31,7 @@
 netatalk-config \- script to get information about the installed version of netatalk
 .SH "SYNOPSIS"
 .HP \w'\fBnetatalk\-config\fR\ 'u
-\fBnetatalk\-config\fR [\-\-prefix\ [\fI=DIR\fR]] [\-\-exec_prefix\ [\fI=DIR\fR]] [\-\-help] [\-\-version] [\-\-libs] [\-\-libs\-dirs] [\-\-libs\-names] [\-\-cflags] [\-\-macros]
+\fBnetatalk\-config\fR [\-\-prefix\ [\ \fI=DIR\fR\ ]] [\-\-exec_prefix\ [\ \fI=DIR\fR\ ]] [\-\-help] [\-\-version] [\-\-libs] [\-\-libs\-dirs] [\-\-libs\-names] [\-\-cflags] [\-\-macros]
 .SH "DESCRIPTION"
 .PP
 \fBnetatalk\-config\fR
