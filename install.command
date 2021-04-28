@@ -22,6 +22,9 @@ make -j "$cores"
 make html -j "$cores"
 sudo make install -j "$cores"
 
+# Cleanup
+make distclean -j "$cores"
+
 # Exit gracefully
 osascript -e 'tell application "Terminal" to close (every window whose name contains ".command")' &
 exit
