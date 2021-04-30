@@ -1,5 +1,6 @@
 #!/bin/sh
-rm -R autom4te.cache
+
+if [ -d "autom4te.cache" ]; then rm -Rf $autom4te.cache; fi
 
 autoreconf -fi
 
@@ -11,4 +12,4 @@ esac
 
 ./configure RANLIB="ranlib -no_warning_for_no_symbols"
 
-make clean
+
