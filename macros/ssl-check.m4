@@ -38,24 +38,16 @@ AC_DEFUN([AC_NETATALK_PATH_SSL], [
 	saved_LIBS=$LIBS
 	saved_CFLAGS=$CFLAGS
 	neta_cv_have_openssl=no
-dnl	compile_ssl=no
-
-	dnl make sure atalk_libname is defined beforehand
+    
+dnl Make sure atalk_libname is defined beforehand
 	[[ -n "$atalk_libname" ]] || AC_MSG_ERROR([internal error, atalk_libname undefined])
-
+    
+dnl Check for Homebrew
+    AC_CHECK_PROG([BREW],brew, brew)
+    
 	if test "$tryssl" = "yes"; then
-		AC_MSG_CHECKING([for SSL])
-
-		case "$host_os" in
-		     darwin*)
-		     dnl when compiling for Darwin, attempt to find OpenSSL using brew.
-		     dnl We append the location given by brew to PKG_CONFIG_PATH path
-		     dnl and then export it, so that it can be used in detection below.
-		     AC_CHECK_PROG([BREW],brew, brew)
-		     ;;
-		 esac
-
-		for ssldir in "" $tryssldir $($BREW --prefix openssl 2>/dev/null) /usr /usr/local/openssl /usr/$atalk_libname/openssl /usr/local/ssl /usr/$atalk_libname/ssl /usr/local /usr/pkg /opt /opt/openssl /usr/local/ssl ; do
+		AC_MSG_CHECKING([for SSL])        
+		for ssldir in "" $tryssldir $($BREW --prefix openssl 2>/dev/null) ; do
 			if test -f "$ssldir/include/openssl/cast.h" ; then
 				SSL_CFLAGS="$SSL_CFLAGS -I$ssldir/include -I$ssldir/include/openssl"
 				SSL_LIBS="$SSL_LIBS -L$ssldir/$atalk_libname -L$ssldir -lcrypto"
@@ -69,11 +61,8 @@ dnl	compile_ssl=no
 				CFLAGS="$CFLAGS $SSL_CFLAGS"
 				LIBS="$LIBS $SSL_LIBS"
 
-dnl FIXME: The following looks crude and probably doesn't work properly.
-				dnl Check for the crypto library:
+dnl Check for the crypto library:
 				AC_CHECK_LIB(crypto, main)
-				dnl Check for "DES" library (for SSLeay, not openssl):
-				AC_CHECK_LIB(des, main)
 
 		 		AC_DEFINE(OPENSSL_DHX,	1, [Define if the OpenSSL DHX modules should be built])
 				AC_DEFINE(UAM_DHX,	1, [Define if the DHX UAM modules should be compiled])
