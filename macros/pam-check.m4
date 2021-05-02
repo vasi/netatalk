@@ -63,6 +63,12 @@ AC_DEFUN([AC_NETATALK_PATH_PAM], [
 		LDFLAGS="$savedLDFLAGS"
 		LIBS="$savedLIBS"
 	fi
+ 
+    netatalk_cv_install_pam=yes
+    if test x"$pam_found" = "xyes" -a "x$PAMDIR" = "xNONE"; then
+        AC_MSG_WARN([PAM support can be compiled, but the install location for the netatalk.pamd file could not be determined. Either install this file by hand or specify the install path.])
+        netatalk_cv_install_pam=no
+    fi
 
 	netatalk_cv_install_pam=yes
 	AC_MSG_CHECKING([whether to enable PAM support])
