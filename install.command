@@ -23,7 +23,7 @@ sudo make install -j "$cores"
 
 # Cleanup
 make distclean -j "$cores"
-if [ -d "autom4te.cache" ]; then rm -Rf $autom4te.cache; fi
+if [ -d "autom4te.cache" ]; then rm -Rf autom4te.cache; fi
 
 # Exit gracefully
 osascript -e 'tell application "Terminal" to close (every window whose name contains ".command")' &
