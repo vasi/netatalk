@@ -234,6 +234,17 @@ static void check_ea_support(struct vol *vol) {
  */
 static int check_vol_acl_support(const struct vol *vol) {
   int ret = 0;
+    
+#ifdef HAVE_POSIX_ACLS
+    acl_t acl = NULL;
+    ret = 1;
+    if ((acl = acl_get_file(vol->v_path, ACL_TYPE_ACCESS)) == NULL)
+        ret = 0;
+#endif
+
+#ifdef HAVE_POSIX_ACLS
+    if (acl) acl_free(acl);
+#endif /* HAVE_POSIX_ACLS */
 
   LOG(log_debug, logtype_afpd, "Volume \"%s\" ACL support: %s", vol->v_path,
       ret ? "yes" : "no");
@@ -834,6 +845,10 @@ static struct vol *creatvol(AFPObj *obj, const struct passwd *pwd,
     volume->v_flags |= AFPVOL_SEARCHDB;
   if (!getoption_bool(obj->iniconfig, section, "network ids", preset, 1))
     volume->v_flags |= AFPVOL_NONETIDS;
+#ifdef HAVE_ACLS
+  if (getoption_bool(obj->iniconfig, section, "acls", preset, 1))
+    volume->v_flags |= AFPVOL_ACLS;
+#endif
   if (!getoption_bool(obj->iniconfig, section, "convert appledouble", preset,
                       1))
     volume->v_flags |= AFPVOL_NOV2TOEACONV;
@@ -1019,10 +1034,6 @@ static struct vol *creatvol(AFPObj *obj, const struct passwd *pwd,
 
   volume->v_name = utf8_encoding(obj) ? volume->v_u8mname : volume->v_macname;
 
-#ifdef __svr4__
-  volume->v_qfd = -1;
-#endif /* __svr4__ */
-
   /* os X start at 1 and use network order ie. 1 2 3 */
   lastvid++;
   if (lastvid == UINT16_MAX) {
@@ -1032,6 +1043,14 @@ static struct vol *creatvol(AFPObj *obj, const struct passwd *pwd,
   }
   volume->v_vid = lastvid;
   volume->v_vid = htons(volume->v_vid);
+    
+#ifdef HAVE_ACLS
+  if (!check_vol_acl_support(volume)) {
+    LOG(log_debug, logtype_afpd, "creatvol(\"%s\"): disabling ACL support", volume->v_path);
+    volume->v_flags &= ~AFPVOL_ACLS;
+    obj->options.flags &= ~(OPTION_ACL2MODE | OPTION_ACL2MACCESS);
+  }
+#endif
 
   /* Check EA support on volume */
   if (volume->v_vfs_ea == AFPVOL_EA_AUTO || volume->v_adouble == AD_VERSION_EA)

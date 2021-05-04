@@ -71,6 +71,11 @@
   const struct vol *vol, int sfd, const char *src, const char *dst
 #define VFS_FUNC_VARS_COPYFILE vol, sfd, src, dst
 
+#ifdef HAVE_POSIX_ACLS
+#define VFS_FUNC_ARGS_ACL const struct vol *vol, const char *path, acl_type_t type, int count, acl_t acl
+#define VFS_FUNC_VARS_ACL vol, path, type, count, acl
+#endif
+
 #define VFS_FUNC_ARGS_REMOVE_ACL                                               \
   const struct vol *vol, const char *path, int dir
 #define VFS_FUNC_VARS_REMOVE_ACL vol, path, dir

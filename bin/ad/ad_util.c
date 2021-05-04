@@ -48,6 +48,11 @@
 #include <string.h>
 #include <libgen.h>
 
+#ifdef HAVE_POSIX_ACLS
+#include <sys/types.h>
+#include <sys/acl.h>
+#endif /* HAVE_POSIX_ACLS */
+
 #include <atalk/util.h>
 #include <atalk/cnid.h>
 #include <atalk/bstrlib.h>

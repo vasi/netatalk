@@ -81,6 +81,9 @@ AC_NETATALK_KERBEROS
 dnl Check for overwrite the config files or not
 AC_NETATALK_OVERWRITE_CONFIG
 
+dnl Check for ACL support
+AC_NETATALK_ACL
+
 dnl Check for Extended Attributes support
 AC_NETATALK_EXTENDED_ATTRIBUTES
 
@@ -102,6 +105,7 @@ AC_SUBST(UAMS_PATH)
 
 AM_CONDITIONAL(HAVE_LIBGCRYPT, test x$neta_cv_have_libgcrypt = xyes)
 AM_CONDITIONAL(HAVE_OPENSSL, test x$neta_cv_have_openssl = xyes)
+AM_CONDITIONAL(HAVE_ACLS, test x"$ac_cv_have_acls" = x"yes")
 AM_CONDITIONAL(USE_DHX, test x$neta_cv_compile_dhx = xyes)
 AM_CONDITIONAL(USE_DHX2, test x$neta_cv_compile_dhx2 = xyes)
 AM_CONDITIONAL(USE_PAM_SO, test x$use_pam_so = xyes)

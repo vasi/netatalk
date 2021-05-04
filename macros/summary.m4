@@ -23,6 +23,7 @@ AC_DEFUN([AC_NETATALK_CONFIG_SUMMARY], [
 	fi
 	AC_MSG_RESULT([    Options:])
 	AC_MSG_RESULT([         Zeroconf support:        $netatalk_cv_zeroconf])
+	AC_MSG_RESULT([         ACL support:             $with_acl_support])
 	AC_MSG_RESULT([         Kerberos support:        $with_kerberos])
 	AC_MSG_RESULT([    Paths:])
 	AC_MSG_RESULT([         Netatalk lockfile:       $ac_cv_netatalk_lock])
