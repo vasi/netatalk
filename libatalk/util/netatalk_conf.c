@@ -234,16 +234,17 @@ static void check_ea_support(struct vol *vol) {
  */
 static int check_vol_acl_support(const struct vol *vol) {
   int ret = 0;
-    
+
 #ifdef HAVE_POSIX_ACLS
-    acl_t acl = NULL;
-    ret = 1;
-    if ((acl = acl_get_file(vol->v_path, ACL_TYPE_ACCESS)) == NULL)
-        ret = 0;
+  acl_t acl = NULL;
+  ret = 1;
+  if ((acl = acl_get_file(vol->v_path, ACL_TYPE_ACCESS)) == NULL)
+    ret = 0;
 #endif
 
 #ifdef HAVE_POSIX_ACLS
-    if (acl) acl_free(acl);
+  if (acl)
+    acl_free(acl);
 #endif /* HAVE_POSIX_ACLS */
 
   LOG(log_debug, logtype_afpd, "Volume \"%s\" ACL support: %s", vol->v_path,
@@ -1043,10 +1044,11 @@ static struct vol *creatvol(AFPObj *obj, const struct passwd *pwd,
   }
   volume->v_vid = lastvid;
   volume->v_vid = htons(volume->v_vid);
-    
+
 #ifdef HAVE_ACLS
   if (!check_vol_acl_support(volume)) {
-    LOG(log_debug, logtype_afpd, "creatvol(\"%s\"): disabling ACL support", volume->v_path);
+    LOG(log_debug, logtype_afpd, "creatvol(\"%s\"): disabling ACL support",
+        volume->v_path);
     volume->v_flags &= ~AFPVOL_ACLS;
     obj->options.flags &= ~(OPTION_ACL2MODE | OPTION_ACL2MACCESS);
   }

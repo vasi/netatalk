@@ -100,7 +100,7 @@ struct scrit {
   struct finderinfo finfo; /* Finder info */
   char lname[64];          /* Long name */
   char utf8name[514];
-      /* UTF8 or UCS2 name */ /* for convert_charset dest_len parameter +2 */
+  /* UTF8 or UCS2 name */ /* for convert_charset dest_len parameter +2 */
 };
 
 /*

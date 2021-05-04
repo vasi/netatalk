@@ -27,8 +27,7 @@
 #include <atalk/uuid.h>
 
 /* CNID object flags */
-#define CNID_FLAG_PERSISTENT 0x01 /* This backend implements DID persistence   \
-                                   */
+#define CNID_FLAG_PERSISTENT 0x01 /* This backend implements DID persistence */
 #define CNID_FLAG_MANGLING 0x02   /* This backend has name mangling feature. */
 #define CNID_FLAG_SETUID 0x04     /* Set db owner to parent folder owner. */
 #define CNID_FLAG_BLOCK 0x08      /* block signals in update. */

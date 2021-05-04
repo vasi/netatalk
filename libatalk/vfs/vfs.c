@@ -664,27 +664,14 @@ static int vfs_validupath(VFS_FUNC_ARGS_VALIDUPATH) {
  * These funcs are defined via the macros above.
  */
 static struct vfs_ops vfs_master_funcs = {
-    vfs_validupath,
-    vfs_chown,
-    vfs_renamedir,
-    vfs_deletecurdir,
-    vfs_setfilmode,
-    vfs_setdirmode,
-    vfs_setdirunixmode,
-    vfs_setdirowner,
-    vfs_deletefile,
-    vfs_renamefile,
-    vfs_copyfile,
+    vfs_validupath, vfs_chown,         vfs_renamedir,      vfs_deletecurdir,
+    vfs_setfilmode, vfs_setdirmode,    vfs_setdirunixmode, vfs_setdirowner,
+    vfs_deletefile, vfs_renamefile,    vfs_copyfile,
 #ifdef HAVE_ACLS
-    vfs_acl,
-    vfs_remove_acl,
+    vfs_acl,        vfs_remove_acl,
 #endif
-    vfs_ea_getsize,
-    vfs_ea_getcontent,
-    vfs_ea_list,
-    vfs_ea_set,
-    vfs_ea_remove
-};
+    vfs_ea_getsize, vfs_ea_getcontent, vfs_ea_list,        vfs_ea_set,
+    vfs_ea_remove};
 
 /*
  * Primary adouble modules: v2, ea
@@ -785,8 +772,7 @@ static struct vfs_ops netatalk_posix_acl_adouble = {
     /* vfs_copyfile       */ NULL,
     /* rf_acl:            */ RF_posix_acl,
     /* rf_remove_acl      */ RF_posix_remove_acl,
-    NULL
-};
+    NULL};
 #endif
 
 /* ---------------- */
@@ -818,8 +804,8 @@ void initvol_vfs(struct vol *vol) {
   } else {
     LOG(log_debug, logtype_afpd, "initvol_vfs: volume without EA support");
   }
-    /* ACLs */
+  /* ACLs */
 #ifdef HAVE_POSIX_ACLS
-    vol->vfs_modules[2] = &netatalk_posix_acl_adouble;
+  vol->vfs_modules[2] = &netatalk_posix_acl_adouble;
 #endif
 }

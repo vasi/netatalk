@@ -1552,7 +1552,7 @@ static int ad_open_rf(const char *path, int adflags, int mode,
 /***********************************************************************************
  * API functions
  *********************************************************************************
-*/
+ */
 
 off_t ad_getentryoff(const struct adouble *ad, int eid) {
   if (ad->ad_vers == AD_VERSION2)

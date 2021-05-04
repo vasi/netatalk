@@ -44,26 +44,19 @@
 #define OPTION_CLOSEVOL (1 << 1)
 #define OPTION_SERVERNOTIF (1 << 2)
 #define OPTION_NOSENDFILE (1 << 3)
-#define OPTION_VETOMSG                                                         \
-  (1 << 4) /* whether to send an AFP message for veto file access */
-#define OPTION_AFP_READ_LOCK                                                   \
-  (1 << 5) /* whether to do AFP spec conforming read locks (default: no) */
+#define OPTION_VETOMSG (1 << 4)         /* whether to send an AFP message for veto file access */
+#define OPTION_AFP_READ_LOCK (1 << 5)   /* whether to do AFP spec conforming read locks (default: no) */
 #define OPTION_ANNOUNCESSH (1 << 6)
 #define OPTION_UUID (1 << 7)
 #define OPTION_ACL2MACCESS (1 << 8)
 #define OPTION_NOZEROCONF (1 << 9)
 #define OPTION_ACL2MODE (1 << 10)
-#define OPTION_SHARE_RESERV                                                    \
-  (1 << 11) /* whether to use Solaris fcntl F_SHARE locks */
-#define OPTION_DBUS_AFPSTATS                                                   \
-  (1 << 12)                        /* whether to run dbus thread for afpstats */
-#define OPTION_SPOTLIGHT (1 << 13) /* whether to initialize Spotlight support  \
-                                    */
-#define OPTION_SPOTLIGHT_VOL                                                   \
-  (1 << 14) /* whether spotlight shall be enabled by default for volumes */
+#define OPTION_SHARE_RESERV (1 << 11)   /* whether to use Solaris fcntl F_SHARE locks */
+#define OPTION_DBUS_AFPSTATS (1 << 12)  /* whether to run dbus thread for afpstats */
+#define OPTION_SPOTLIGHT (1 << 13)      /* whether to initialize Spotlight support */
+#define OPTION_SPOTLIGHT_VOL (1 << 14)  /* whether spotlight shall be enabled by default for volumes */
 #define OPTION_RECVFILE (1 << 15)
-#define OPTION_SPOTLIGHT_EXPR                                                  \
-  (1 << 16) /* whether to allow Spotlight logic expressions */
+#define OPTION_SPOTLIGHT_EXPR (1 << 16) /* whether to allow Spotlight logic expressions */
 
 #define PASSWD_NONE 0
 #define PASSWD_SET (1 << 0)

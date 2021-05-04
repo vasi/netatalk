@@ -88,8 +88,7 @@ int sys_getxattrfd(int fd, const char *uname, int oflag, ...);
  * Stuff for our implementation of storing EAs in files in .AppleDouble dirs
  ****************************************************************************************/
 
-#define EA_INITED 0xea494e54 /* ea"INT", for interfacing ea_open w. ea_close   \
-                              */
+#define EA_INITED 0xea494e54 /* ea"INT", for interfacing ea_open w. ea_close */
 #define EA_MAGIC 0x61644541  /* "adEA" */
 #define EA_VERSION1 0x01
 #define EA_VERSION EA_VERSION1

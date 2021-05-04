@@ -149,7 +149,7 @@ void accessmode(const AFPObj *obj, const struct vol *vol, char *path,
   }
   utommode(obj, st, ma);
 #ifdef HAVE_ACLS
-    acltoownermode(obj, vol, path, st, ma);
+  acltoownermode(obj, vol, path, st, ma);
 #endif
 }
 
