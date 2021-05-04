@@ -22,6 +22,7 @@ AC_DEFUN([AC_NETATALK_CONFIG_SUMMARY], [
 		AC_MSG_RESULT([         Kerberos V])
 	fi
 	AC_MSG_RESULT([    Options:])
+	AC_MSG_RESULT([         Zeroconf support:        $netatalk_cv_zeroconf])
 	AC_MSG_RESULT([         Kerberos support:        $with_kerberos])
 	AC_MSG_RESULT([    Paths:])
 	AC_MSG_RESULT([         Netatalk lockfile:       $ac_cv_netatalk_lock])
@@ -52,11 +53,11 @@ AC_DEFUN([AC_NETATALK_LIBS_SUMMARY], [
 		AC_MSG_RESULT([        LIBS   = $SSL_LIBS])
 		AC_MSG_RESULT([        CFLAGS = $SSL_CFLAGS])
 	fi
-    if test x"$neta_cv_have_libgcrypt" = x"yes"; then
-        AC_MSG_RESULT([    LIBGCRYPT:])
-        AC_MSG_RESULT([        LIBS   = $LIBGCRYPT_LIBS])
-        AC_MSG_RESULT([        CFLAGS = $LIBGCRYPT_CFLAGS])
-    fi
+	if test x"$neta_cv_have_libgcrypt" = x"yes"; then
+		AC_MSG_RESULT([    LIBGCRYPT:])
+		AC_MSG_RESULT([        LIBS   = $LIBGCRYPT_LIBS])
+		AC_MSG_RESULT([        CFLAGS = $LIBGCRYPT_CFLAGS])
+	fi
 	if test x"$netatalk_cv_use_pam" = x"yes"; then
 		AC_MSG_RESULT([    PAM:])
 		AC_MSG_RESULT([        LIBS   = $PAM_LIBS])

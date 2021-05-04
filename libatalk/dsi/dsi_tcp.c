@@ -29,13 +29,6 @@
 
 #include <signal.h>
 #include <atalk/logger.h>
-
-#ifdef TCPWRAP
-#include <tcpd.h>
-int allow_severity = log_info;
-int deny_severity = log_warning;
-#endif /* TCPWRAP */
-
 #include <atalk/dsi.h>
 #include <atalk/util.h>
 #include <atalk/errchk.h>
@@ -122,22 +115,8 @@ static pid_t dsi_tcp_open(DSI *dsi)
     len = sizeof(dsi->client);
     dsi->socket = accept(dsi->serversock, (struct sockaddr *) &dsi->client, &len);
 
-#ifdef TCPWRAP
-    {
-        struct request_info req;
-        request_init(&req, RQ_DAEMON, "afpd", RQ_FILE, dsi->socket, NULL);
-        fromhost(&req);
-        if (!hosts_access(&req)) {
-            LOG(deny_severity, logtype_dsi, "refused connect from %s", eval_client(&req));
-            close(dsi->socket);
-            errno = ECONNREFUSED;
-            dsi->socket = -1;
-        }
-    }
-#endif /* TCPWRAP */
-
     if (dsi->socket < 0)
-        return -1;
+      return -1;
 
     getitimer(ITIMER_PROF, &itimer);
     if (0 == (pid = fork()) ) { /* child */
@@ -249,7 +228,7 @@ static void guess_interface(DSI *dsi, const char *hostname, const char *port)
     start = list = getifacelist();
     if (!start)
         return;
-        
+
     fd = socket(PF_INET, SOCK_STREAM, 0);
 
     while (list && *list) {
@@ -279,7 +258,7 @@ static void guess_interface(DSI *dsi, const char *hostname, const char *port)
         goto iflist_done;
     }
 
-    LOG(log_note, logtype_dsi, "dsi_tcp: couldn't find network interface with IP address to advertice, "
+    LOG(log_note, logtype_dsi, "dsi_tcp: couldn't find network interface with IP address to advertise, "
         "check to make sure \"%s\" is in /etc/hosts or can be resolved with DNS, or "
         "add a netinterface that is not a loopback or point-2-point type", hostname);
 
@@ -520,4 +499,3 @@ EC_CLEANUP:
         free(port);
     EC_EXIT;
 }
-
