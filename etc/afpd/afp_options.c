@@ -104,7 +104,7 @@ static void show_version( void )
 static void show_version_extended(void) {
   show_version();
 
-  printf( "      Zeroconf support:\t" );
+  printf( "    Zeroconf support:\t" );
 #if defined (HAVE_MDNS)
   puts( "mDNSResponder" );
 #else
@@ -116,6 +116,13 @@ static void show_version_extended(void) {
 
   printf("            EA support:\t");
   puts(EA_MODULES);
+    
+  printf( "         ACL support:\t" );
+#ifdef HAVE_ACLS
+  puts( "Yes" );
+#else
+  puts( "No" );
+#endif
 }
 
 /*

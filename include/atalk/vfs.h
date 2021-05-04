@@ -1,16 +1,16 @@
 /*
    Copyright (c) 2004 Didier Gautheron
- 
+
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
- 
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
- 
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
@@ -62,6 +62,11 @@
 #define VFS_FUNC_ARGS_COPYFILE const struct vol *vol, int sfd, const char *src, const char *dst
 #define VFS_FUNC_VARS_COPYFILE vol, sfd, src, dst
 
+#ifdef HAVE_POSIX_ACLS
+#define VFS_FUNC_ARGS_ACL const struct vol *vol, const char *path, acl_type_t type, int count, acl_t acl
+#define VFS_FUNC_VARS_ACL vol, path, type, count, acl
+#endif
+
 #define VFS_FUNC_ARGS_REMOVE_ACL const struct vol *vol, const char *path, int dir
 #define VFS_FUNC_VARS_REMOVE_ACL vol, path, dir
 
@@ -82,7 +87,7 @@
 
 /*
  * Forward declaration. We need it because of the circular inclusion of
- * of vfs.h <-> volume.h. 
+ * of vfs.h <-> volume.h.
  */
 struct vol;
 

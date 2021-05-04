@@ -312,9 +312,19 @@ static void check_ea_support(struct vol *vol)
  *
  * @returns        0 if not, 1 if yes
  */
-static int check_vol_acl_support(const struct vol *vol)
-{
-    int ret = 0;
+static int check_vol_acl_support(const struct vol *vol) {
+  int ret = 0;
+
+#ifdef HAVE_POSIX_ACLS
+    acl_t acl = NULL;
+    ret = 1;
+    if ((acl = acl_get_file(vol->v_path, ACL_TYPE_ACCESS)) == NULL)
+        ret = 0;
+#endif
+
+#ifdef HAVE_POSIX_ACLS
+    if (acl) acl_free(acl);
+#endif /* HAVE_POSIX_ACLS */
 
     LOG(log_debug, logtype_afpd, "Volume \"%s\" ACL support: %s",
         vol->v_path, ret ? "yes" : "no");
@@ -582,7 +592,7 @@ static const char *getoption(const dictionary *conf, const char *vol, const char
 
     if ((!(result = atalk_iniparser_getstring(conf, vol, opt, NULL))) && (defsec != NULL))
         result = atalk_iniparser_getstring(conf, defsec, opt, NULL);
-    
+
     if (result == NULL)
         result = defval;
     return result;
@@ -605,7 +615,7 @@ static int getoption_bool(const dictionary *conf, const char *vol, const char *o
 
     if (((result = atalk_iniparser_getboolean(conf, vol, opt, -1)) == -1) && (defsec != NULL))
         result = atalk_iniparser_getboolean(conf, defsec, opt, -1);
-    
+
     if (result == -1)
         result = defval;
     return result;
@@ -689,7 +699,7 @@ static struct vol *creatvol(AFPObj *obj,
 
     for (struct vol *vol = Volumes; vol; vol = vol->v_next) {
         if (STRCMP(name, ==, vol->v_localname) && vol->v_deleted) {
-            /* 
+            /*
              * reloading config, volume still present, nothing else to do,
              * we don't change options for volumes once they're loaded
              */
@@ -844,265 +854,288 @@ static struct vol *creatvol(AFPObj *obj,
         }
 
     } else {
-        volume->v_cnidserver = strdup(obj->options.Cnid_srv);
-        volume->v_cnidport = strdup(obj->options.Cnid_port);
+      volume->v_cnidport = strdup("4700");
     }
 
-    if ((val = getoption(obj->iniconfig, section, "ea", preset, NULL))) {
-        if (strcasecmp(val, "ad") == 0)
-            volume->v_vfs_ea = AFPVOL_EA_AD;
-        else if (strcasecmp(val, "sys") == 0)
-            volume->v_vfs_ea = AFPVOL_EA_SYS;
-        else if (strcasecmp(val, "none") == 0)
-            volume->v_vfs_ea = AFPVOL_EA_NONE;
-        else if (strcasecmp(val, "samba") == 0) {
-            volume->v_vfs_ea = AFPVOL_EA_SYS;
-            volume->v_flags |= AFPVOL_EA_SAMBA;
-	}
+  } else {
+    volume->v_cnidserver = strdup(obj->options.Cnid_srv);
+    volume->v_cnidport = strdup(obj->options.Cnid_port);
+  }
+
+  if ((val = getoption(obj->iniconfig, section, "ea", preset, NULL))) {
+    if (strcasecmp(val, "ad") == 0)
+      volume->v_vfs_ea = AFPVOL_EA_AD;
+    else if (strcasecmp(val, "sys") == 0)
+      volume->v_vfs_ea = AFPVOL_EA_SYS;
+    else if (strcasecmp(val, "none") == 0)
+      volume->v_vfs_ea = AFPVOL_EA_NONE;
+    else if (strcasecmp(val, "samba") == 0) {
+      volume->v_vfs_ea = AFPVOL_EA_SYS;
+      volume->v_flags |= AFPVOL_EA_SAMBA;
     }
+  }
 
-    if ((val = getoption(obj->iniconfig, section, "casefold", preset, NULL))) {
-        if (strcasecmp(val, "tolower") == 0)
-            volume->v_casefold = AFPVOL_UMLOWER;
-        else if (strcasecmp(val, "toupper") == 0)
-            volume->v_casefold = AFPVOL_UMUPPER;
-        else if (strcasecmp(val, "xlatelower") == 0)
-            volume->v_casefold = AFPVOL_UUPPERMLOWER;
-        else if (strcasecmp(val, "xlateupper") == 0)
-            volume->v_casefold = AFPVOL_ULOWERMUPPER;
+  if ((val = getoption(obj->iniconfig, section, "casefold", preset, NULL))) {
+    if (strcasecmp(val, "tolower") == 0)
+      volume->v_casefold = AFPVOL_UMLOWER;
+    else if (strcasecmp(val, "toupper") == 0)
+      volume->v_casefold = AFPVOL_UMUPPER;
+    else if (strcasecmp(val, "xlatelower") == 0)
+      volume->v_casefold = AFPVOL_UUPPERMLOWER;
+    else if (strcasecmp(val, "xlateupper") == 0)
+      volume->v_casefold = AFPVOL_ULOWERMUPPER;
+  }
+  if (getoption_bool(obj->iniconfig, section, "case sensitive", preset, 1))
+    volume->v_casefold |= AFPVOL_CASESENS;
+
+  if (getoption_bool(obj->iniconfig, section, "read only", preset, 0))
+    volume->v_flags |= AFPVOL_RO;
+  if (getoption_bool(obj->iniconfig, section, "invisible dots", preset, 0))
+    volume->v_flags |= AFPVOL_INV_DOTS;
+  if (!getoption_bool(obj->iniconfig, section, "stat vol", preset, 1))
+    volume->v_flags |= AFPVOL_NOSTAT;
+  if (getoption_bool(obj->iniconfig, section, "unix priv", preset, 1))
+    volume->v_flags |= AFPVOL_UNIX_PRIV;
+  if (!getoption_bool(obj->iniconfig, section, "cnid dev", preset, 1))
+    volume->v_flags |= AFPVOL_NODEV;
+  if (getoption_bool(obj->iniconfig, section, "illegal seq", preset, 0))
+    volume->v_flags |= AFPVOL_EILSEQ;
+  if (getoption_bool(obj->iniconfig, section, "time machine", preset, 0))
+    volume->v_flags |= AFPVOL_TM;
+  if (getoption_bool(obj->iniconfig, section, "search db", preset, 0))
+    volume->v_flags |= AFPVOL_SEARCHDB;
+  if (!getoption_bool(obj->iniconfig, section, "network ids", preset, 1))
+    volume->v_flags |= AFPVOL_NONETIDS;
+#ifdef HAVE_ACLS
+  if (getoption_bool(obj->iniconfig, section, "acls", preset, 1))
+    volume->v_flags |= AFPVOL_ACLS;
+#endif
+  if (!getoption_bool(obj->iniconfig, section, "convert appledouble", preset,
+                      1))
+    volume->v_flags |= AFPVOL_NOV2TOEACONV;
+  if (getoption_bool(obj->iniconfig, section, "follow symlinks", preset, 0))
+    volume->v_flags |= AFPVOL_FOLLOWSYM;
+  if (getoption_bool(obj->iniconfig, section, "spotlight", preset,
+                     obj->options.flags & OPTION_SPOTLIGHT_VOL)) {
+    volume->v_flags |= AFPVOL_SPOTLIGHT;
+    obj->options.flags |= OPTION_SPOTLIGHT;
+  }
+  if (getoption_bool(obj->iniconfig, section, "delete veto files", preset, 0))
+    volume->v_flags |= AFPVOL_DELVETO;
+
+  if (getoption_bool(obj->iniconfig, section, "preexec close", preset, 0))
+    volume->v_preexec_close = 1;
+  if (getoption_bool(obj->iniconfig, section, "root preexec close", preset, 0))
+    volume->v_root_preexec_close = 1;
+  if (vdgoption_bool(obj->iniconfig, section, "force xattr with sticky bit",
+                     preset, 0))
+    volume->v_flags |= AFPVOL_FORCE_STICKY_XATTR;
+
+  if ((val = getoption(obj->iniconfig, section, "ignored attributes", preset,
+                       obj->options.ignored_attr))) {
+    if (strstr(val, "all")) {
+      volume->v_ignattr |=
+          ATTRBIT_NOWRITE | ATTRBIT_NORENAME | ATTRBIT_NODELETE;
     }
-    if (getoption_bool(obj->iniconfig, section, "case sensitive", preset, 1))
-        volume->v_casefold |= AFPVOL_CASESENS;
-
-    if (getoption_bool(obj->iniconfig, section, "read only", preset, 0))
-        volume->v_flags |= AFPVOL_RO;
-    if (getoption_bool(obj->iniconfig, section, "invisible dots", preset, 0))
-        volume->v_flags |= AFPVOL_INV_DOTS;
-    if (!getoption_bool(obj->iniconfig, section, "stat vol", preset, 1))
-        volume->v_flags |= AFPVOL_NOSTAT;
-    if (getoption_bool(obj->iniconfig, section, "unix priv", preset, 1))
-        volume->v_flags |= AFPVOL_UNIX_PRIV;
-    if (!getoption_bool(obj->iniconfig, section, "cnid dev", preset, 1))
-        volume->v_flags |= AFPVOL_NODEV;
-    if (getoption_bool(obj->iniconfig, section, "illegal seq", preset, 0))
-        volume->v_flags |= AFPVOL_EILSEQ;
-    if (getoption_bool(obj->iniconfig, section, "time machine", preset, 0))
-        volume->v_flags |= AFPVOL_TM;
-    if (getoption_bool(obj->iniconfig, section, "search db", preset, 0))
-        volume->v_flags |= AFPVOL_SEARCHDB;
-    if (!getoption_bool(obj->iniconfig, section, "network ids", preset, 1))
-        volume->v_flags |= AFPVOL_NONETIDS;
-    if (!getoption_bool(obj->iniconfig, section, "convert appledouble", preset, 1))
-        volume->v_flags |= AFPVOL_NOV2TOEACONV;
-    if (getoption_bool(obj->iniconfig, section, "follow symlinks", preset, 0))
-        volume->v_flags |= AFPVOL_FOLLOWSYM;
-    if (getoption_bool(obj->iniconfig, section, "spotlight", preset, obj->options.flags & OPTION_SPOTLIGHT_VOL)) {
-        volume->v_flags |= AFPVOL_SPOTLIGHT;
-        obj->options.flags |= OPTION_SPOTLIGHT;
+    if (strstr(val, "nowrite")) {
+      volume->v_ignattr |= ATTRBIT_NOWRITE;
     }
-    if (getoption_bool(obj->iniconfig, section, "delete veto files", preset, 0))
-        volume->v_flags |= AFPVOL_DELVETO;
-
-    if (getoption_bool(obj->iniconfig, section, "preexec close", preset, 0))
-        volume->v_preexec_close = 1;
-    if (getoption_bool(obj->iniconfig, section, "root preexec close", preset, 0))
-        volume->v_root_preexec_close = 1;
-    if (vdgoption_bool(obj->iniconfig, section, "force xattr with sticky bit", preset, 0))
-        volume->v_flags |= AFPVOL_FORCE_STICKY_XATTR;
-
-    if ((val = getoption(obj->iniconfig, section, "ignored attributes", preset, obj->options.ignored_attr))) {
-        if (strstr(val, "all")) {
-            volume->v_ignattr |= ATTRBIT_NOWRITE | ATTRBIT_NORENAME | ATTRBIT_NODELETE;
-        }
-        if (strstr(val, "nowrite")) {
-            volume->v_ignattr |= ATTRBIT_NOWRITE;
-        }
-        if (strstr(val, "norename")) {
-            volume->v_ignattr |= ATTRBIT_NORENAME;
-        }
-        if (strstr(val, "nodelete")) {
-            volume->v_ignattr |= ATTRBIT_NODELETE;
-        }
+    if (strstr(val, "norename")) {
+      volume->v_ignattr |= ATTRBIT_NORENAME;
     }
-
-    val = getoption(obj->iniconfig, section, "chmod request", preset, NULL);
-    if (val == NULL) {
-        val = atalk_iniparser_getstring(obj->iniconfig, INISEC_GLOBAL, "chmod request", "preserve");
+    if (strstr(val, "nodelete")) {
+      volume->v_ignattr |= ATTRBIT_NODELETE;
     }
-    if (strcasecmp(val, "ignore") == 0) {
-        volume->v_flags |= AFPVOL_CHMOD_IGNORE;
-    } else if (strcasecmp(val, "preserve") == 0) {
-        volume->v_flags |= AFPVOL_CHMOD_PRESERVE_ACL;
-    } else if (strcasecmp(val, "simple") != 0) {
-        LOG(log_warning, logtype_afpd, "unknown 'chmod request' setting: '%s', using default", val);
-        volume->v_flags |= AFPVOL_CHMOD_PRESERVE_ACL;
+  }
+
+  val = getoption(obj->iniconfig, section, "chmod request", preset, NULL);
+  if (val == NULL) {
+    val = atalk_iniparser_getstring(obj->iniconfig, INISEC_GLOBAL,
+                                    "chmod request", "preserve");
+  }
+  if (strcasecmp(val, "ignore") == 0) {
+    volume->v_flags |= AFPVOL_CHMOD_IGNORE;
+  } else if (strcasecmp(val, "preserve") == 0) {
+    volume->v_flags |= AFPVOL_CHMOD_PRESERVE_ACL;
+  } else if (strcasecmp(val, "simple") != 0) {
+    LOG(log_warning, logtype_afpd,
+        "unknown 'chmod request' setting: '%s', using default", val);
+    volume->v_flags |= AFPVOL_CHMOD_PRESERVE_ACL;
+  }
+
+  /*
+   * Handle read-only behaviour. semantics:
+   * 1) neither the rolist nor the rwlist exist -> rw
+   * 2) rolist exists -> ro if user is in it.
+   * 3) rwlist exists -> ro unless user is in it.
+   * 4) cnid scheme = last -> ro forcibly.
+   */
+  if (pwd) {
+    if (accessvol(obj,
+                  getoption(obj->iniconfig, section, "rolist", preset, NULL),
+                  pwd->pw_name) == 1 ||
+        accessvol(obj,
+                  getoption(obj->iniconfig, section, "rwlist", preset, NULL),
+                  pwd->pw_name) == 0)
+      volume->v_flags |= AFPVOL_RO;
+  }
+  if (0 == strcmp(volume->v_cnidscheme, "last"))
+    volume->v_flags |= AFPVOL_RO;
+
+  if ((volume->v_flags & AFPVOL_NODEV))
+    volume->v_ad_options |= ADVOL_NODEV;
+  if ((volume->v_flags & AFPVOL_UNIX_PRIV))
+    volume->v_ad_options |= ADVOL_UNIXPRIV;
+  if ((volume->v_flags & AFPVOL_INV_DOTS))
+    volume->v_ad_options |= ADVOL_INVDOTS;
+  if ((volume->v_flags & AFPVOL_FOLLOWSYM))
+    volume->v_ad_options |= ADVOL_FOLLO_SYML;
+  if ((volume->v_flags & AFPVOL_RO))
+    volume->v_ad_options |= ADVOL_RO;
+  if ((volume->v_flags & AFPVOL_FORCE_STICKY_XATTR))
+    volume->v_ad_options |= ADVOL_FORCE_STICKY_XATTR;
+
+  /* Mac to Unix conversion flags*/
+  if ((volume->v_flags & AFPVOL_EILSEQ))
+    volume->v_mtou_flags |= CONV__EILSEQ;
+
+  if ((volume->v_casefold & AFPVOL_MTOUUPPER))
+    volume->v_mtou_flags |= CONV_TOUPPER;
+  else if ((volume->v_casefold & AFPVOL_MTOULOWER))
+    volume->v_mtou_flags |= CONV_TOLOWER;
+
+  /* Unix to Mac conversion flags*/
+  volume->v_utom_flags = CONV_IGNORE;
+  if ((volume->v_casefold & AFPVOL_UTOMUPPER))
+    volume->v_utom_flags |= CONV_TOUPPER;
+  else if ((volume->v_casefold & AFPVOL_UTOMLOWER))
+    volume->v_utom_flags |= CONV_TOLOWER;
+  if ((volume->v_flags & AFPVOL_EILSEQ))
+    volume->v_utom_flags |= CONV__EILSEQ;
+
+  /* suffix for mangling use (lastvid + 1)   */
+  /* because v_vid has not been decided yet. */
+  if (lastvid == UINT16_MAX) {
+    LOG(log_error, logtype_default, "vid overflow");
+    EC_FAIL;
+  }
+  suffixlen = snprintf(suffix, sizeof(suffix), "#%X", lastvid + 1);
+  if (suffixlen >= sizeof(suffix)) {
+    LOG(log_error, logtype_default, "vid overflow");
+    EC_FAIL;
+  }
+
+  /* Unicode Volume Name */
+  /* Firstly convert name from unixcharset to UTF8-MAC */
+  flags = CONV_IGNORE;
+  tmpvlen = convert_charset(obj->options.unixcharset, CH_UTF8_MAC, 0, name,
+                            vlen, tmpname, AFPVOL_U8MNAMELEN, &flags);
+  if (tmpvlen <= 0) {
+    strcpy(tmpname, "???");
+    tmpvlen = 3;
+  }
+
+  /* Do we have to mangle ? */
+  if ((flags & CONV_REQMANGLE) || (tmpvlen > obj->options.volnamelen)) {
+    if (tmpvlen + suffixlen > obj->options.volnamelen) {
+      flags = CONV_FORCE;
+      tmpvlen =
+          convert_charset(obj->options.unixcharset, CH_UTF8_MAC, 0, name, vlen,
+                          tmpname, obj->options.volnamelen - suffixlen, &flags);
+      tmpname[tmpvlen >= 0 ? tmpvlen : 0] = 0;
     }
+    strcat(tmpname, suffix);
+    tmpvlen = strlen(tmpname);
+  }
 
-    /*
-     * Handle read-only behaviour. semantics:
-     * 1) neither the rolist nor the rwlist exist -> rw
-     * 2) rolist exists -> ro if user is in it.
-     * 3) rwlist exists -> ro unless user is in it.
-     * 4) cnid scheme = last -> ro forcibly.
-     */
-    if (pwd) {
-        if (accessvol(obj, getoption(obj->iniconfig, section, "rolist", preset, NULL), pwd->pw_name) == 1
-            || accessvol(obj, getoption(obj->iniconfig, section, "rwlist", preset, NULL), pwd->pw_name) == 0)
-            volume->v_flags |= AFPVOL_RO;
+  /* Secondly convert name from UTF8-MAC to UCS2 */
+  if (0 >= (u8mvlen = convert_string(CH_UTF8_MAC, CH_UCS2, tmpname, tmpvlen,
+                                     u8mtmpname, AFPVOL_U8MNAMELEN * 2)))
+    EC_FAIL;
+
+  LOG(log_maxdebug, logtype_afpd,
+      "creatvol: Volume '%s' -> UTF8-MAC Name: '%s'", name, tmpname);
+
+  /* Maccharset Volume Name */
+  /* Firsty convert name from unixcharset to maccharset */
+  flags = CONV_IGNORE;
+  tmpvlen = convert_charset(obj->options.unixcharset, obj->options.maccharset,
+                            0, name, vlen, tmpname, AFPVOL_U8MNAMELEN, &flags);
+  if (tmpvlen <= 0) {
+    strcpy(tmpname, "???");
+    tmpvlen = 3;
+  }
+
+  /* Do we have to mangle ? */
+  if ((flags & CONV_REQMANGLE) || (tmpvlen > AFPVOL_MACNAMELEN)) {
+    if (tmpvlen + suffixlen > AFPVOL_MACNAMELEN) {
+      flags = CONV_FORCE;
+      tmpvlen = convert_charset(obj->options.unixcharset,
+                                obj->options.maccharset, 0, name, vlen, tmpname,
+                                AFPVOL_MACNAMELEN - suffixlen, &flags);
+      tmpname[tmpvlen >= 0 ? tmpvlen : 0] = 0;
     }
-    if (0 == strcmp(volume->v_cnidscheme, "last"))
-        volume->v_flags |= AFPVOL_RO;
+    strcat(tmpname, suffix);
+    tmpvlen = strlen(tmpname);
+  }
 
-    if ((volume->v_flags & AFPVOL_NODEV))
-        volume->v_ad_options |= ADVOL_NODEV;
-    if ((volume->v_flags & AFPVOL_UNIX_PRIV))
-        volume->v_ad_options |= ADVOL_UNIXPRIV;
-    if ((volume->v_flags & AFPVOL_INV_DOTS))
-        volume->v_ad_options |= ADVOL_INVDOTS;
-    if ((volume->v_flags & AFPVOL_FOLLOWSYM))
-        volume->v_ad_options |= ADVOL_FOLLO_SYML;
-    if ((volume->v_flags & AFPVOL_RO))
-        volume->v_ad_options |= ADVOL_RO;
-    if ((volume->v_flags & AFPVOL_FORCE_STICKY_XATTR))
-        volume->v_ad_options |= ADVOL_FORCE_STICKY_XATTR;
+  /* Secondly convert name from maccharset to UCS2 */
+  if (0 >=
+      (macvlen = convert_string(obj->options.maccharset, CH_UCS2, tmpname,
+                                tmpvlen, mactmpname, AFPVOL_U8MNAMELEN * 2)))
+    EC_FAIL;
 
-    /* Mac to Unix conversion flags*/
-    if ((volume->v_flags & AFPVOL_EILSEQ))
-        volume->v_mtou_flags |= CONV__EILSEQ;
+  LOG(log_maxdebug, logtype_afpd, "creatvol: Volume '%s' ->  Longname: '%s'",
+      name, tmpname);
 
-    if ((volume->v_casefold & AFPVOL_MTOUUPPER))
-        volume->v_mtou_flags |= CONV_TOUPPER;
-    else if ((volume->v_casefold & AFPVOL_MTOULOWER))
-        volume->v_mtou_flags |= CONV_TOLOWER;
+  EC_NULL(volume->v_localname = strdup(name));
+  EC_NULL(volume->v_u8mname = strdup_w(u8mtmpname));
+  EC_NULL(volume->v_macname = strdup_w(mactmpname));
+  EC_NULL(volume->v_path = strdup(path));
 
-    /* Unix to Mac conversion flags*/
-    volume->v_utom_flags = CONV_IGNORE;
-    if ((volume->v_casefold & AFPVOL_UTOMUPPER))
-        volume->v_utom_flags |= CONV_TOUPPER;
-    else if ((volume->v_casefold & AFPVOL_UTOMLOWER))
-        volume->v_utom_flags |= CONV_TOLOWER;
-    if ((volume->v_flags & AFPVOL_EILSEQ))
-        volume->v_utom_flags |= CONV__EILSEQ;
+  volume->v_name = utf8_encoding(obj) ? volume->v_u8mname : volume->v_macname;
 
-    /* suffix for mangling use (lastvid + 1)   */
-    /* because v_vid has not been decided yet. */
-    if (lastvid == UINT16_MAX) {
-        LOG(log_error, logtype_default, "vid overflow");
-        EC_FAIL;
-    }
-    suffixlen = snprintf(suffix, sizeof(suffix), "#%X", lastvid + 1 );
-    if (suffixlen >= sizeof(suffix)) {
-        LOG(log_error, logtype_default, "vid overflow");
-        EC_FAIL;
-    }
+  /* os X start at 1 and use network order ie. 1 2 3 */
+  lastvid++;
+  if (lastvid == UINT16_MAX) {
+    LOG(log_error, logtype_default,
+        "creatvol(\"%s\"): exceeded maximum number of volumes", volume->v_path);
+    EC_FAIL;
+  }
+  volume->v_vid = lastvid;
+  volume->v_vid = htons(volume->v_vid);
 
-    /* Unicode Volume Name */
-    /* Firstly convert name from unixcharset to UTF8-MAC */
-    flags = CONV_IGNORE;
-    tmpvlen = convert_charset(obj->options.unixcharset, CH_UTF8_MAC, 0, name, vlen, tmpname, AFPVOL_U8MNAMELEN, &flags);
-    if (tmpvlen <= 0) {
-        strcpy(tmpname, "???");
-        tmpvlen = 3;
-    }
+#ifdef HAVE_ACLS
+  if (!check_vol_acl_support(volume)) {
+    LOG(log_debug, logtype_afpd, "creatvol(\"%s\"): disabling ACL support", volume->v_path);
+    volume->v_flags &= ~AFPVOL_ACLS;
+    obj->options.flags &= ~(OPTION_ACL2MODE | OPTION_ACL2MACCESS);
+  }
+#endif
 
-    /* Do we have to mangle ? */
-    if ( (flags & CONV_REQMANGLE) || (tmpvlen > obj->options.volnamelen)) {
-        if (tmpvlen + suffixlen > obj->options.volnamelen) {
-            flags = CONV_FORCE;
-            tmpvlen = convert_charset(obj->options.unixcharset, CH_UTF8_MAC, 0, name, vlen, tmpname, obj->options.volnamelen - suffixlen, &flags);
-            tmpname[tmpvlen >= 0 ? tmpvlen : 0] = 0;
-        }
-        strcat(tmpname, suffix);
-        tmpvlen = strlen(tmpname);
-    }
+  /* Check EA support on volume */
+  if (volume->v_vfs_ea == AFPVOL_EA_AUTO || volume->v_adouble == AD_VERSION_EA)
+    check_ea_support(volume);
+  initvol_vfs(volume);
 
-    /* Secondly convert name from UTF8-MAC to UCS2 */
-    if ( 0 >= ( u8mvlen = convert_string(CH_UTF8_MAC, CH_UCS2, tmpname, tmpvlen, u8mtmpname, AFPVOL_U8MNAMELEN*2)) )
-        EC_FAIL;
+  /* get/store uuid from file in afpd master*/
+  become_root();
+  char *uuid = get_vol_uuid(obj, volume->v_localname);
+  unbecome_root();
+  if (!uuid) {
+    LOG(log_error, logtype_afpd, "Volume '%s': couldn't get UUID",
+        volume->v_localname);
+  } else {
+    volume->v_uuid = uuid;
+    LOG(log_debug, logtype_afpd, "Volume '%s': UUID '%s'", volume->v_localname,
+        volume->v_uuid);
+  }
 
-    LOG(log_maxdebug, logtype_afpd, "creatvol: Volume '%s' -> UTF8-MAC Name: '%s'", name, tmpname);
-
-    /* Maccharset Volume Name */
-    /* Firsty convert name from unixcharset to maccharset */
-    flags = CONV_IGNORE;
-    tmpvlen = convert_charset(obj->options.unixcharset, obj->options.maccharset, 0, name, vlen, tmpname, AFPVOL_U8MNAMELEN, &flags);
-    if (tmpvlen <= 0) {
-        strcpy(tmpname, "???");
-        tmpvlen = 3;
-    }
-
-    /* Do we have to mangle ? */
-    if ( (flags & CONV_REQMANGLE) || (tmpvlen > AFPVOL_MACNAMELEN)) {
-        if (tmpvlen + suffixlen > AFPVOL_MACNAMELEN) {
-            flags = CONV_FORCE;
-            tmpvlen = convert_charset(obj->options.unixcharset,
-                                      obj->options.maccharset,
-                                      0,
-                                      name,
-                                      vlen,
-                                      tmpname,
-                                      AFPVOL_MACNAMELEN - suffixlen,
-                                      &flags);
-            tmpname[tmpvlen >= 0 ? tmpvlen : 0] = 0;
-        }
-        strcat(tmpname, suffix);
-        tmpvlen = strlen(tmpname);
-    }
-
-    /* Secondly convert name from maccharset to UCS2 */
-    if ( 0 >= ( macvlen = convert_string(obj->options.maccharset,
-                                         CH_UCS2,
-                                         tmpname,
-                                         tmpvlen,
-                                         mactmpname,
-                                         AFPVOL_U8MNAMELEN*2)) )
-        EC_FAIL;
-
-    LOG(log_maxdebug, logtype_afpd, "creatvol: Volume '%s' ->  Longname: '%s'", name, tmpname);
-
-    EC_NULL( volume->v_localname = strdup(name) );
-    EC_NULL( volume->v_u8mname = strdup_w(u8mtmpname) );
-    EC_NULL( volume->v_macname = strdup_w(mactmpname) );
-    EC_NULL( volume->v_path = strdup(path) ); 
-        
-    volume->v_name = utf8_encoding(obj) ? volume->v_u8mname : volume->v_macname;
-
-#ifdef __svr4__
-    volume->v_qfd = -1;
-#endif /* __svr4__ */
-
-    /* os X start at 1 and use network order ie. 1 2 3 */
-    lastvid++;
-    if (lastvid == UINT16_MAX) {
-        LOG(log_error, logtype_default, "creatvol(\"%s\"): exceeded maximum number of volumes",
-            volume->v_path);
-        EC_FAIL;
-    }
-    volume->v_vid = lastvid;
-    volume->v_vid = htons(volume->v_vid);
-
-    /* Check EA support on volume */
-    if (volume->v_vfs_ea == AFPVOL_EA_AUTO || volume->v_adouble == AD_VERSION_EA)
-        check_ea_support(volume);
-    initvol_vfs(volume);
-
-    /* get/store uuid from file in afpd master*/
-    become_root();
-    char *uuid = get_vol_uuid(obj, volume->v_localname);
-    unbecome_root();
-    if (!uuid) {
-        LOG(log_error, logtype_afpd, "Volume '%s': couldn't get UUID",
-            volume->v_localname);
-    } else {
-        volume->v_uuid = uuid;
-        LOG(log_debug, logtype_afpd, "Volume '%s': UUID '%s'",
-            volume->v_localname, volume->v_uuid);
-    }
-
-    /* no errors shall happen beyond this point because the cleanup would mess the volume chain up */
-    volume->v_next = Volumes;
-    Volumes = volume;
-    volume->v_obj = obj;
+  /* no errors shall happen beyond this point because the cleanup would mess the
+   * volume chain up */
+  volume->v_next = Volumes;
+  Volumes = volume;
+  volume->v_obj = obj;
 
 EC_CLEANUP:
     LOG(log_debug, logtype_afpd, "creatvol: END: %d", ret);
@@ -1189,7 +1222,7 @@ static int readvolfile(AFPObj *obj, const struct passwd *pwent)
 
     LOG(log_debug, logtype_afpd, "readvolfile: BEGIN");
 
-    int secnum = atalk_iniparser_getnsec(obj->iniconfig);    
+    int secnum = atalk_iniparser_getnsec(obj->iniconfig);
     LOG(log_debug, logtype_afpd, "readvolfile: sections: %d", secnum);
     const char *secname;
 
@@ -1197,7 +1230,7 @@ static int readvolfile(AFPObj *obj, const struct passwd *pwent)
         LOG(log_debug, logtype_afpd, "readvolfile: default_preset: %s", default_preset);
     }
 
-    for (i = 0; i < secnum; i++) { 
+    for (i = 0; i < secnum; i++) {
         secname = atalk_iniparser_getsecname(obj->iniconfig, i);
 
         if (!vol_section(secname))
@@ -1697,15 +1730,15 @@ struct vol *getvolbyvid(const uint16_t vid )
 
 /*
  * get username by path
- * 
+ *
  * getvolbypath() assumes that the user home directory has the same name as the username.
  * If that is not true, getuserbypath() is called and tries to retrieve the username
  * from the directory owner, checking its validity.
- * 
+ *
  * @param   path (r) absolute volume path
  * @returns NULL     if no match is found, pointer to username if successfull
  *
- */ 
+ */
 static char *getuserbypath(const char *path)
 {
     EC_INIT;
@@ -1728,7 +1761,7 @@ static char *getuserbypath(const char *path)
         EC_FAIL;
 
     /* resolve and remove symlinks */
-    if ((hdir = realpath_safe(pwd->pw_dir)) == NULL) 
+    if ((hdir = realpath_safe(pwd->pw_dir)) == NULL)
         EC_FAIL;
 
     /* handle subdirectories, path = */
@@ -1755,7 +1788,7 @@ EC_CLEANUP:
  * Both cnid_metad and dbd thus need a way to lookup and create struct vols
  * for user home by path. This is what this func does as well.
  *
- * (1) Search "normal" volume list 
+ * (1) Search "normal" volume list
  * (2) Check if theres a [Homes] section, load_volumes() remembers this for us
  * (3) If there is, match "path" with "basedir regex" to get the user home parent dir
  * (4) Built user home path by appending the basedir matched in (3) and appending the username
@@ -1829,7 +1862,7 @@ struct vol *getvolbypath(AFPObj *obj, const char *path)
 
     int secnum = atalk_iniparser_getnsec(obj->iniconfig);
 
-    for (int i = 0; i < secnum; i++) { 
+    for (int i = 0; i < secnum; i++) {
         secname = atalk_iniparser_getsecname(obj->iniconfig, i);
         if (STRCMP(secname, ==, INISEC_HOMES))
             break;
@@ -1970,7 +2003,7 @@ int afp_config_parse(AFPObj *AFPObj, char *processname)
     options->sigconffile = strdup(_PATH_STATEDIR "afp_signature.conf");
     options->uuidconf    = strdup(_PATH_STATEDIR "afp_voluuid.conf");
     options->flags       = OPTION_UUID | AFPObj->cmdlineflags;
-    
+
     if ((config = atalk_iniparser_load(AFPObj->options.configfile)) == NULL)
         return -1;
     AFPObj->iniconfig = config;
@@ -2167,7 +2200,7 @@ int afp_config_parse(AFPObj *AFPObj, char *processname)
         options->volcodepage = strdup(p);
     }
     LOG(log_debug, logtype_afpd, "Global vol charset is %s", options->volcodepage);
-    
+
     /* mac charset is in [G] and [V] */
     if (!(p = atalk_iniparser_getstring(config, INISEC_GLOBAL, "mac charset", NULL))) {
         options->maccodepage = strdup("MAC_ROMAN");

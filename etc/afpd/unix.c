@@ -27,6 +27,9 @@
 #include "volume.h"
 #include "unix.h"
 #include "fork.h"
+#ifdef HAVE_ACLS
+#include "acls.h"
+#endif
 
 /*
  * Get the free space on a partition.
@@ -35,24 +38,15 @@ int ustatfs_getvolspace(const struct vol *vol, VolSpace *bfree, VolSpace *btotal
 {
     VolSpace maxVolSpace = UINT64_MAX;
 
-#ifdef ultrix
-    struct fs_data	sfs;
-#else /*ultrix*/
-    struct statfs	sfs;
-#endif /*ultrix*/
+  struct statfs sfs;
 
     if ( statfs( vol->v_path, &sfs ) < 0 ) {
         LOG(log_error, logtype_afpd, "ustatfs_getvolspace unable to stat %s", vol->v_path);
         return( AFPERR_PARAM );
     }
 
-#ifdef ultrix
-    *bfree = (VolSpace) sfs.fd_req.bfreen;
-    *bsize = 1024;
-#else /* !ultrix */
-    *bfree = (VolSpace) sfs.f_bavail;
-    *bsize = sfs.f_frsize;
-#endif /* ultrix */
+  *bfree = (VolSpace)sfs.f_bavail;
+  *bsize = sfs.f_frsize;
 
     if ( *bfree > maxVolSpace / *bsize ) {
         *bfree = maxVolSpace;
@@ -60,12 +54,7 @@ int ustatfs_getvolspace(const struct vol *vol, VolSpace *bfree, VolSpace *btotal
         *bfree *= *bsize;
     }
 
-#ifdef ultrix
-    *btotal = (VolSpace)
-              ( sfs.fd_req.btot - ( sfs.fd_req.bfree - sfs.fd_req.bfreen ));
-#else /* !ultrix */
-    *btotal = (VolSpace) sfs.f_blocks;
-#endif /* ultrix */
+  *btotal = (VolSpace)sfs.f_blocks;
 
     /* see similar block above comments */
     if ( *btotal > maxVolSpace / *bsize ) {
@@ -126,8 +115,8 @@ static void utommode(const AFPObj *obj, const struct stat *stat, struct maccess 
      * There are certain things the mac won't try if you don't have
      * the "owner" bit set, even tho you can do these things on unix wiht
      * only write permission.  What were the things?
-     * 
-     * FIXME 
+     *
+     * FIXME
      * ditto seems to care if st_uid is 0 ?
      * was ma->ma_user & AR_UWRITE
      * but 0 as owner is a can of worms.
@@ -150,17 +139,20 @@ static void utommode(const AFPObj *obj, const struct stat *stat, struct maccess 
  *
  * dir parameter is used by AFS
  */
-void accessmode(const AFPObj *obj, const struct vol *vol, char *path, struct maccess *ma, struct dir *dir , struct stat *st)
-{
-    struct stat     sb;
+void accessmode(const AFPObj *obj, const struct vol *vol, char *path,
+                struct maccess *ma, struct dir *dir, struct stat *st) {
+  struct stat sb;
 
-    ma->ma_user = ma->ma_owner = ma->ma_world = ma->ma_group = 0;
-    if (!st) {
-        if (ostat(path, &sb, vol_syml_opt(vol)) != 0)
-            return;
-        st = &sb;
-    }
-    utommode(obj, st, ma );
+  ma->ma_user = ma->ma_owner = ma->ma_world = ma->ma_group = 0;
+  if (!st) {
+    if (ostat(path, &sb, vol_syml_opt(vol)) != 0)
+      return;
+    st = &sb;
+  }
+  utommode(obj, st, ma);
+#ifdef HAVE_ACLS
+    acltoownermode(obj, vol, path, st, ma);
+#endif
 }
 
 static mode_t mtoubits(u_char bits)
@@ -179,8 +171,8 @@ static mode_t mtoubits(u_char bits)
 
 /* ----------------------------------
    from the finder's share windows (menu--> File--> sharing...)
-   and from AFP 3.0 spec page 63 
-   the mac mode should be save somewhere 
+   and from AFP 3.0 spec page 63
+   the mac mode should be save somewhere
 */
 mode_t mtoumode(struct maccess *ma)
 {
@@ -208,7 +200,7 @@ int setfilunixmode (const struct vol *vol, struct path* path, mode_t mode)
     if (path->st_errno) {
         return -1;
     }
-        
+
     mode |= vol->v_fperm;
 
     if (setfilmode(vol, path->u_name, mode, &path->st) < 0)
@@ -264,7 +256,7 @@ int setfilowner(const struct vol *vol, const uid_t uid, const gid_t gid, struct 
     return 0;
 }
 
-/* --------------------------------- 
+/* ---------------------------------
  * uid/gid == 0 need to be handled as special cases. they really mean
  * that user/group should inherit from other, but that doesn't fit
  * into the unix permission scheme. we can get around this by

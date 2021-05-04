@@ -38,6 +38,9 @@
 #include "status.h"
 #include "fork.h"
 #include "extattrs.h"
+#ifdef HAVE_ACLS
+#include "acls.h"
+#endif
 
 static int afp_version_index;
 static struct uam_mod uam_modules = {NULL, NULL, &uam_modules, &uam_modules};

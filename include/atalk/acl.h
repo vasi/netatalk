@@ -19,8 +19,32 @@
 #include "config.h"
 #endif /* HAVE_CONFIG_H */
 
+#ifdef HAVE_ACLS
+
+#define O_NETATALK_ACL (O_NOFOLLOW << 1)
+#define O_IGNORE (O_NOFOLLOW << 2)
+
+#ifdef HAVE_POSIX_ACLS
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/acl.h>
+
+#define chmod_acl posix_chmod
+#define fchmod_acl posix_fchmod
+
+extern int posix_chmod(const char *name, mode_t mode);
+extern int posix_fchmod(int fd, mode_t mode);
+
+#endif /* HAVE_POSIX_ACLS */
+
+extern int remove_acl_vfs(const char *name);
+
+#else /* HAVE_ACLS=no */
+
 #define O_NETATALK_ACL 0
 #define O_IGNORE 0
 #define chmod_acl chmod
+
+#endif /* HAVE_ACLS */
 
 #endif /* ATALK_ACL_H */
