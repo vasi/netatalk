@@ -39,7 +39,7 @@
         <listitem>
           <para>CNID backend used on this volume, either dbd, last or mysql. Should
           match the backend selected with afpd for this volume. If not
-          specified, the default CNID backend dbd is used</para>
+          specified, the default CNID backend @DEFAULT_CNID_SCHEME@ is used</para>
         </listitem>
       </varlistentry>
       <varlistentry>
