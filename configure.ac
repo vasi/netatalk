@@ -48,6 +48,9 @@ AC_NETATALK_DEBUGGING
 dnl	Check for libiconv support
 AC_NETATALK_CHECK_ICONV
 
+dnl Check for optional Zeroconf support
+AC_NETATALK_ZEROCONF
+
 dnl Check for CNID database backends
 AC_NETATALK_CNID([bdb_required=yes],[bdb_required=no])
 
