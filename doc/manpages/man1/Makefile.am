@@ -5,6 +5,7 @@ CLEANFILES =
 
 MAN_MANPAGES = \
 	ad.1 \
+	afpldaptest.1 \
 	apple_dump.1 \
 	asip-status.pl.1 \
 	dbd.1 \
@@ -15,6 +16,7 @@ MAN_MANPAGES = \
 
 EXTRA_DIST = \
 	ad.1.xml \
+	afpldaptest.xml \
 	apple_dump.1.xml \
 	asip-status.pl.1.xml \
 	dbd.1.xml \
