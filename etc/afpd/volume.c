@@ -41,6 +41,10 @@
 #include <atalk/netatalk_conf.h>
 #include <atalk/server_ipc.h>
 
+#ifdef HAVE_LDAP
+#include <atalk/ldapconfig.h>
+#endif /* HAVE_LDAP */
+
 #ifdef CNID_DB
 #include <atalk/cnid.h>
 #endif /* CNID_DB*/
@@ -110,7 +114,7 @@ static long long int get_tm_bands(const char *path)
     while ((entry = readdir(dir)) != NULL)
         count++;
     count -= 2; /* All OSens I'm aware of return "." and "..", so just substract them, avoiding string comparison in loop */
-        
+
 EC_CLEANUP:
     if (dir)
         closedir(dir);
@@ -175,7 +179,7 @@ static int get_tm_used(struct vol * restrict vol)
             && (strlen(entry->d_name) == (p + strlen("sparsebundle") - entry->d_name))) {
 
             EC_NULL_LOG( infoplist = bformat("%s/%s/%s", vol->v_path, entry->d_name, "Info.plist") );
-            
+
             if ((bandsize = get_tm_bandsize(cfrombstr(infoplist))) == -1) {
                 bdestroy(infoplist);
                 infoplist = NULL;
@@ -359,7 +363,12 @@ static int getvolparams(const AFPObj *obj, uint16_t bitmap, struct vol *vol, str
                         ashort |= VOLPBIT_ATTR_UNIXPRIV;
                     if (vol->v_flags & AFPVOL_TM)
                         ashort |= VOLPBIT_ATTR_TM;
-                    ashort |= VOLPBIT_ATTR_NONETIDS;
+                    #ifdef HAVE_LDAP
+                      if (!ldap_config_valid || vol->v_flags & AFPVOL_NONETIDS)
+                         ashort |= VOLPBIT_ATTR_NONETIDS;
+                    #else
+                      short |= VOLPBIT_ATTR_NONETIDS;
+                    #endif
                     if (obj->afp_version >= 32) {
                         if (vol->v_vfs_ea)
                             ashort |= VOLPBIT_ATTR_EXT_ATTRS;
@@ -546,7 +555,7 @@ int afp_getsrvrparms(AFPObj *obj, char *ibuf , size_t ibuflen , char *rbuf, size
         /*
          * There seems to be an undocumented limit on how big our reply can get
          * before the client chokes and closes the connection.
-         * Testing with 10.8.4 found the limit at ~4600 bytes. Go figure. 
+         * Testing with 10.8.4 found the limit at ~4600 bytes. Go figure.
          */
         if (((data + len + 3) - rbuf) > 4600)
             break;

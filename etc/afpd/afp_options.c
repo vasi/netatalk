@@ -110,14 +110,21 @@ static void show_version_extended(void) {
 #else
   puts( "No" );
 #endif
-    
+
   printf("   Admin group support:\t");
   puts("Yes");
 
   printf("            EA support:\t");
   puts(EA_MODULES);
-    
-  printf( "         ACL support:\t" );
+
+  printf("          LDAP support:\t");
+#ifdef HAVE_LDAP
+  puts("Yes");
+#else
+  puts("No");
+#endif
+
+  printf("           ACL support:\t");
 #ifdef HAVE_ACLS
   puts( "Yes" );
 #else

@@ -25,6 +25,7 @@ AC_DEFUN([AC_NETATALK_CONFIG_SUMMARY], [
 	AC_MSG_RESULT([         Zeroconf support:        $netatalk_cv_zeroconf])
 	AC_MSG_RESULT([         ACL support:             $with_acl_support])
 	AC_MSG_RESULT([         Kerberos support:        $with_kerberos])
+	AC_MSG_RESULT([         LDAP support:            $netatalk_cv_ldap])
 	AC_MSG_RESULT([    Paths:])
 	AC_MSG_RESULT([         Netatalk lockfile:       $ac_cv_netatalk_lock])
 	if test x"$use_pam_so" = x"yes"; then
@@ -73,10 +74,10 @@ AC_DEFUN([AC_NETATALK_LIBS_SUMMARY], [
 		AC_MSG_RESULT([        LIBS   = $GSSAPI_LIBS])
 		AC_MSG_RESULT([        CFLAGS = $GSSAPI_CFLAGS])
 	fi
-	if test x"$netatalk_cv_use_cups" = x"yes"; then
-		AC_MSG_RESULT([    CUPS:])
-		AC_MSG_RESULT([        LIBS   = $CUPS_LIBS])
-		AC_MSG_RESULT([        CFLAGS = $CUPS_CFLAGS])
+	if test x"$netatalk_cv_ldap" = x"yes"; then
+		AC_MSG_RESULT([    LDAP:])
+		AC_MSG_RESULT([        LIBS   = $LDAP_LDFLAGS $LDAP_LIBS])
+		AC_MSG_RESULT([        CFLAGS = $LDAP_CFLAGS])
 	fi
 	AC_MSG_RESULT([    LIBEVENT:])
 		AC_MSG_RESULT([        LIBS   = $EVENT_LIBS])

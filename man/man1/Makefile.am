@@ -2,6 +2,7 @@
 
 man_MANS = \
 	ad.1 \
+	afpldaptest.1 \
 	apple_dump.1 \
 	asip-status.pl.1 \
 	dbd.1 \

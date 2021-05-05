@@ -30,6 +30,10 @@
 #include <atalk/netatalk_conf.h>
 #include <atalk/fce_api.h>
 
+#ifdef HAVE_LDAP
+#include <atalk/ldapconfig.h>
+#endif
+
 #include "afp_config.h"
 #include "uam_auth.h"
 #include "status.h"
@@ -188,6 +192,11 @@ int configinit(AFPObj *obj)
             getip_string((struct sockaddr *)&dsi->server),
             getip_port((struct sockaddr *)&dsi->server));
     }
+
+    #ifdef HAVE_LDAP
+      /* Parse afp.conf */
+      acl_ldap_readconfig(obj->iniconfig);
+    #endif /* HAVE_LDAP */
 
     if ((r = atalk_iniparser_getstring(obj->iniconfig, INISEC_GLOBAL, "fce listener", NULL))) {
 		LOG(log_note, logtype_afpd, "Adding FCE listener: %s", r);
