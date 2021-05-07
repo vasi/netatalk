@@ -29,7 +29,6 @@ autoscan.log
 .gitignore
 *.o
 **/.DS_Store
-*.xml
 *.iml
 ylwrap
 test-driver
@@ -42,4 +41,3 @@ test-driver
 *.Po
 .*
 !/.gitignore
-etc/afpd/afpstats_service_glue.h
