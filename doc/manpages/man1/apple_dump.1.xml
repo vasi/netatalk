@@ -8,11 +8,11 @@
     <refmiscinfo class="manual">Netatalk AFP fileserver Manual</refmiscinfo>
     <refmiscinfo class="version">@NETATALK_VERSION@</refmiscinfo>
   </refmeta>
-  <refnamediv id="name">
+  <refnamediv>
     <refname>apple_dump</refname>
     <refpurpose>Dump AppleSingle/AppleDouble format data</refpurpose>
   </refnamediv>
-  <refsynopsisdiv id="synopsis">
+  <refsynopsisdiv>
     <cmdsynopsis>
       <command>apple_dump</command>
       <arg choice="opt">
@@ -70,7 +70,7 @@
       </group>
     </cmdsynopsis>
   </refsynopsisdiv>
-  <refsect1 id="description">
+  <refsect1>
     <title>DESCRIPTION</title>
     <para><command>apple_dump</command> is a perl script to dump
     AppleSingle/AppleDouble format data. </para>
@@ -142,7 +142,7 @@
     <para>If setting option -e, -f or -d,  assume FinderInfo and doesn't look
     for another data.</para>
   </refsect1>
-  <refsect1 id="see_also">
+  <refsect1>
     <title>SEE ALSO</title>
     <para><citerefentry><refentrytitle>ad</refentrytitle><manvolnum>1</manvolnum></citerefentry>,
     <citerefentry><refentrytitle>getfattr</refentrytitle><manvolnum>1</manvolnum></citerefentry>,
