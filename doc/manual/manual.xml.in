@@ -75,6 +75,8 @@ url="http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt">http://www.gnu.org/li
     &afp_voluuid.conf.5;
 
     &afpd.8;
+    
+    &afpldaptest.1;
 
     &apple_dump.1;
 

@@ -22,8 +22,8 @@ HTML_PAGES = \
 	ad.1.html \
 	afp.conf.5.html \
 	afpd.8.html \
+	afpldaptest.1.html \
 	afp_signature.conf.5.html  \
-	afpstats.1.html \
 	afp_voluuid.conf.5.html \
 	apple_dump.1.html \
 	asip-status.pl.1.html \
