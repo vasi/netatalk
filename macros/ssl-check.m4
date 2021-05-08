@@ -42,9 +42,6 @@ AC_DEFUN([AC_NETATALK_PATH_SSL], [
 dnl Make sure atalk_libname is defined beforehand
 	[[ -n "$atalk_libname" ]] || AC_MSG_ERROR([internal error, atalk_libname undefined])
     
-dnl Check for Homebrew
-    AC_CHECK_PROG([BREW],brew, brew)
-    
 	if test "$tryssl" = "yes"; then
 		AC_MSG_CHECKING([for SSL])        
 		for ssldir in "" $tryssldir $($BREW --prefix openssl 2>/dev/null) ; do

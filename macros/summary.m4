@@ -50,6 +50,7 @@ AC_DEFUN([AC_NETATALK_LIBS_SUMMARY], [
 
 	AC_MSG_RESULT([Compilation summary:])
 	AC_MSG_RESULT([    CFLAGS         = $CFLAGS])
+	AC_MSG_RESULT([    LIBS           = $LIBS])
 	if test x"$neta_cv_have_openssl" = x"yes"; then
 		AC_MSG_RESULT([    SSL:])
 		AC_MSG_RESULT([        LIBS   = $SSL_LIBS])
@@ -63,6 +64,7 @@ AC_DEFUN([AC_NETATALK_LIBS_SUMMARY], [
 	if test x"$netatalk_cv_use_pam" = x"yes"; then
 		AC_MSG_RESULT([    PAM:])
 		AC_MSG_RESULT([        LIBS   = $PAM_LIBS])
+		AC_MSG_RESULT([        CFLAGS = $PAM_CFLAGS])
 	fi
 	if test x"$bdb_required" = x"yes"; then
 		AC_MSG_RESULT([    BDB:])

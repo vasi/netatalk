@@ -3,12 +3,12 @@
 arch=$(uname -m)
 
 if [[ $arch == x86_64 ]]; then
-    export LDFLAGS="-L/usr/local/opt/openssl/lib -L/usr/local/opt/openldap/lib"
-    export CPPFLAGS="-I/usr/local/opt/openssl/include -I/usr/local/opt/openldap/include"
+    export LDFLAGS="-L/usr/local/opt/openssl/lib"
+    export CPPFLAGS="-I/usr/local/opt/openssl/include"
     echo -e "\e[1;91mConfiguring for Intel\e[0m"
 elif [[ $arch == arm64 ]]; then
-    export LDFLAGS="-L/opt/homebrew/opt/openssl/lib -L/opt/homebrew/opt/openldap/lib"
-    export CPPFLAGS="-I/opt/homebrew/opt/openssl/include -I/opt/homebrew/opt/openldap/include"
+    export LDFLAGS="-L/opt/homebrew/opt/openssl/lib"
+    export CPPFLAGS="-I/opt/homebrew/opt/openssl/include"
     echo -e "\e[1;91mConfiguring for Apple Silicon\e[0m"
 fi
 
