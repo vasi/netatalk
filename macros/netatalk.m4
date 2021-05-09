@@ -129,7 +129,7 @@ AC_ARG_ENABLE(debug,
 )
 ])
 
-dnl Check whethe to disable tickle SIGALARM stuff, which eases debugging
+dnl Check whether to disable tickle SIGALARM stuff, which eases debugging
 AC_DEFUN([AC_NETATALK_DEBUGGING], [
 AC_MSG_CHECKING([whether to enable debugging with debuggers])
 AC_ARG_ENABLE(debugging,

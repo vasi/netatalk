@@ -10,7 +10,7 @@ AC_DEFUN([AC_NETATALK_CONFIG_SUMMARY], [
 	AC_MSG_RESULT([    UAMS:])
 	uams_using_options=""
 	if test x"$netatalk_cv_use_pam" != x"no"; then
-        	uams_using_options="PAM"
+        		uams_using_options="PAM"
 	fi
 	if test "x$neta_cv_compile_dhx" = "xyes"; then
 		AC_MSG_RESULT([         DHX     ($uams_using_options)])
@@ -49,8 +49,8 @@ AC_DEFUN([AC_NETATALK_LIBS_SUMMARY], [
 	dnl # Display summary of libraries detected
 
 	AC_MSG_RESULT([Compilation summary:])
-	AC_MSG_RESULT([    CFLAGS         = $CFLAGS])
-	AC_MSG_RESULT([    LIBS           = $LIBS])
+		AC_MSG_RESULT([    CFLAGS     = $CFLAGS])
+		AC_MSG_RESULT([    LIBS       = $LIBS])
 	if test x"$neta_cv_have_openssl" = x"yes"; then
 		AC_MSG_RESULT([    SSL:])
 		AC_MSG_RESULT([        LIBS   = $SSL_LIBS])

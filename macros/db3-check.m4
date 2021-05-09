@@ -125,7 +125,7 @@ if test "x$bdb_required" = "xyes"; then
                 if test -f "${bdbdir}/include${subdir}/db.h" ; then
                     AC_MSG_RESULT([yes])
 
-                    dnl -- Check if it meets minimun requirement, also return the version
+                    dnl -- Check if it meets minimum requirement, also return the version
                     NETATALK_BDB_HEADER([${bdbdir}/include${subdir}])
 
                     if test ${atalk_cv_bdbheader} != "no"; then
