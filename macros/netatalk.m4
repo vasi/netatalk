@@ -5,7 +5,7 @@ AC_DEFUN([AX_CHECK_DOCBOOK], [
 # It's just rude to go over the net to build
 XSLTPROC_FLAGS=--nonet
 DOCBOOK_ROOT=
-for i in /usr/local/etc/xml/catalog ;
+for i in $(brew --prefix)/etc/xml/catalog ;
 do
     if test -f $i; then
           XML_CATALOG="$i"
