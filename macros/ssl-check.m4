@@ -44,7 +44,7 @@ dnl Make sure atalk_libname is defined beforehand
     
 	if test "$tryssl" = "yes"; then
 		AC_MSG_CHECKING([for SSL])        
-		for ssldir in "" $tryssldir $($BREW --prefix openssl 2>/dev/null) ; do
+		for ssldir in "" $tryssldir $($BREW --prefix openssl) ; do
 			if test -f "$ssldir/include/openssl/cast.h" ; then
 				SSL_CFLAGS="$SSL_CFLAGS -I$ssldir/include -I$ssldir/include/openssl"
 				SSL_LIBS="$SSL_LIBS -L$ssldir/$atalk_libname -L$ssldir -lcrypto"

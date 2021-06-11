@@ -318,11 +318,6 @@ fi
 if test x"$with_acl_support" != x"no" -a x"$ac_cv_have_acls" != x"yes" ; then
     # Runtime checks for POSIX ACLs
     AC_CHECK_LIB(acl,acl_get_file,[ACL_LIBS="$ACL_LIBS -lacl"])
-    case "$host_os" in
-    *linux*)
-        AC_CHECK_LIB(attr,getxattr,[ACL_LIBS="$ACL_LIBS -lattr"])
-        ;;
-    esac
 
     AC_CACHE_CHECK([for POSIX ACL support],netatalk_cv_HAVE_POSIX_ACLS,[
         acl_LIBS=$LIBS
