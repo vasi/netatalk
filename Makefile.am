@@ -12,7 +12,7 @@ AUTOMAKE_OPTIONS = foreign
 #
 
 install-exec-local:
-	cp -p ./netatalk-init @prefix@/bin
+	cp -p ./netatalkd @prefix@/bin
 
 uninstall-local:
-	rm -f @prefix@/bin/netatalk-init
+	rm -f @prefix@/bin/netatalkd
