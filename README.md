@@ -19,10 +19,10 @@ This is a fork of the 3.1 branch of the Netatalk repo on SourceForge. It has bee
 
 4. Clone the repo:
 
-    git clone https://github.com/dgsga/Netatalk3.git
+    git clone https://github.com/dgsga/netatalk.git
 
 5. cd to the repo then double-click install.command
 
-6. Grant afpd and cnid_metad Full Disk Access in System Preferences (allows filesharing from APFS volumes)
+6. Grant /usr/local/sbin/**afpd** and /usr/local/sbin/**cnid_metad** Full Disk Access in System Preferences (allows filesharing from APFS volumes)
 
 7. Set up your afp.conf file and specify AFP shares as needed
