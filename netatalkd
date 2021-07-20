@@ -1,59 +1,37 @@
-# Startup daemon for Netatalk on macOS
-
 #!/bin/zsh
 
-set -e
+# Startup daemon for Netatalk on macOS
 
-# root check
+# Root check
 if [ "$(id -u)" != "0" ]; then
    printf "Error: The startup daemon for Netatalk needs to be executed with sudo privileges.\n" 1>&2
    exit 1
 fi
 
-PREFIX=/usr/local
-
-# Start Netatalk servers.
-atalk_startup() {
-	# prepare startup of file services
-        printf "   cnid_metad ..."
-		"$PREFIX/sbin/cnid_metad"
-		printf " Done.\n"
-	
-	    printf "   afpd ..."
-	    "$PREFIX/sbin/afpd"
-	    printf " Done.\n"
+# Prepare the environment
+PREFIX=/usr/local/sbin
+. /etc/rc.common
+ 
+# The start subroutine
+StartService() {
+   #Ensure network availability before running daemon
+    ConsoleMessage "Starting netatalk fileserver"
+    $PREFIX/cnid_metad
+    $PREFIX/afpd
 }
-
-case "$1" in
-	start)
-			echo "Starting Netatalk services..."
-			atalk_startup
-			echo "All done."
-	;;
-
-	stop)
-                AFP_PID=`ps aux | grep -v awk | awk '/^root.*afpd/ {print $2}'`
-		if [ "x$AFP_PID" != "x" ] ; then
-		    kill $AFP_PID
-		fi
-                CNID_PID=`ps aux | grep -v awk | awk '/^root.*cnid_metad/ {print $2}'`
-		if [ "x$CNID_PID" != "x" ] ; then
-		    kill $CNID_PID
-		fi
-   	;;
-	
-	restart)
-		$0 force-reload
-	;;
-
-	force-reload)
-		$0 stop
-		sleep 2
-		$0 start
-	;;
-  
-	*)
-		echo "Usage: $0 {start|stop|restart|force-reload}" >&2
-		exit 1
-	;;
-esac
+ 
+# The stop subroutine
+StopService() {
+    ConsoleMessage "Stopping netatalk fileserver"
+    killall -TERM afpd
+    killall -TERM cnid_metad
+}
+ 
+# The restart subroutine
+RestartService() {
+    ConsoleMessage "Restarting netatalk fileserver"
+    killall -HUP afpd
+    killall -HUP cnid_metad
+}
+ 
+RunService "$1"
