@@ -7,26 +7,22 @@ This is a fork of the 3.1 branch of the Netatalk repo on SourceForge. It has bee
 
 1. Install Homebrew:
 
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
 2. Install Apple's Command Line Tools for Xcode:
 
-sudo xcode-select --install
+    sudo xcode-select --install
 
 3. Install Netatalk3's dependencies from Homebrew:
 
-brew install automake autoconf libtool libgcrypt berkeley-db openssl libevent mysql pkg-config docbook docbook-xsl
+    brew install automake autoconf libtool libgcrypt berkeley-db openssl libevent mysql pkg-config docbook docbook-xsl
 
 4. Clone the repo:
 
-git clone https://github.com/dgsga/Netatalk3.git
+    git clone https://github.com/dgsga/Netatalk3.git
 
-5. cd to the repo then:
+5. cd to the repo then double-click install.command
 
-./bootstrap
+6. Grant afpd and cnid_metad Full Disk Access in System Preferences (allows filesharing from APFS volumes)
 
-make
-
-sudo make install
-
-6. Set up your afp.conf file and specify AFP shares as needed
+7. Set up your afp.conf file and specify AFP shares as needed
