@@ -16,7 +16,7 @@ MAN_MANPAGES = \
 
 EXTRA_DIST = \
 	ad.1.xml \
-	afpldaptest.xml \
+	afpldaptest.1.xml \
 	apple_dump.1.xml \
 	asip-status.pl.1.xml \
 	dbd.1.xml \
