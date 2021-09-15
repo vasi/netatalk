@@ -2,7 +2,7 @@
 
 # Script for compiling Netatalk binaries on macOS
 
-# Go to the Netatalk3 root directory
+# Set the path for the executable to current folder
 cd "$(dirname $0)"
 
 # Global variables
@@ -22,7 +22,6 @@ make html -j "$cores"
 sudo make install -j "$cores"
 
 # Install startup daemon
-
 sudo cp com.netatalk.daemon.plist /Library/LaunchDaemons
 sudo launchctl load -w /Library/LaunchDaemons/com.netatalk.daemon.plist
 
