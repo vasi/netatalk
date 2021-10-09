@@ -9,8 +9,8 @@ elif [[ $arch == arm64 ]]; then
 fi
 
 export XML_CATALOG_FILES="$(brew --prefix)/etc/xml/catalog"
-export LDFLAGS="-L$(brew --prefix openssl)/lib"
-export CPPFLAGS="-I$(brew --prefix openssl)/include"
+export LDFLAGS="-L$(brew --prefix openssl@1.1)/lib"
+export CPPFLAGS="-I$(brew --prefix openssl@1.1)/include"
 
 
 if [ -d "autom4te.cache" ]; then rm -Rf autom4te.cache; fi
