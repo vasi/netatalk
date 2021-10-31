@@ -5,13 +5,12 @@
 # Set the path for the executable to current folder
 cd "$(dirname $0)"
 
-# Correct permissions for installation folders
+# Correct permissions for installation folders on Apple Silicon (Homebrew does this on Intel)
 arch=$(uname -m)
 if [[ $arch == arm64 ]]; then
     sudo chown -R $(whoami) /usr/local/*
     echo -e "\e[1;91mCorrecting installation folder permissions for Apple Silicon\e[0m"
 fi
-
 
 # Global variables
 local cores
