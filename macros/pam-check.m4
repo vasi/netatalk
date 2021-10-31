@@ -18,26 +18,22 @@ AC_DEFUN([AC_NETATALK_PATH_PAM], [
 	)
 
 	AC_MSG_CHECKING([for PAM installation directory])
-	if test "$host_os" != "solaris"; then
-		if test "x$PAMDIR" = "xNONE" -a "x$require_pam" != "xnever"; then
-		  dnl Test for PAM
-		  pam_paths="/ /usr/ /usr/local/"
-		  for path in $pam_paths; do
-			if test -d "${path}etc/pam.d"; then
-				PAMDIR="$path"
-				break
-			fi
-		  done
-		fi
+    if test "x$PAMDIR" = "xNONE" -a "x$require_pam" != "xnever"; then
+        dnl Test for PAM
+        pam_paths="/ /usr/ /usr/local/"
+        for path in $pam_paths; do
+        if test -d "${path}etc/pam.d"; then
+            PAMDIR="$path"
+            break
+        fi
+        done
+    fi
 
-		if test "x$PAMDIR" != "xNONE"; then
-			AC_MSG_RESULT([yes (path: ${PAMDIR}etc/pam.d)])
-		else
-			AC_MSG_RESULT([no])
-		fi
-	else
-		AC_MSG_RESULT([/etc/pam.conf (solaris)])
-	fi
+    if test "x$PAMDIR" != "xNONE"; then
+        AC_MSG_RESULT([yes (path: ${PAMDIR}etc/pam.d)])
+    else
+        AC_MSG_RESULT([no])
+    fi
 		
 	pam_found="no"
 	if test "x$require_pam" != "xnever"; then
