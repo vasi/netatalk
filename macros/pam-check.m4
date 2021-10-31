@@ -18,21 +18,25 @@ AC_DEFUN([AC_NETATALK_PATH_PAM], [
 	)
 
 	AC_MSG_CHECKING([for PAM installation directory])
-	if test "x$PAMDIR" = "xNONE" -a "x$require_pam" != "xnever"; then
-		 dnl Test for PAM
-		 pam_paths="/ /usr/ /usr/local/"
-		 for path in $pam_paths; do
-		if test -d "${path}etc/pam.d"; then
-			PAMDIR="$path"
-			break
+	if test "$host_os" != "solaris"; then
+		if test "x$PAMDIR" = "xNONE" -a "x$require_pam" != "xnever"; then
+		  dnl Test for PAM
+		  pam_paths="/ /usr/ /usr/local/"
+		  for path in $pam_paths; do
+			if test -d "${path}etc/pam.d"; then
+				PAMDIR="$path"
+				break
+			fi
+		  done
 		fi
-		 done
-	fi
 
-	if test "x$PAMDIR" != "xNONE"; then
-		AC_MSG_RESULT([yes (path: ${PAMDIR}etc/pam.d)])
+		if test "x$PAMDIR" != "xNONE"; then
+			AC_MSG_RESULT([yes (path: ${PAMDIR}etc/pam.d)])
+		else
+			AC_MSG_RESULT([no])
+		fi
 	else
-		AC_MSG_RESULT([no])
+		AC_MSG_RESULT([/etc/pam.conf (solaris)])
 	fi
 		
 	pam_found="no"
@@ -63,14 +67,29 @@ AC_DEFUN([AC_NETATALK_PATH_PAM], [
 		LDFLAGS="$savedLDFLAGS"
 		LIBS="$savedLIBS"
 	fi
- 
-    netatalk_cv_install_pam=yes
-    if test x"$pam_found" = "xyes" -a "x$PAMDIR" = "xNONE"; then
-        AC_MSG_WARN([PAM support can be compiled, but the install location for the netatalk.pamd file could not be determined. Either install this file by hand or specify the install path.])
-        netatalk_cv_install_pam=no
-    fi
 
 	netatalk_cv_install_pam=yes
+	if test x"$pam_found" = "xyes" -a "x$PAMDIR" = "xNONE"; then
+		AC_MSG_WARN([PAM support can be compiled, but the install location for the netatalk.pamd file could not be determined. Either install this file by hand or specify the install path.])
+		netatalk_cv_install_pam=no
+    else
+        dnl Check for some system|common auth file
+        AC_MSG_CHECKING([for includable common PAM config])
+        pampath="${PAMDIR}etc/pam.d"
+        dnl macOS
+        if test -f "$pampath/passwd" ; then
+           PAM_DIRECTIVE=required
+           PAM_AUTH=pam_opendirectory.so
+           PAM_ACCOUNT=pam_opendirectory.so
+           PAM_PASSWORD=pam_permit.so
+           PAM_SESSION=pam_permit.so
+        fi  
+
+        if test "x$PAM_DIRECTIVE" != "xrequired" ; then
+            AC_MSG_RESULT([yes ($PAM_DIRECTIVE $PAM_AUTH)])
+        fi
+	fi
+
 	AC_MSG_CHECKING([whether to enable PAM support])
 	if test "x$pam_found" = "xno"; then
 		netatalk_cv_install_pam=no
@@ -103,4 +122,9 @@ AC_DEFUN([AC_NETATALK_PATH_PAM], [
 	AC_SUBST(PAMDIR)
 	AC_SUBST(PAM_CFLAGS)
 	AC_SUBST(PAM_LIBS)
+    AC_SUBST(PAM_DIRECTIVE)
+    AC_SUBST(PAM_AUTH)
+    AC_SUBST(PAM_ACCOUNT)
+    AC_SUBST(PAM_PASSWORD)
+    AC_SUBST(PAM_SESSION)
 ])
