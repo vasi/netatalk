@@ -400,27 +400,12 @@ case "$this_os" in
 	AC_SEARCH_LIBS(getxattr, [attr])
 
     if test "x$neta_cv_eas_sys_found" != "xyes" ; then
-       AC_CHECK_FUNCS([getxattr lgetxattr fgetxattr listxattr llistxattr],
+       AC_CHECK_FUNCS([getxattr fgetxattr listxattr],
                       [neta_cv_eas_sys_found=yes],
                       [neta_cv_eas_sys_not_found=yes])
-	   AC_CHECK_FUNCS([flistxattr removexattr lremovexattr fremovexattr],,
+	   AC_CHECK_FUNCS([flistxattr removexattr fremovexattr],,
                       [neta_cv_eas_sys_not_found=yes])
-	   AC_CHECK_FUNCS([setxattr lsetxattr fsetxattr],,
-                      [neta_cv_eas_sys_not_found=yes])
-    fi
-
-    if test "x$neta_cv_eas_sys_found" != "xyes" ; then
-	   AC_CHECK_FUNCS([getea fgetea lgetea listea flistea llistea],
-                      [neta_cv_eas_sys_found=yes],
-                      [neta_cv_eas_sys_not_found=yes])
-	   AC_CHECK_FUNCS([removeea fremoveea lremoveea setea fsetea lsetea],,
-                      [neta_cv_eas_sys_not_found=yes])
-    fi
-
-    if test "x$neta_cv_eas_sys_found" != "xyes" ; then
-	   AC_CHECK_FUNCS([attr_get attr_list attr_set attr_remove],,
-                      [neta_cv_eas_sys_not_found=yes])
-       AC_CHECK_FUNCS([attr_getf attr_listf attr_setf attr_removef],,
+	   AC_CHECK_FUNCS([setxattr fsetxattr],,
                       [neta_cv_eas_sys_not_found=yes])
     fi
   ;;
