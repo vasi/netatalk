@@ -154,7 +154,7 @@ static int login(void *obj, char *username, int ulen,  struct passwd **uam_pwd,
     PAM_password = ibuf; /* Set these things up for the conv function */
 
     err = AFPERR_NOTAUTH;
-    PAM_error = pam_start("netatalk", username, &PAM_conversation,
+    PAM_error = pam_start("chkpasswd", username, &PAM_conversation,
 			  &pamh);
     if (PAM_error != PAM_SUCCESS)
       goto login_err;
@@ -295,7 +295,7 @@ static int pam_changepw(void *obj , char *username,
     PAM_username = username;
     PAM_password = pw; 
 
-    PAM_error = pam_start("netatalk", username, &PAM_conversation,
+    PAM_error = pam_start("chkpasswd", username, &PAM_conversation,
 			  &lpamh);
     if (PAM_error != PAM_SUCCESS) 
       return AFPERR_PARAM;
@@ -395,7 +395,7 @@ static int pam_printer(char *start, char *stop, char *username, struct papfile *
     PAM_username = username;
     PAM_password = password;
 
-    PAM_error = pam_start("netatalk", username, &PAM_conversation,
+    PAM_error = pam_start("chkpasswd", username, &PAM_conversation,
                           &pamh);
     if (PAM_error != PAM_SUCCESS) {
 	LOG(log_info, logtype_uams, "Bad Login ClearTxtUAM: %s: %s", 

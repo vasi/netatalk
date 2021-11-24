@@ -1,6 +1,5 @@
 ## Makefile.am for config/
 
-SUBDIRS = pam
 SUFFIXES = .tmpl .
 
 TMPLFILES = afp.conf.tmpl
@@ -41,7 +40,6 @@ uninstall-local:
 		echo rm -f $(DESTDIR)$(pkgconfdir)/$$f; \
 		rm -f $(DESTDIR)$(pkgconfdir)/$$f; \
 	done
-	rm -f $(DESTDIR)$(pkgconfdir)/dbus-session.conf
 	rm -f $(DESTDIR)$(localstatedir)/netatalk/README
 	rm -f $(DESTDIR)$(localstatedir)/netatalk/CNID/README
 
