@@ -104,7 +104,7 @@ static void show_version( void )
 static void show_version_extended(void) {
   show_version();
 
-  printf( "    Zeroconf support:\t" );
+  printf("      Zeroconf support:\t" );
 #if defined (HAVE_MDNS)
   puts( "mDNSResponder" );
 #else
