@@ -21,7 +21,11 @@ This is a fork of the 3.1 branch of the Netatalk repo on SourceForge. It has bee
 
     git clone https://github.com/dgsga/netatalk.git
 
-5. cd to the repo then double-click install.command
+5. cd to the repo then double-click install.command **or** install using homebrew:
+
+    brew tap dgsga/netatalk
+    
+    brew install --HEAD netatalk
 
 6. Grant /usr/local/sbin/**afpd** and /usr/local/sbin/**cnid_metad** Full Disk Access in System Preferences (allows filesharing from APFS volumes)
 
