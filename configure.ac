@@ -134,7 +134,6 @@ AC_CONFIG_FILES([Makefile
 	bin/megatron/Makefile
 	bin/misc/Makefile
 	config/Makefile
-	config/pam/Makefile
 	contrib/Makefile
 	contrib/macusers/Makefile
 	contrib/macusers/macusers

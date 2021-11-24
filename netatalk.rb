@@ -24,10 +24,6 @@ class Netatalk < Formula
     system "make", "-j8"
     system "make" "html"
     system "make", "install"
-    if Hardware::CPU.arm?
-      system "mkdir", "-p", "/usr/local/etc/pam.d"
-      system "cp", "#{prefix}/etc/pam.d/netatalk", "/usr/local/etc/pam.d/netatalk"
-    end
   end
   
   plist_options :startup => true
