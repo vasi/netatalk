@@ -46,6 +46,7 @@ dnl Make sure atalk_libname is defined beforehand
 		done
 		if test "x$neta_cv_have_bdb" = "xno"; then
 			AC_MSG_RESULT([no])
+			AC_MSG_ERROR([Berkeley DB library required but not found, please install using Homebrew!])
 		fi
 	fi
 	CFLAGS_REMOVE_USR_INCLUDE(BDB_CFLAGS)
