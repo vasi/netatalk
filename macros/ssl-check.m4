@@ -38,13 +38,13 @@ AC_DEFUN([AC_NETATALK_PATH_SSL], [
 	saved_LIBS=$LIBS
 	saved_CFLAGS=$CFLAGS
 	neta_cv_have_openssl=no
-    
+
 dnl Make sure atalk_libname is defined beforehand
 	[[ -n "$atalk_libname" ]] || AC_MSG_ERROR([internal error, atalk_libname undefined])
-    
+
 	if test "$tryssl" = "yes"; then
-		AC_MSG_CHECKING([for SSL])        
-		for ssldir in "" $tryssldir $($BREW --prefix openssl@1.1) ; do
+		AC_MSG_CHECKING([for SSL])
+		for ssldir in "" $tryssldir /opt/homebrew/opt/openssl@1.1 /usr/local/opt/openssl@1.1 ; do
 			if test -f "$ssldir/include/openssl/cast.h" ; then
 				SSL_CFLAGS="$SSL_CFLAGS -I$ssldir/include -I$ssldir/include/openssl"
 				SSL_LIBS="$SSL_LIBS -L$ssldir/$atalk_libname -L$ssldir -lcrypto"

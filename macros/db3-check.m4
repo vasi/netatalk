@@ -22,13 +22,13 @@ AC_DEFUN([AC_NETATALK_PATH_BDB], [
 	saved_LIBS=$LIBS
 	saved_CFLAGS=$CFLAGS
 	neta_cv_have_bdb=no
-    
+
 dnl Make sure atalk_libname is defined beforehand
 	[[ -n "$atalk_libname" ]] || AC_MSG_ERROR([internal error, atalk_libname undefined])
-    
+
 	if test "$trybdb" = "yes"; then
 		AC_MSG_CHECKING([for BDB])
-		for bdbdir in "" $trybdbdir $($BREW --prefix berkeley-db) ; do
+		for bdbdir in "" $trybdbdir /opt/homebrew/opt/berkeley-db /usr/local/opt/berkeley-db ; do
 			if test -f "$bdbdir/include/db.h" ; then
 				BDB_CFLAGS="$BDB_CFLAGS -I$bdbdir/include"
 				BDB_LIBS="$BDB_LIBS -L$bdbdir/$atalk_libname -L$bdbdir -ldb"
