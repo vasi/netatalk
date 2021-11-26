@@ -2,9 +2,11 @@ dnl configure.ac for netatalk
 
 AC_INIT([netatalk],m4_normalize(m4_include([VERSION])))
 AC_CANONICAL_TARGET
-AM_INIT_AUTOMAKE([subdir-objects])
+
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIRS([macros])
+AC_CONFIG_AUX_DIR([build-aux])
+AM_INIT_AUTOMAKE([subdir-objects])
 AM_MAINTAINER_MODE([enable])
 AM_SILENT_RULES([yes])
 
@@ -12,29 +14,8 @@ NETATALK_VERSION=`cat $srcdir/VERSION`
 AC_SUBST(NETATALK_VERSION)
 
 dnl Checks for programs.
-AC_PROG_CC
-AC_PROG_PERL
 LT_INIT
-
-dnl Check for Homebrew
-AC_CHECK_PROG([BREW],brew, brew)
-
-AC_SYS_LARGEFILE([], AC_MSG_ERROR([AFP 3.x support requires Large File Support.]))
-
 AC_DEFINE(OPEN_NOFOLLOW_ERRNO, ELOOP, errno returned by open with O_NOFOLLOW)
-
-dnl Special checks
-ac_neta_haveatfuncs=yes
-AC_CHECK_FUNCS(openat renameat fstatat unlinkat, , ac_neta_haveatfuncs=no)
-if test x"$ac_neta_haveatfuncs" = x"yes" ; then
-   AC_DEFINE([_ATFILE_SOURCE], 1, AT file source)
-   AC_DEFINE([HAVE_ATFUNCS], 1, whether at funcs are available)
-fi
-
-dnl Search for necessary libraries
-AC_SEARCH_LIBS(gethostbyname, nsl)
-AC_SEARCH_LIBS(connect, socket)
-AC_CHECK_FUNCS(getifaddrs) dnl comes after gethostbyname and connect so it picks up the libs
 
 dnl 64bit platform check
 AC_NETATALK_64BIT_LIBS
