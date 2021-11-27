@@ -59,13 +59,15 @@ This UUID is advertised by Zeroconf in order to provide robust disambiguation of
 .PP
 It is also used by the MySQL CNID backend\&.
 .PP
+The afpd generates the UUID from random numbers and saves it into afp_voluuid\&.conf, only when setting "time machine = yes" option in afp\&.conf\&.
+.PP
 This file should not be thoughtlessly edited and be copied onto another server\&.
 .sp .5v
 .RE
 .PP
 .SH "EXAMPLES"
 .PP
-\fBExample.\ \&afp_voluuid.conf with three volumes\fR
+\fBExample.\ \&afp_voluuid\&.conf with three volumes\fR
 .sp
 .if n \{\
 .RS 4

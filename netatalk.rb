@@ -2,7 +2,7 @@ class Netatalk < Formula
   desc "Open source Apple Filing Protocol fileserver"
   homepage "https://netatalk.sourceforge.net"
   head "https://github.com/dgsga/netatalk.git", using: :git, branch: "main"
-  version "3.1.13"
+  version "3.2"
   license "BSD-3-Clause"
 
   depends_on "automake"
@@ -25,7 +25,7 @@ class Netatalk < Formula
     system "make" "html"
     system "make", "install"
   end
-  
+
   plist_options :startup => true
 
   def plist
