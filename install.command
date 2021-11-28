@@ -16,7 +16,7 @@ git pull
 ./bootstrap
 make -j "$cores"
 make html -j "$cores"
-make install -j "$cores"
+make install-strip -j "$cores"
 
 # Install startup daemon
 sudo cp com.netatalk.daemon.plist /Library/LaunchDaemons
