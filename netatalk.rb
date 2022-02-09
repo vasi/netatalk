@@ -22,7 +22,7 @@ class Netatalk < Formula
     system "autoreconf", "-fi"
     system "./configure", "--prefix=#{prefix}"
     system "make", "-j8"
-    system "make" "html"
+    system "make", "html"
     system "make", "install"
   end
 
